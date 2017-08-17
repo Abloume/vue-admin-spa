@@ -1,0 +1,54 @@
+jenkins地址：http://10.8.3.32:8080/jenkins/view/hcn/  账号：admin  密码：bsoft@123
+
+ git外网 122.224.131.235:9001 
+
+cas-admin测试环境访问地址：http://10.8.3.48:7010/cas-admin/
+
+
+'http://122.224.131.235:9092/cas-admin/' 外网接口地址
+
+用户名：hcn.admin 密码：qwerty
+
+
+用户名 15924139771
+密码 qwerty
+
+后台用户
+
+
+登录测试账号：
+Map<String, Object> map = new LinkedHashMap<String, Object>();
+        map.put("tenantId", "hcn.tongxiang");
+        map.put("loginName", "15924139771");
+        map.put("rid", "patient");
+        map.put("pwd", MD5.encode("qwerty"));
+        map.put("forAccessToken", true);
+        String json = JSONObject.toJSONString(map);
+        System.out.println(json);
+        RPCHttpClient.doPost(url+"logon/login", json);
+
+
+
+15924139771 qwerty
+
+svn UI存放位置   \04-开发管理\02-设计阶段\03-交互设计
+
+需求 rp文件存放位置   04-开发管理\01-需求阶段\HCN标准化需求  HCN-管理后台-WEB.rp
+
+
+查询 1
+新增 2
+修改 4
+删除 8
+审核 16
+
+规范
+1、api文件里面不需要修改，都由毛建飞来修改
+2、assets/main.css 不需要修改  都由毛建飞来修改 每个人在assets/css文件夹新增一个css文件，命名规则 姓名的首位之母.css
+3、assets中每个人新建一个存放图片的文件夹，命名规则 姓名的首位之母
+4、lib文件夹都由毛建飞来修改
+5、公用组件都放 components/common 里面  命名规则 姓名的首位之母开头
+6、页面组件 在components中新建文件夹命名规则 姓名的首位之母+page
+7、store 里面的index。js 家里内容要告诉毛建飞
+8
+

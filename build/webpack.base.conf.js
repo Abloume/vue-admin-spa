@@ -54,16 +54,19 @@ module.exports = {
       }
     }]
   },
+  externals: { //引入百度地图
+    'BMap': 'BMap',
+  },
   plugins: [
     new webpack.DllReferencePlugin({
       context: path.resolve(__dirname, '..'),
       manifest: require('./vendor-manifest.json')
     }),
-    //配置jquery全局引入 
-    // new webpack.ProvidePlugin({
-    //   $: "jquery",
-    //   jQuery: "jquery",
-    //   "window.jQuery": "jquery"
-    // }),
+    // 配置jquery全局引入 
+    new webpack.ProvidePlugin({
+      $: "jquery",
+      jQuery: "jquery",
+      "window.jQuery": "jquery"
+    }),
   ]
 }

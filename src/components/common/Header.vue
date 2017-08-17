@@ -1,10 +1,10 @@
 <template>
     <div class="header">
-        <div class="logo">后台管理系统</div>
+        <div class="logo">HCN3.0管理平台</div>
         <div class="user-info">
             <el-dropdown trigger="click" @command="handleCommand">
                 <span class="el-dropdown-link">
-                    <img class="user-logo" src="../../../static/img/img.jpg">
+                    <img class="user-logo" src="../../assets/img/img.jpg">
                     {{username}}
                 </span>
                 <el-dropdown-menu slot="dropdown">
@@ -18,7 +18,7 @@
     export default {
         data() {
             return {
-                name: 'linxin'
+                name: 'admin'
             }
         },
         computed:{

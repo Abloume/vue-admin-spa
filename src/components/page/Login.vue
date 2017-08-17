@@ -1,27 +1,26 @@
 <template>
     <div class="login-wrap">
-        <div class="ms-title">后台管理系统</div>
+        <div class="ms-title">HCN3.0管理平台</div>
         <div class="ms-login">
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="0px" class="demo-ruleForm">
                 <el-form-item prop="username">
                     <el-input v-model="ruleForm.username" placeholder="请输入用户名"></el-input>
                 </el-form-item>
                 <el-form-item prop="password">
-                    <el-input type="password" placeholder="请输入密码" v-model="ruleForm.password" @keyup.enter.native="submitForm('ruleForm')"></el-input>
+                    <el-input type="password" placeholder="请输入密码" v-model="ruleForm.password"></el-input>
                 </el-form-item>
                 <div class="login-btn">
-                    <el-button type="primary" @click="submitForm('ruleForm')" v-loading.fullscreen.lock="fullscreenLoading">登录</el-button>
-                    <div class="selectrole" id="selectrole">
+                    <el-button type="primary" @click="submitForm('ruleForm')" v-loading.lock="loading">登录</el-button>
+                  <!--   <div class="selectrole" id="selectrole">
                         <h3>请选择一个登录角色</h3>
                         <ul>
-                            <li :class="{'maindoc':item.roleId=='main_doctor','choicdoc':item.roleId=='chronic_doctor','healthdoc':item.roleId=='health_doctor'}" @click="getroleId(item)" v-for="(item,index) in role_list">
+                            <li :class="{'maindoc':item.roleId=='main_doctor','choicdoc':item.roleId=='chronic_doctor','healthdoc':item.roleId=='health_doctor'}" @click="getrid(item)" v-for="(item,index) in role_list">
                                 <p></p>
                                 <p>{{item.roleName}}</p>
                             </li>
                         </ul>
-                    </div>
+                    </div> -->
                 </div>
-                <!-- <p style="font-size:12px;line-height:30px;color:#999;">Tips : 用户名和密码随便填。</p> -->
             </el-form>
         </div>
     </div>
@@ -32,13 +31,12 @@ import {
 }
 from '../../api/api';
 import md5 from 'md5';
-// var md5 = require("md5");
 export default {
     data: function() {
         return {
             ruleForm: {
-                username: '',
-                password: ''
+                username: 'hcn.admin',
+                password: 'qwerty'
             },
             role_list: [],
             rules: {
@@ -53,100 +51,93 @@ export default {
                     trigger: 'blur'
                 }]
             },
-            fullscreenLoading: false
+            loading: false
         }
     },
     methods: {
+        // 点击登录按钮，如果只有一个角色（过滤掉APP中病人的角色），直接根据角色ID登录
         submitForm(formName) {
-                const that = this;
-                this.fullscreenLoading = true;
+                this.loading = true;
+                // let loginParams = {
+                //     tenantId:'hcn',
+                //     loginName: this.ruleForm.username,
+                //     pwd: md5(this.ruleForm.password),
+                //     forAccessToken: true
+                // }
+
+
+                //桐乡租户
+                // let loginParams = {
+                //    "tenantId":"hcn.tongxiang","loginName":"hcn.tongxiang.admin","pwd":"d8578edf8458ce06fbc5bb76a58c5ca4","forAccessToken":true
+                // }
+
                 let loginParams = {
-                    uid: this.ruleForm.username,
-                    pwd: md5(this.ruleForm.password),
-                    forAccessToken: true
+                   "tenantId":"hcn.tongxiang","loginName":"15924139771","pwd":md5("qwerty"),"forAccessToken":true
                 }
-                that.$refs[formName].validate((valid) => {
+               
+                this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        requestrolelist(loginParams).then(res => {
-                            that.role_list = res.data.body.filter(item =>  item.roleId != "patient");
-                            let temopt = {
-                                tenantId: 'coms.xiangtan',
-                                uid: loginParams.uid,
-                                roleId: "",
-                                pwd: loginParams.pwd,
-                                forAccessToken: true
-                            };
-                            if (that.role_list.length == 1) {
-                                temopt.roleId = that.role_list[0].roleId;
-                                requestLoginon(temopt).then((res) => {
-                                    that.$router.push('/readme');
-                                    sessionStorage.setItem('accessToken', res.data.properties.accessToken);
-                                    sessionStorage.setItem('roleId', res.data.body.roleId);
-                                    sessionStorage.setItem('userName', res.data.body.userName);
-                                    that.fullscreenLoading = false;
-                                })
-
-                            } else {
-                                that.fullscreenLoading = false;
-                                document.getElementById("selectrole").style.display = "block"
+                        requestLoginon(loginParams).then(res => {
+                            if (res.code == 200) {
+                                this.loading = false;
+                                  sessionStorage.setItem('accessToken', res.properties.accessToken);
+                                    sessionStorage.setItem('tenantId', res.body.tenantId);
+                                    sessionStorage.setItem('roleIds', "01,02,03,04,05,06");
+                                 this.$router.push('/readme');
+                            } else if(res.code == 501){ 
+                                this.loading = false;
+                                this.$message({
+                                    type: 'error',
+                                    message: "密码不正确"
+                                });
+                            } else if(res.code == 404){
+                                this.loading = false;
+                                this.$message({
+                                    type: 'error',
+                                    message: "用户ID不存在"
+                                });
+                            }else{
+                                 this.$message({
+                                    type: 'error',
+                                    message: res.msg
+                                });
                             }
-
-                            // let {
-                            //     msg, code, user
-                            // } = data;
-                            // if (code !== 200) {
-                            //     this.$notify({
-                            //         title: '错误',
-                            //         message: msg,
-                            //         type: 'error'
-                            //     });
-                            // } else {
-                            //     sessionStorage.setItem('user', JSON.stringify(user));
-                            //     this.$router.push({
-                            //         path: '/table'
-                            //     });
-                            // }
-                            // that.$router.push('/readme');
-                        });
-                        // localStorage.setItem('ms_username',that.ruleForm.username);
-
+                        })
                     } else {
-                        console.log('error submit!!');
-                        return false;
+                         this.loading = false;
+                         return false;
                     }
                 });
             },
-            getroleId(item) {
-                var that = this;
-                let loginParams = {
-                    uid: this.ruleForm.username,
+            // 点击角色列表中的某个角色
+            getrid(item) {
+                this.loading = true;
+                this.loginon(item.roleId)
+            },
+            // 获取角色ID登录
+            loginon(roleId) {
+                let temopt = {
+                    tenantId: 'coms.xiangtan',
+                    loginName: this.ruleForm.username,
+                    rid: roleId,
                     pwd: md5(this.ruleForm.password),
                     forAccessToken: true
-                }
-                this.fullscreenLoading = true;
-                requestrolelist(loginParams).then(res => {
+                };
+                requestLoginon(temopt).then((res) => {
+                    this.loading = false;
+                    if (res.code == 200) {
+                        sessionStorage.setItem('accessToken', res.properties.accessToken);
+                        sessionStorage.setItem('userName', res.body.userName);
+                        sessionStorage.setItem('rid', res.body.roleId);
+                        this.$router.push('/readme');
+                    } else {
+                        this.$message({
+                            type: 'error',
+                            message: res.msg
+                        });
+                    }
 
-                    that.role_list = res.data.body.filter(el => el.roleId != "patient");
-                    let temopt = {
-                        tenantId: 'coms.xiangtan',
-                        uid: loginParams.uid,
-                        roleId: "",
-                        pwd: loginParams.pwd,
-                        forAccessToken: true
-                    };
-
-                    temopt.roleId = item.roleId;
-                    requestLoginon(temopt).then((res) => {
-                        that.fullscreenLoading = false;
-                        that.$router.push('/readme');
-                        sessionStorage.setItem('accessToken', res.data.properties.accessToken);
-                        sessionStorage.setItem('userName', res.data.body.userName);
-                        sessionStorage.setItem('roleId', item.roleId);
-
-                    })
-
-
-                });
+                })
             }
     }
 }
@@ -235,17 +226,17 @@ export default {
 
 .selectrole ul li.maindoc p:nth-child(1) {
     height: 80px;
-    background: url(../../../static/img/maindoc.png) no-repeat center center;
+    background: url(../../assets/img/maindoc.png) no-repeat center center;
 }
 
 .selectrole ul li.choicdoc p:nth-child(1) {
     height: 80px;
-    background: url(../../../static/img/choicdoc.png) no-repeat center center;
+    background: url(../../assets/img/choicdoc.png) no-repeat center center;
 }
 
 .selectrole ul li.healthdoc p:nth-child(1) {
     height: 80px;
-    background: url(../../../static/img/healthdoc.png) no-repeat center center;
+    background: url(../../assets/img/healthdoc.png) no-repeat center center;
 }
 
 .selectrole ul li:hover {
