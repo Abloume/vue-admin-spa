@@ -14,7 +14,7 @@
             </el-row>
             <el-row class="search_con" :gutter="20">
                 <el-col :span="8">
-                    <el-input v-model="params.moduleName" placeholder="请输入模块名称或模块编码" @blur="getserchval"></el-input>
+                    <el-input v-model="params.keyWord" placeholder="请输入模块名称或模块编码" ></el-input>
                 </el-col>
                 <el-col :span="6">
                     <el-button type="primary" icon="search" @click="searchClick">搜索</el-button>
@@ -57,12 +57,12 @@
                     <el-input v-model="formdata.moduleName"></el-input>
                 </el-form-item>
                 <el-form-item label="链接类型" :label-width="formLabelWidth" prop="linkedType">
-                    <el-select v-model="formdata.linkedType" placeholder="请选择医院分类">
+                    <el-select v-model="formdata.linkedType" placeholder="请选择链接类型">
                         <el-option v-for="item in dictionary.linkedTypes" :key="item.key" :label="item.text" :value="item.key">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="链接URL" :label-width="formLabelWidth" prop="linkedUrl">
+                <el-form-item label="链接URL" :label-width="formLabelWidth" prop="linkedUrl" v-if="formdata.linkedType!='00'">
                     <el-input v-model="formdata.linkedUrl"></el-input>
                 </el-form-item>
                 <el-form-item label="排序" :label-width="formLabelWidth" prop="moduleOrder">
@@ -99,8 +99,8 @@ export default {
                 formLabelWidth: '120px',
                 tableData: [],
                 params: {
-                    "moduleCode": "",
-                    "moduleName": "",
+                    "keyWord": "",
+                    "productCode": "",
                     pageNo: 1,
                     pageSize: 10,
                 },
@@ -141,6 +141,10 @@ export default {
                         trigger: 'blur'
                     }],
                     linkedUrl: [{
+                        required: true,
+                        message: '请填输入连接地址',
+                        trigger: 'blur'
+                    },{
                         max: 100,
                         message: '最长100字符',
                         trigger: 'blur'
@@ -164,11 +168,6 @@ export default {
 
         },
         methods: {
-            //搜索框赋值
-            getserchval() {
-                    this.params.moduleCode = this.params.moduleName
-                },
-
                 handleEdit(index, row) {
                     this.dialogFormVisible = true;
                     if (row) {
@@ -267,6 +266,9 @@ export default {
                 getTableData() {
                     commonAjax("cas.productRelatedService", "moduleList", '[' + JSON.stringify(this.params) + ']').then(res => {
                         if (res.code == 200) {
+                            // res.body.data.sort(function(a, b) {
+                            //     return a.moduleOrder - b.moduleOrder
+                            // });
                             this.tableData = res.body.data;
                             this.total = res.body.total;
                         } else {
@@ -341,7 +343,7 @@ export default {
                 submitForm(formName) {
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
-                            commonAjax("cas.productRelatedService", "moduleaddedOrUpdated", '[' + JSON.stringify(this.formdata) + ','+JSON.stringify(this.selectaction)+']').then(res => {
+                            commonAjax("cas.productRelatedService", "moduleaddedOrUpdated", '[' + JSON.stringify(this.formdata) + ',' + JSON.stringify(this.selectaction) + ']').then(res => {
                                 if (res.code == 200) {
                                     this.dialogFormVisible = false;
                                     this.$message({

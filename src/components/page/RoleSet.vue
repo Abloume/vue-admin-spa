@@ -445,7 +445,8 @@ export default {
                         }
                     });
                     temarr = JSON.stringify(temarr);
-                    let temopt = `['${this.curroleId}',${temarr}]`;
+                    let temopt = `['${this.curprocode}','${this.curroleId}',${temarr}]`;
+                    console
                     commonAjax("cas.menuManageService", "saveRoleMenu", temopt).then(res => {
                         if (res.code == 200) {
                             this.dialogFormVisible = false;

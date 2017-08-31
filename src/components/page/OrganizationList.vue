@@ -35,7 +35,7 @@
                     <el-button size="small" @click="handleEdit(scope.$index, scope.row,'orgnavigation')">医院导航</el-button>
                     <el-button size="small" @click="handleEdit(scope.$index, scope.row,'reportDes')">报告说明</el-button>
                     <el-button size="small" @click="handleEdit(scope.$index, scope.row,'countInfo')">账号信息</el-button>
-                    <el-button size="small" @click="handleEdit(scope.$index, scope.row,'qrCode')">二维码</el-button>
+                    <!-- <el-button size="small" @click="handleEdit(scope.$index, scope.row,'qrCode')">二维码</el-button> -->
                     <el-button size="small" @click="handleEdit(scope.$index, scope.row,'serviceList')">服务列表</el-button>
                     <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                 </template>
@@ -163,6 +163,7 @@ export default {
                                             type: 'success',
                                             message: "删除成功"
                                         });
+                                        this.getTableData();
                                     } else {
                                         this.$message({
                                             type: 'error',

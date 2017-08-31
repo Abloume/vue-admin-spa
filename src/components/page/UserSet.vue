@@ -66,19 +66,25 @@
                     <el-input v-model="formdata.name"></el-input>
                 </el-form-item>
                 <el-form-item label="密码" prop="password" :label-width="formLabelWidth">
-                    <el-input type="password" v-model="formdata.password" auto-complete="off"></el-input>
+                    <el-row>
+                        <el-col :span="16">
+                            <el-input type="password" v-model="formdata.password" auto-complete="off" :disabled="ispwedit"></el-input>
+                        </el-col>
+                        <el-col :span="5" >
+                            <el-button type="primary" @click="pwedit" v-show="ispwedit">编辑密码</el-button>
+                        </el-col>
+                    </el-row>
                 </el-form-item>
+
                 <el-form-item label="确认密码" prop="checkPass" :label-width="formLabelWidth">
-                    <el-input type="password" v-model="formdata.checkPass" auto-complete="off"></el-input>
+                    <el-input type="password" v-model="formdata.checkPass" auto-complete="off" :disabled="ispwedit"></el-input>
                 </el-form-item>
                 <el-form-item label="邮箱" :label-width="formLabelWidth" prop="email">
                     <el-input v-model="formdata.email"></el-input>
                 </el-form-item>
                 <h2 class="account-title">
                     <span>角色列表</span>
-              
                       <el-button size="small" type="primary" @click="handleEdit2" icon="plus">添加角色</el-button>
-              
                 </h2>
                 <el-table :data="temlist" border style="width: 100%">
                     <el-table-column prop="tenantId" label="租户id">
@@ -285,17 +291,30 @@ export default {
                         max: 50,
                         message: '最多50个字符',
                         trigger: 'blur'
+                    },{
+                        required: true,
+                        message: '请输入用户名',
+                        trigger: 'blur'
                     }],
                     email: [{
                         max: 45,
                         message: '最多45个字符',
                         trigger: 'blur'
                     }],
-                    password: [{
+                    password: [
+                    {
+                        required: true,
+                        message: '请输入密码',
+                        trigger: 'blur'
+                    },{
                         validator: validatePass,
                         trigger: 'blur'
                     }],
                     checkPass: [{
+                        required: true,
+                        message: '请再次输入密码',
+                        trigger: 'blur'
+                    },{
                         validator: validatePass2,
                         trigger: 'blur'
                     }],
@@ -358,8 +377,8 @@ export default {
                 // isdisabled: false,
                 orgobject: {},
                 teamobject: {},
-                temlist: [],
-                curmd5password: "",
+                temlist: [],//角色列表临时存储的数组
+                ispwedit:false,//编辑用户的时候显示是否修改密码
             }
         },
         computed: {
@@ -373,20 +392,21 @@ export default {
                     this.dialogFormVisible = true;
                     if (row) {
                         this.dialogtitle = "编辑用户";
+                        this.ispwedit=true;
                         this.formdata = {
                             "email": row.email,
                             "id": row.id,
                             "loginName": row.loginName,
                             "name": row.name,
-                            "password": "111111",
-                            checkPass: "111111",
+                            "password": "",
+                            checkPass: "",
                             "userRoleTokens": row.userRoleTokens,
                         }
 
                         commonAjax("cas.userManageService", "userDetail", `['${row.id}']`).then(res => {
                             if (res.code == 200) {
                                 this.temlist = res.body[1]
-                                this.curmd5password = res.body[0].password
+
                             } else {
                                 this.$message({
                                     type: 'error',
@@ -398,6 +418,7 @@ export default {
 
                     } else {
                         this.dialogtitle = "新增用户";
+                         this.ispwedit=false;
                         this.formdata = {
                             "email": "",
                             "id": undefined,
@@ -407,7 +428,7 @@ export default {
                             "userRoleTokens": []
                         }
                         this.temlist = [];
-                        this.curmd5password = "";
+
 
                     }
 
@@ -574,45 +595,54 @@ export default {
                 //保存按钮提交数据
                 submitForm(formName) {
                     this.$refs[formName].validate((valid) => {
-                        if (this.temlist.length == 0) {
-                            this.$message({
+                        if (this.formdata.id) { //编辑的时候
+                            if (this.formdata.password != '') { //编辑的时候输入密码
+                                if (valid) {
+                                    this.formdata.password = md5(this.formdata.password);
+                                }
+                            } else { //编辑的时候不输入密码
+                                this.formdata.password = undefined;
+                            }
+                        } else { //新增
+                            if (valid) {
+                                this.formdata.password = md5(this.formdata.password);
+                            }
+                        }
+                        this.submitajax()
+                    });
+                },
+                //点击可编辑编辑密码
+                pwedit(){
+                    this.ispwedit=false;
+                },
+                // 点击请求的方法
+                submitajax() {
+                    if(this.temlist.length==0){
+                         this.$message({
                                 type: 'info',
                                 message: "请添加角色"
                             });
-                        }else{
-                             if (valid) {
-                                if (this.formdata.id) {
-                                    this.formdata.password = this.curmd5password
-                                } else {
-                                    this.formdata.password = md5(this.formdata.password);
-                                    // this.formdata.checkPass = md5(this.formdata.checkPass);
-                                }
-                                commonAjax("cas.userManageService", "userSaved", '[' + JSON.stringify(this.formdata) + ',' + JSON.stringify(this.temlist) + ']').then(res => {
-                                    if (res.code == 200) {
-                                        this.dialogFormVisible = false;
-                                        this.$message({
-                                            type: 'success',
-                                            message: "保存成功"
-                                        });
-                                        this.getTableData();
-                                    } else {
-                                        this.$message({
-                                            type: 'error',
-                                            message: res.msg
-                                        });
-                                    }
-                                });
-
-
-                            } else {
-                                console.log('error submit!!');
-                                return false;
-                            }
+                         this.formdata.password=this.formdata.checkPass;
+                         return
+                    }
+                    commonAjax("cas.userManageService", "userSaved", '[' + JSON.stringify(this.formdata) + ',' + JSON.stringify(this.temlist) + ']').then(res => {
+                        if (res.code == 200) {
+                            this.dialogFormVisible = false;
+                            this.$message({
+                                type: 'success',
+                                message: "保存成功"
+                            });
+                            this.getTableData();
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: res.msg
+                            });
                         }
                     });
                 },
                 //保存新增的角色
-                submitForm2(formName) {
+            submitForm2(formName) {
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
 

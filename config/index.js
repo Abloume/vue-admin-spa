@@ -30,11 +30,11 @@ module.exports = {
 		proxyTable: {
 			'/proxyapi': {
 				// target: 'http://10.0.26.61:8075/cas-admin/', //朱雄敏电脑IP
-				// target: 'http://10.8.3.48:7010/cas-admin/', //链接51调试内网
+				target: 'http://10.8.3.48:7010/cas-admin/', //链接51调试内网
 				// target: 'http://122.224.131.235:9096/cas-admin', //链接51外网
 				// target: "http://10.0.26.30:8080/", //杨毅的电脑
 				// target: 'http://10.0.26.45:8090/', //徐洛克
-				target: 'http://10.0.26.156:8080/admin', //徐念冲
+				// target: 'http://10.0.26.156:8080/admin', //徐念冲
 				changeOrigin: true,
 				pathRewrite: {
 					'/proxyapi': ''

@@ -68,7 +68,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="角色编码" :label-width="formLabelWidth" prop="productCode">
-                    <el-select v-model="formdata.roleId" placeholder="请选择">
+                    <el-select v-model="formdata.roleId" placeholder="请选择" disabled>
                         <el-option v-for="item in rolelist" :key="item.roleId" :label="item.name" :value="item.name">
                         </el-option>
                     </el-select>

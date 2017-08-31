@@ -4,7 +4,7 @@
             <el-row class="navbreadcrumb cbafter">
                 <el-col :span="12" class="zuhu">
                     <el-breadcrumb separator="/">
-                        <el-breadcrumb-item>租户管理</el-breadcrumb-item>
+                        <el-breadcrumb-item>机构管理</el-breadcrumb-item>
                         <el-breadcrumb-item>家医团队</el-breadcrumb-item>
                     </el-breadcrumb>
                 </el-col>
@@ -26,13 +26,13 @@
                 </div>
                 <div class="right-con">
                     <el-table :data="tableData" border style="width: 100%">
-                        <el-table-column prop="doctorName" label="医生姓名">
+                        <el-table-column prop="teamName" label="团队名称">
                         </el-table-column>
-                        <el-table-column prop="phoneNo" label="电话">
+                        <el-table-column prop="teamLeaderName" label="团队长">
                         </el-table-column>
-                        <el-table-column prop="doctorLevelText" label="职称">
+                        <el-table-column prop="telNo" label="联系电话">
                         </el-table-column>
-                        <el-table-column prop="deptName" label="所属科室">
+                        <el-table-column prop="info" label="简介">
                         </el-table-column>
                         <el-table-column label="操作">
                             <template scope="scope">
@@ -42,7 +42,7 @@
                         </el-table-column>
                     </el-table>
                     <div class="pagination">
-                        <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="doclisttotal" :page-sizes="[10,20,50]" @size-change="handleSizeChange" @current-change="handleCurrentChange" :page-size="param.pageSize">
+                        <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="teamclisttotal" :page-sizes="[10,20,50]" @size-change="handleSizeChange" @current-change="handleCurrentChange" :page-size="param.pageSize">
                         </el-pagination>
                     </div>
                 </div>
@@ -50,54 +50,107 @@
         </el-row>
         <div id="rMenu">
             <ul>
-                <li id="m_add" @click="addTreeNode">添加医生</li>
+                <li id="m_add" @click="addTreeNode">添加团队</li>
             </ul>
         </div>
-        <!-- 编辑医生 -->
-        <el-dialog :title="dialogtitle" v-model="editDocdialogFormVisible" @close="resetForm('editDocinfoForm')">
-            <el-form :model="editDocformdata" :rules="editDocrules" ref="editDocinfoForm" auto-complete="off">
-                <el-row :gutter="20">
-                    <el-col :span="18">
-                        <el-form-item label="医生姓名" :label-width="formLabelWidth" prop="name">
-                            <el-input v-model="editDocformdata.doctorName" disabled="true"></el-input>
+        <!-- 编辑或者新增团队 -->
+        <el-dialog :title="dialogtitle" v-model="editTeamdialogFormVisible" @close="resetForm('editTeaminfoForm')">
+            <el-tabs type="card" :active-name="activeName" @tab-click="tabHandleClick">
+                <el-tab-pane label="基本信息" name="baseInfo" class="eltabpane">
+                    <el-form :model="editTeamformdata" :rules="editTeamrules" ref="editTeaminfoForm" auto-complete="off">
+                        <el-form-item label="团队名称" :label-width="formLabelWidth" prop="teamName">
+                            <el-input v-model="editTeamformdata.teamName"></el-input>
                         </el-form-item>
-                    </el-col>
-                    <el-col :span="6" v-show="editDocformdata.id!=0">
-                        <el-button type="primary" @click="lookdoc(editDocformdata.id)">查看医生信息</el-button>
-                    </el-col>
-                    <el-col :span="6" v-show="editDocformdata.id==0">
-                        <el-button type="info" @click="selectdoc">选择医生</el-button>
-                    </el-col>
-                </el-row>
-                <el-form-item label="员工代码" :label-width="formLabelWidth" prop="localDoctorId">
-                    <el-input v-model="editDocformdata.localDoctorId" :disabled="infoisdisabled"></el-input>
-                </el-form-item>
-                <el-form-item label="机构名称" :label-width="formLabelWidth" prop="orgName" v-show="editDocformdata.id!=0">
-                    <el-input v-model="editDocformdata.orgName" :disabled="infoisdisabled"></el-input>
-                </el-form-item>
-                <el-form-item label="科室名称" :label-width="formLabelWidth" prop="deptName" v-show="editDocformdata.id!=0">
-                    <el-input v-model="editDocformdata.deptName" :disabled="infoisdisabled"></el-input>
-                </el-form-item>
-                <el-form-item label="专家标识（医生）" :label-width="formLabelWidth" prop="expertFlag">
-                    <el-select placeholder="请选择" v-model="editDocformdata.expertFlag">
-                        <el-option label="是" value="1"></el-option>
-                        <el-option label="否" value="0"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="专家费用（医生）" :label-width="formLabelWidth" prop="expertFee">
-                    <el-input v-model="editDocformdata.expertFee"></el-input>
-                </el-form-item>
-                <el-form-item label="主职业标识" :label-width="formLabelWidth" prop="mainFlag">
-                    <el-select placeholder="请选择" v-model="editDocformdata.mainFlag">
-                        <el-option label="是" value="1"></el-option>
-                        <el-option label="否" value="0"></el-option>
-                    </el-select>
-                </el-form-item>
-                <div class="center-foot">
-                    <el-button @click="closeeditDocinfo('editDocinfoForm')">取 消</el-button>
-                    <el-button type="primary" @click="editDocsubmitForm('editDocinfoForm')">确 定</el-button>
-                </div>
-            </el-form>
+                        <el-form-item label="联系电话" :label-width="formLabelWidth" prop="telNo">
+                            <el-input v-model="editTeamformdata.telNo"></el-input>
+                        </el-form-item>
+                        <el-form-item label="所属机构" :label-width="formLabelWidth" prop="curbeloneorg">
+                            <el-input v-model="curbeloneorg" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="简介" :label-width="formLabelWidth" prop="info">
+                            <el-input v-model="editTeamformdata.info" type="textarea" :autosize="{ minRows: 4, maxRows: 8}"></el-input>
+                        </el-form-item>
+                        <div class="center-foot">
+                            <el-button @click="closeeditTeaminfo('editTeaminfoForm')">取 消</el-button>
+                            <el-button type="primary" @click="editTeamsubmitForm('editTeaminfoForm')">确 定</el-button>
+                        </div>
+                    </el-form>
+                </el-tab-pane>
+                <el-tab-pane label="团队成员管理" name="teamMember" class="eltabpane" v-if="ishowtab">
+                    <el-row class="addbtn">
+                        <el-col :span="24" class="addorg">
+                            <el-button type="primary" icon="plus" @click="teamMemberEdit">新建成员</el-button>
+                        </el-col>
+                    </el-row>
+                    <el-table :data="teamDoclist" border style="width: 100%">
+                        <el-table-column prop="memberName" label="姓名">
+                        </el-table-column>
+                        <el-table-column prop="memberRoleText" label="角色">
+                        </el-table-column>
+                        <el-table-column prop="memberTypeText" label="家医类型">
+                        </el-table-column>
+                        <el-table-column label="操作">
+                            <template scope="scope">
+                                <el-button size="small" @click="setLeader(scope.$index, scope.row)" v-show="scope.row.memberRole==1">设为团队长</el-button>
+                                <el-button size="small" type="danger" @click="teamMemberDelete(scope.$index, scope.row)" v-show="scope.row.memberRole==1">删除</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-tab-pane>
+                <el-tab-pane label="服务包" name="servicePkg" class="eltabpane" v-if="ishowtab">
+                    <!-- <el-row class="addbtn">
+                        <el-col :span="24" class="addorg">
+                            <el-button type="primary" icon="plus" @click="serhandleEdit">新建服务包</el-button>
+                        </el-col>
+                    </el-row> -->
+                    <el-row class="addbtn" :gutter="20">
+                        <el-col :span="4">
+                            <el-input v-model="spPackParam.spName" placeholder="请输入服务名称"></el-input>
+                        </el-col>
+                        <el-col :span="4">
+                            <el-input v-model="spPackParam.packCode" placeholder="请输入编号"></el-input>
+                        </el-col>
+                        <el-col :span="4">
+                            <el-select v-model="spPackParam.status" placeholder="启用情况">
+                                <el-option label="全部" value=""></el-option>
+                                <el-option label="启用" value="1"></el-option>
+                                <el-option label="禁用" value="0"></el-option>
+                            </el-select>
+                        </el-col>
+                        <el-col :span="4">
+                            <el-button type="primary" icon="search" @click="sersearchClick">搜索</el-button>
+                        </el-col>
+                        <el-col :span="6" class="addorg">
+                            <el-button type="primary" icon="plus" @click="spPackEdit">新建服务包</el-button>
+                        </el-col>
+                    </el-row>
+                    <el-table :data="spPacklist" border style="width: 100%">
+                        <el-table-column prop="spPackName" label="名称">
+                        </el-table-column>
+                        <el-table-column prop="price" label="价格" width="200">
+                        </el-table-column>
+                        <el-table-column prop="validPeriod" label="有效期" width="200">
+                        </el-table-column>
+                        <el-table-column prop="status" label="启用状态" width="200">
+                            <template scope="scope">
+                                <p v-show="scope.row.status==1">是</p>
+                                <p v-show="scope.row.status==0">否</p>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="操作">
+                            <template scope="scope">
+                                <el-button size="small" @click="spPackEdit(scope.$index, scope.row)">编辑</el-button>
+                                <el-button size="small" type="danger" @click="spPackhandleDelete(scope.$index, scope.row)" v-show="scope.row.status==1">禁用</el-button>
+                                <el-button size="small" type="primary" @click="spPackhandleDelete(scope.$index, scope.row)" v-show="scope.row.status==0">启用</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <div class="pagination">
+                        <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="spPacktotal" :page-sizes="[10,20,50]" @size-change="spPackhandleSizeChange" @current-change="spPackhandleCurrentChange" :page-size="spPackParam.pageSize">
+                        </el-pagination>
+                    </div>
+                </el-tab-pane>
+            </el-tabs>
         </el-dialog>
         <!-- 选择医生 -->
         <el-dialog title="选择医生" v-model="selectdialogFormVisible">
@@ -106,23 +159,16 @@
                     <el-input placeholder="请输入医生姓名" v-model="selectparam.doctorName">
                     </el-input>
                 </el-col>
-                <el-col :span="8">
-                    <el-input placeholder="身份证号" v-model="selectparam.idCard">
-                    </el-input>
-                </el-col>
                 <el-col :span="4" class="addbtn">
                     <el-button type="primary" icon="search" @click="selectsearchClick">搜索</el-button>
                 </el-col>
-                <!-- <el-col :span="4" class="addbtn">
-                            <el-button type="info" icon="plus" @click="lookdoc(0)">添加医生</el-button>
-                        </el-col> -->
             </el-row>
             <el-table :data="selectdoctableData" border style="width: 100%">
                 <el-table-column prop="doctorName" label="医生姓名">
                 </el-table-column>
-                <el-table-column prop="idCard" label="身份证">
+                <el-table-column prop="deptName" label="科室名称">
                 </el-table-column>
-                <el-table-column prop="sexText" label="性别">
+                <el-table-column prop="doctorLevelText" label="职称">
                 </el-table-column>
                 <el-table-column label="操作">
                     <template scope="scope">
@@ -131,116 +177,123 @@
                 </el-table-column>
             </el-table>
             <div class="pagination">
-                <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="selectdoclisttotal" :page-sizes="[10,20,50]" @size-change="selectSizeChange" @current-change="selectCurrentChange" :page-size="selectparam.pageSize">
+                <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="selectteamclisttotal" :page-sizes="[10,20,50]" @size-change="selectSizeChange" @current-change="selectCurrentChange" :page-size="selectparam.pageSize">
                 </el-pagination>
             </div>
         </el-dialog>
-        <!-- 医生详细信息 -->
-        <el-dialog title="医生详细信息" v-model="docdetaildialogFormVisible" @close="resetForm('editDocdetailinfoForm')">
-            <el-form :model="editdetailDocformdata" :rules="editdetailDocinforules" ref="editDocdetailinfoForm" auto-complete="off">
-                <el-row :gutter="20">
-                    <el-col :span="4">
-                        <el-upload class="avatar-uploader" :action="imguploadurl" :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :headers="headers" :data="imguploaddata">
-                            <img v-if="imageUrl" :src="imageUrl" class="avatar">
-                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                        </el-upload>
-                    </el-col>
-                    <el-col :span="20">
-                        <el-form-item label="医生姓名" :label-width="formLabelWidth" prop="doctorName">
-                            <el-input v-model="editdetailDocformdata.doctorName"></el-input>
-                        </el-form-item>
-                        <el-form-item label="身份证号" :label-width="formLabelWidth" prop="idCard">
-                            <el-input v-model="editdetailDocformdata.idCard"></el-input>
-                        </el-form-item>
-                        <el-form-item label="性别" :label-width="formLabelWidth" prop="sex">
-                            <el-select v-model="editdetailDocformdata.sex" placeholder="请选择">
-                                <el-option v-for="item in dictionary.sex" :key="item.key" :label="item.text" :value="item.key">
-                                </el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item label="出生日期" :label-width="formLabelWidth" prop="dob">
-                            <el-date-picker type="date" placeholder="选择日期" v-model="editdetailDocformdata.dob" style="width: 100%;" :picker-options="pickerOptions0" @change="dateformat2"></el-date-picker>
-                        </el-form-item>
-                        <el-form-item label="国籍" :label-width="formLabelWidth" prop="nationality">
-                            <el-select v-model="editdetailDocformdata.nationality" placeholder="请选择">
-                                <el-option v-for="item in dictionary.nationality" :key="item.key" :label="item.text" :value="item.key">
-                                </el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item label="民族" :label-width="formLabelWidth" prop="nation">
-                            <el-select v-model="editdetailDocformdata.nation" placeholder="请选择">
-                                <el-option v-for="item in dictionary.nation" :key="item.key" :label="item.text" :value="item.key">
-                                </el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item label="电话号码" :label-width="formLabelWidth" prop="phoneNo">
-                            <el-input v-model="editdetailDocformdata.phoneNo"></el-input>
-                        </el-form-item>
-                        <el-form-item label="Email" :label-width="formLabelWidth" prop="email">
-                            <el-input v-model="editdetailDocformdata.email"></el-input>
-                        </el-form-item>
-                        <el-form-item label="学历" :label-width="formLabelWidth" prop="academic">
-                            <el-select v-model="editdetailDocformdata.academic" placeholder="请选择">
-                                <el-option v-for="item in dictionary.education" :key="item.key" :label="item.text" :value="item.key">
-                                </el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item label="医师级别" :label-width="formLabelWidth" prop="doctorLevel">
-                            <el-select v-model="editdetailDocformdata.doctorLevel" placeholder="请选择">
-                                <el-option v-for="item in dictionary.doctorTitle" :key="item.key" :label="item.text" :value="item.key">
-                                </el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item label="执业类别" :label-width="formLabelWidth" prop="certifiy">
-                            <el-select v-model="editdetailDocformdata.certifiy" placeholder="请选择">
-                                <el-option v-for="item in dictionary.practiceCategory" :key="item.key" :label="item.text" :value="item.key">
-                                </el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-row :gutter="20">
-                            <el-col :span="18">
-                                <el-form-item label="执业证书编号" :label-width="formLabelWidth" prop="certifiyNo">
-                                    <el-input v-model="editdetailDocformdata.certifiyNo"></el-input>
-                                </el-form-item>
-                            </el-col>
-                            <el-col :span="6">
-                                <el-button>查看证书</el-button>
-                            </el-col>
-                        </el-row>
-                        <el-form-item label="执业地点" :label-width="formLabelWidth" prop="certifiyAddress">
-                            <el-input v-model="editdetailDocformdata.certifiyAddress"></el-input>
-                        </el-form-item>
-                        <el-form-item label="执业范围" :label-width="formLabelWidth" prop="certifiyScope">
-                            <el-input v-model="editdetailDocformdata.certifiyScope"></el-input>
-                        </el-form-item>
-                        <el-form-item label="发证机构" :label-width="formLabelWidth" prop="checkOrg">
-                            <el-input v-model="editdetailDocformdata.checkOrg"></el-input>
-                        </el-form-item>
-                        <el-form-item label="医生介绍" :label-width="formLabelWidth" prop="introduce">
-                            <el-input v-model="editdetailDocformdata.introduce" type="textarea" :autosize="{ minRows: 4, maxRows: 8}"></el-input>
-                        </el-form-item>
-                        <el-form-item label="医生专长" :label-width="formLabelWidth" prop="speciality">
-                            <el-input v-model="editdetailDocformdata.speciality"></el-input>
-                        </el-form-item>
-                        <el-form-item label="擅长疾病名称" :label-width="formLabelWidth" prop="diseaseName">
-                            <el-input v-model="editdetailDocformdata.diseaseName" placeholder="多个擅长疾病，用英文逗号隔开"></el-input>
-                        </el-form-item>
-                        <!--  <el-form-item label="综合评价" :label-width="formLabelWidth" prop="summary">
-                            <el-input v-model="editdetailDocformdata.summary" type="textarea" :autosize="{ minRows: 4, maxRows: 8}" ></el-input>
-                        </el-form-item> -->
-                    </el-col>
-                </el-row>
+        <!-- 设置团队长 -->
+        <el-dialog title="变更原因" v-model="setleaderdialogFormVisible" @close="resetForm('setleaderinfoForm')">
+            <el-form :model="setleaderformdata" :rules="setleaderrules" ref="setleaderinfoForm" auto-complete="off">
+                <el-input v-model="setleaderformdata.reason" type="textarea" :autosize="{ minRows: 4, maxRows: 8}" placeholder="请输入变更原因" class="mb20"></el-input>
                 <div class="center-foot">
-                    <el-button @click="closeeditdetailDocinfo('editDocdetailinfoForm')">取 消</el-button>
-                    <el-button type="primary" @click="editdetailDocsubmitForm('editDocdetailinfoForm')">确 定</el-button>
+                    <el-button @click="closesetleader('setleaderinfoForm')">取 消</el-button>
+                    <el-button type="primary" @click="setleadersubmitForm('setleaderinfoForm')">确 定</el-button>
                 </div>
             </el-form>
         </el-dialog>
+        <!-- 新增或者编辑服务包 -->
+        <el-dialog :title="dialogtitle2" v-model="editserpackldialogFormVisible" @close="resetForm('editserpackinfoForm')">
+            <el-form :model="editserpackformdata" :rules="editserpackrules" ref="editserpackinfoForm" auto-complete="off">
+                <el-form-item label="基础服务包" :label-width="formLabelWidth" prop="spPack.packId" v-show="dialogtitle2=='新增服务包'">
+                    <el-select v-model="editserpackformdata.spPack.packId" placeholder="请选择基础服务包" filterable @change="baseserchange">
+                        <el-option v-for="item in baseserlist" :key="item.packId" :label="item.packName" :value="item.packId">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="基础服务包" :label-width="formLabelWidth" prop="spPack.packId" v-show="dialogtitle2=='编辑服务包'">
+                    <el-input v-model="editserpackformdata.spPack.packId" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="团队服务包" :label-width="formLabelWidth" prop="spPack.spPackName">
+                    <el-input v-model="editserpackformdata.spPack.spPackName"></el-input>
+                </el-form-item>
+                <el-form-item label="编号" :label-width="formLabelWidth" prop="spPack.packCode">
+                    <el-input v-model="editserpackformdata.spPack.packCode" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="实际价格(元)" :label-width="formLabelWidth" prop="spPack.price">
+                    <el-input v-model="editserpackformdata.spPack.price"></el-input>
+                </el-form-item>
+                <el-form-item label="有效期(天)" :label-width="formLabelWidth" prop="spPack.validPeriod">
+                    <el-input v-model="editserpackformdata.spPack.validPeriod" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="适合人群" :label-width="formLabelWidth" prop="spPack.packDesc">
+                    <el-input v-model="editserpackformdata.spPack.packDesc" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="启用时间" :label-width="formLabelWidth" prop="spPack.startDt">
+                    <el-input v-model="editserpackformdata.spPack.startDt" disabled></el-input>
+                </el-form-item>
+                <h2 class="account-title" v-show="dialogtitle2=='编辑服务包'">
+                    <span>服务项</span>
+                      <el-button size="small" type="primary" @click="assciationhandleEdit" icon="plus">添加服务项</el-button>
+                </h2>
+                <el-table :data="editserpackformdata.assciationVos" border style="width: 100%" v-show="dialogtitle2=='编辑服务包'" class="mb20">
+                    <el-table-column prop="serviceName" label="名称">
+                    </el-table-column>
+                    <el-table-column prop="validPeriod" label="有效期(天)">
+                    </el-table-column>
+                    <el-table-column prop="frequency" label="年服务次数">
+                    </el-table-column>
+                    <el-table-column prop="appointmentFlag" label="是否可预约">
+                        <template scope="scope">
+                            <p v-if="scope.row.appointmentFlag==='1'">是</p>
+                            <p v-if="scope.row.appointmentFlag==='0'">否</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作">
+                        <template scope="scope">
+                            <el-button size="small" type="danger" @click="assciationVoshandleDelete(scope.$index, scope.row)">删除</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <div class="center-foot">
+                    <el-button @click="closeeditserpack('editserpackinfoForm')">取 消</el-button>
+                    <el-button type="primary" @click="editserpacksubmitForm('editserpackinfoForm')">确 定</el-button>
+                </div>
+            </el-form>
+        </el-dialog>
+        <!-- 可选择的服务项列表 -->
+        <el-dialog title="选择服务项" v-model="assciationdialog">
+            <el-checkbox :label="item.checked" :name="index" v-for="(item,index) in assciationlist" v-model="item.checked">{{item.serviceName}}</el-checkbox>
+             <div class="center-foot mt20">
+                    <el-button @click="closeedassciationdialog">取 消</el-button>
+                    <el-button type="primary" @click="selectassciation">确 定</el-button>
+                </div>
+        </el-dialog>
+        <!-- 选择基础服务包 -->
+        <!--   <el-dialog title="选择医生" v-model="baseserdialogFormVisible">
+            <el-row class="search_con" :gutter="20">
+                <el-col :span="8">
+                    <el-input placeholder="请输入医生姓名" v-model="baseserparam.packName">
+                    </el-input>
+                </el-col>
+                <el-col :span="4" class="addbtn">
+                    <el-button type="primary" icon="search" @click="selectsearchClick">搜索</el-button>
+                </el-col>
+            </el-row>
+            <el-table :data="baseserdata" border style="width: 100%">
+                <el-table-column prop="packId" label="编号">
+                </el-table-column>
+                <el-table-column prop="packName" label="名称">
+                </el-table-column>
+                <el-table-column prop="price" label="价格">
+                </el-table-column>
+                <el-table-column prop="validPeriod" label="有效期">
+                </el-table-column>
+                <el-table-column label="操作">
+                    <template scope="scope">
+                        <el-button size="small" @click="selectbaseser(scope.$index, scope.row)">选择</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination">
+                <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="baseserlisttotal" :page-sizes="[10,20,50]" @size-change="baseserSizeChange" @current-change="baseserCurrentChange" :page-size="baseserparam.pageSize">
+                </el-pagination>
+            </div>
+        </el-dialog> -->
     </div>
 </template>
 <script>
 import {
-    commonAjax, commonurl, imguploadurl, imgview
+    commonAjax, commonurl
 }
 from '../../api/api';
 import 'assets/lib/zTree/img/metro.gif';
@@ -253,169 +306,124 @@ import 'assets/lib/zTree/js/jquery.ztree.exedit.min.js';
 
 export default {
     data() {
-            // var checkidCard = (rule, value, callback) => {
-            //     // let idCardreg = /( ^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$)|(^[1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{2}$)/;
-            //     let idCardreg18 = /^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/;
-            //     let idCardreg15 = /^[1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{2}$/;
-            //     if (value.length == 18) {
-            //         if (idCardreg18.test(value) === false) {
-            //             return callback(new Error('身份证填写错误'));
-            //         } else {
-            //             callback()
-            //         }
-            //     } else if (value.length == 15) {
-            //         if (idCardreg15.test(value) === false) {
-            //             return callback(new Error('身份证填写错误'));
-            //         } else {
-            //             callback()
-            //         }
-            //     } else {
-            //         return callback(new Error('身份证填写错误'));
-            //     }
-            // }
-            // var checkidCard = (rule, value, callback) => {
-            //     let reg = /^(\d{6})(19|20)(\d{2})(1[0-2]|0[1-9])(0[1-9]|[1-2][0-9]|3[0-1])(\d{3})(\d|X|x)?$/;
-            //     if(reg.test(value)===false){
-            //          return callback(new Error('身份证填写错误'));
-            //     }else{
-            //        callback(); 
-            //     }
-               
-            // }
             return {
                 //通用
                 formLabelWidth: '160px',
                 dialogtitle: "",
-                //字典查询数据
-                dictionary: {
-                    sex: [], //性别,字典base_sex
-                    nation: [], //民族base_nation
-                    education: [], //学历base_education
-                    nationality: [], //国籍base_nationality
-                    doctorTitle: [], //医生级别base_doctorTitle
-                    practiceCategory: [], //执业类别base_practiceCategory
-                },
-                //医生列表开始
+                //团队列表开始
                 param: {
-                    doctorName: "",
-                    localDoctorId: "",
                     pageNo: 1,
                     pageSize: 10,
                     orgId: "",
-                    deptId: "",
                 },
-                curorgName: "",
-                doclisttotal: 1,
-                infoisdisabled: false, //医生姓名、员工代码、机构名称、科室名称：是否无法修改
+                teamclisttotal: 1,
                 tableData: [],
-                // 医生列表结束--------------------------------------------------
+                // 团队列表结束--------------------------------------------------
                 //医生添加编辑与机构关系开始----------------------------
-                editDocdialogFormVisible: false,
-                editDocformdata: {
-                    "orgId": "",
-                    "deptId": "",
-                    "doctorId": "",
-                    "localDeptId": "",
-                    "localDoctorId": "",
-                    "expertFlag": "",
-                    "expertFee": "",
-                    "mainFlag": "",
-                    "id": 0, //新增为0
-                    "doctorName": "",
-                    "deptName": "",
-                    "orgName": "",
+                editTeamdialogFormVisible: false,
+                editTeamformdata: {
+                    "teamId": undefined, //团队Id 新增时候为0
+                    "teamName": "",
+                    "telNo": "", //联系电话
+                    "info": "", //简介
+                    "orgId": "" //机构Id
                 },
-                editDocrules: [],
+                curbeloneorg: "",
+                curorgId: "",
+                editTeamrules: {
+                    teamName: [{
+                        required: true,
+                        message: '请输入团队名称',
+                        trigger: 'blur'
+                    }],
+                    telNo: [{
+                        required: true,
+                        message: '请输入联系电话',
+                        trigger: 'blur'
+                    }],
+                    info: [{
+                        required: true,
+                        message: '请输入团队简介',
+                        trigger: 'blur'
+                    }],
+
+                },
+                activeName: "",
+                ishowtab: false,
+                curteamId: "",
+                // 团队成员管理开始--------------
                 //选择医生列表开始--------------------------------
                 selectdoctableData: [],
                 selectdialogFormVisible: false,
-                selectdoclisttotal: 1,
+                selectteamclisttotal: 1,
                 selectparam: {
-                    idCard: "",
+                    deptId: "",
                     doctorName: "",
+                    localDoctorId: "",
+                    orgId: "",
                     pageNo: 1,
-                    pageSize: 10
+                    pageSize: 10,
                 },
-                // 医生详细信息
-                docdetaildialogFormVisible: false,
-                editdetailDocinforules: {
-                    doctorName: [{
-                        required: true,
-                        message: '请输入医生姓名',
-                        trigger: 'blur'
-                    }],
-                    sex: [{
-                        required: true,
-                        message: '请选择出生日期',
-                        trigger: 'change'
-                    }],
-                    dob: [{
-                        required: true,
-                        message: '请选择出生日期',
-                        trigger: 'change'
-                    }],
-                    certifiyNo: [{
-                        required: true,
-                        message: '请输入证书编号',
-                        trigger: 'blur'
-                    }],
-                    // idCard: [{//身份证验证
-                    //     validator: checkidCard,
-                    //     trigger: 'blur'
-                    // }],
-                    //  idCard: [{
-                    //     required: true,
-                    //     message: '请输入身份证号',
-                    //     trigger: 'blur'
-                    // }],
-
-                    // summary: [{
-                    //     required: true,
-                    //     message: '请输入综合评价',
-                    //     trigger: 'blur'
-                    // }],
+                teamDoclist: [],
+                setleaderdialogFormVisible: false,
+                setleaderformdata: {
+                    teamId: "",
+                    doctorId: "",
+                    reason: "",
                 },
-                editdetailDocformdata: {
-                    "doctorId": "",
-                    "doctorName": "",
-                    "sex": "",
-                    "idCard": "",
-                    "dob": "",
-                    "phoneNo": "",
-                    "nation": "",
-                    "nationality": "",
-                    "email": "",
-                    "academic": "",
-                    "avatarFileId": 0,
-                    "introduce": "",
-                    "speciality": "",
-                    "doctorLevel": "",
-                    "certifiy": "",
-                    "certifiyNo": "",
-                    "certifiyAddress": "",
-                    "certifiyScope": "",
-                    "checkOrg": "",
-                    "diseaseName": "",
-                    // "summary":"",
+                //团队服务包开始--------------------------------------------------------
+                spPacklist: [],
+                spPacktotal: 1,
+                spPackParam: {
+                    spName: "",
+                    packCode: "",
+                    status: "",
+                    "pageNo": 1,
+                    "pageSize": 10,
+                    spId: "", //团队id
                 },
-                // 医生详细信息结束-------------------------------------------------
-                //上传图像用
-                imguploadurl: imguploadurl,
-                imageUrl: "",
-                imguploaddata: {
-                    catalog: "avater" //头像:avater,意见反馈:feedback,机构:org,产品广告:banner,机构布局:orglayout
-                },
-                headers: {
-                    "X-Access-Token": sessionStorage.getItem("accessToken")
-                },
-                //出生日期限制在今天之前
-                pickerOptions0: {
-                    disabledDate(time) {
-                        console.log(time);
-                        return time.getTime() > Date.now() - 8.64e7;
+                editserpackformdata: {
+                    "assciationVos": [],
+                    "spPack": {
+                        "packId": "",
+                        "spPackName": "",
+                        "packCode": "",
+                        "price": "",
+                        "suitableObject": "",
+                        "startDt": "",
+                        "spPackId": "",
+                        "spId": "",
+                        "validPeriod": "",
+                        "packDesc": ""
                     }
                 },
+                dialogtitle2: "",
+                editserpackrules: {
+                    "spPack.packId": [{
+                        required: true,
+                        message: '请选择基础服务包',
 
+                    }],
+                    "spPack.spPackName": [{
+                        required: true,
+                        message: '请输入服务包名称',
+                        // trigger: 'blur'
+                    }],
+                    "spPack.price": [{
+                        required: true,
+                        message: '请输入价格',
+                        // trigger: 'blur'
+                    }],
+
+                },
+                // 基础服务包列表
+                baseserlist: [], //下拉框中用到
+                editserpackldialogFormVisible: false,
+                //添加服务项的弹框
+                assciationdialog: false,
+                assciationlist: [],
+                allassciationlist:[],//当前基础服务包下面所有的服务项
+                //团队服务包结束--------------------------------------------------------
                 setting: {
                     async: {
                         enable: true,
@@ -424,13 +432,14 @@ export default {
                         dataType: "JSON",
                         headers: {
                             "X-Access-Token": sessionStorage.getItem('accessToken'),
-                            "X-Service-Id": "cas.departmentService",
-                            "X-Service-Method": 'deptTree',
-                            "Content-Type": "application/json"
+                            "X-Service-Id": "cas.orgService",
+                            "X-Service-Method": 'queryCommunityOrg',
+                            "Content-Type": "application/json",
+                            "roleIds": sessionStorage.getItem("roleIds"),
                         },
                         dataFilter: this.ajaxDataFilter,
                         // otherParam: {"id":"","nodeType":""},
-                        autoParam: ["id", "nodeType=nodeType", "orgId=orgId"],
+                        autoParam: ["id", "nodeType=nodeType"],
                     },
                     callback: {
                         onRightClick: this.OnRightClick,
@@ -445,13 +454,13 @@ export default {
 
         },
         methods: {
-            //选择医生弹框获取所有医生列表
+            // 选择医生弹框获取这个机构下所有医生列表
             getalldoc() {
-                    let params = `['${this.selectparam.idCard}','${this.selectparam.doctorName}',${this.selectparam.pageNo},${this.selectparam.pageSize}]`;
-                    commonAjax("cas.doctorService", "listDoctorBySearch", params).then(res => {
+                    this.selectparam.orgId = this.editTeamformdata.orgId
+                    commonAjax("cas.doctorService", "queryDoctorByOrgIdAndDeptId", "[" + JSON.stringify(this.selectparam) + "]").then(res => {
                         if (res.code == 200) {
                             this.selectdoctableData = res.body.items;
-                            this.selectdoclisttotal = res.body.total;
+                            this.selectteamclisttotal = res.body.total;
                         } else {
                             this.$message({
                                 type: 'error',
@@ -460,12 +469,16 @@ export default {
                         }
                     });
                 },
-                //根据科室获取医生列表数据
+                //根据机构id获取团队列表数据
                 getTableData() {
-                    commonAjax("cas.doctorService", "queryDoctorByOrgIdAndDeptId", '[' + JSON.stringify(this.param) + ']').then(res => {
+                    let {
+                        orgId, pageNo, pageSize
+                    } = this.param;
+                    let param = `['${orgId}',${pageNo},${pageSize}]`;
+                    commonAjax("cas.teamManageService", "queryByOrgId", param).then(res => {
                         if (res.code == 200) {
                             this.tableData = res.body.items;
-                            this.doclisttotal = res.body.total;
+                            this.teamclisttotal = res.body.total;
                         } else {
                             this.$message({
                                 type: 'error',
@@ -474,89 +487,81 @@ export default {
                         }
                     });
                 },
-                //添加编辑医生
+                //添加编辑团队
                 addTreeNode(index, row) {
+                    this.teamDoclist = []; //清空列表
+                    this.spPacklist = [];
+                    this.spPacktotal = 1;
                     this.hideRMenu();
-                    this.editDocdialogFormVisible = true;
+                    this.editTeamdialogFormVisible = true;
+                    this.activeName = 'baseInfo';
                     if (row) {
-                        this.infoisdisabled = true;
-                        this.dialogtitle = "编辑医生";
-                        let params = `['${this.param.orgId}','${row.deptId}','${row.doctorId}']`;
-                        commonAjax("cas.doctorService", "getDoctorOrgs", params).then(res => {
-                            if (res.code == 200) {
-                                this.editDocformdata = {
-                                    "orgId": res.body.orgId,
-                                    "deptId": res.body.deptId,
-                                    "doctorId": res.body.doctorId,
-                                    "localDeptId": res.body.localDeptId,
-                                    "localDoctorId": res.body.localDoctorId,
-                                    "expertFlag": res.body.expertFlag,
-                                    "expertFee": res.body.expertFee,
-                                    "mainFlag": res.body.mainFlag,
-                                    "id": res.body.id, //新增为0
-                                    "doctorName": row.doctorName,
-                                    "deptName": res.body.deptName,
-                                    "orgName": res.body.orgFullName,
-                                }
-                            } else {
-                                this.$message({
-                                    type: 'error',
-                                    message: res.msg
-                                });
-                            }
-                        });
+                        this.dialogtitle = "编辑团队";
+                        this.ishowtab = true;
+                        this.editTeamformdata = {
+                            "teamId": row.teamId, //团队Id 新增时候为0
+                            "teamName": row.teamName,
+                            "telNo": row.telNo, //联系电话
+                            "info": row.info, //简介
+                            "orgId": row.orgId, //机构Id
+                        }
+                        this.curbeloneorg = row.orgFullName
+                        this.curteamId = row.teamId
+
 
                     } else {
-                        this.infoisdisabled = false;
-                        this.dialogtitle = "添加医生";
-                        this.editDocformdata.doctorId = "";
-                        this.editDocformdata.localDoctorId = "";
-                        this.editDocformdata.expertFlag = "";
-                        this.editDocformdata.expertFee = "";
-                        this.editDocformdata.mainFlag = "";
-                        this.editDocformdata.id = 0;
-                        this.editDocformdata.doctorName = "";
-                        this.editDocformdata.doctorId = "";
+                        this.dialogtitle = "新增团队";
+                        this.ishowtab = false;
+                        this.editTeamformdata = {
+                            "teamId": undefined, //团队Id 新增时候为0
+                            "teamName": "",
+                            "telNo": "", //联系电话
+                            "info": "", //简介
+                            "orgId": this.curorgId //机构Id
+                        }
+                    }
+                    this.getalldoc(); //获取这个机构下面的所有医生
+                },
+                //tab切换
+                tabHandleClick(tab, event) {
+                    this.activeName = tab.name;
+                    if (tab.name == "teamMember") {
+                        if (this.teamDoclist.length == 0) {
+                            this.getTeamDoc();
+                        }
+
+                    } else if (tab.name == "servicePkg") {
+                        if (this.spPacklist.length == 0) {
+                            this.getSpPack();
+                        }
+                    } else {
+
                     }
 
                 },
 
-                //点击选择医生
-                selectdoc() {
-                    this.selectdialogFormVisible = true;
 
-                },
-                // 点击医生列表选择医生
-                selecteddoctor(index, row) {
-                    this.editDocformdata.doctorId = row.doctorId
-                        // this.editDocformdata.localDoctorId = row.localDoctorId
-                    this.editDocformdata.doctorName = row.doctorName;
-                    this.selectdialogFormVisible = false;
-                },
-
-                //医生列表页面显示的条数变化
+                //团队列表页面显示的条数变化
                 handleSizeChange(val) {
                     this.param.pageSize = val;
                     this.getTableData()
                 },
-                // 医生列表输入框翻页效果
+                // 团队列表输入框翻页效果
                 handleCurrentChange(val) {
                     this.param.pageNo = val;
                     this.getTableData()
                 },
-                //医生列表搜索按钮点击
-                searchClick() {
-                    this.getTableData();
-                },
-                //新增和编辑医生
-                editDocsubmitForm(formName) {
+                //新增和编辑团队保存
+                editTeamsubmitForm(formName) {
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
-                            commonAjax('cas.doctorService', 'addOrUpdateDoctorOrgs', '[' + JSON.stringify(this.editDocformdata) + ']').then(res => {
+                            commonAjax('cas.teamManageService', 'saveTeamInfo', '[' + JSON.stringify(this.editTeamformdata) + ']').then(res => {
                                 if (res.code == 200) {
-                                    this.editDocdialogFormVisible = false;
-                                    this.param.orgId = this.editDocformdata.orgId;
-                                    this.param.deptId = this.editDocformdata.deptId;
+                                    // this.editTeamdialogFormVisible = false;
+                                    this.ishowtab = true;
+                                    this.param.orgId = this.editTeamformdata.orgId;
+                                    this.curteamId = res.body;
+                                    // this.activeName = 'baseInfo';
                                     this.getTableData();
                                     this.$message({
                                         type: 'success',
@@ -574,11 +579,12 @@ export default {
                         }
                     });
                 },
-                closeeditDocinfo(formName) {
+                closeeditTeaminfo(formName) {
                     this.$refs[formName].resetFields();
-                    this.editDocdialogFormVisible = false;
+                    this.editTeamdialogFormVisible = false;
+                    // this.activeName = 'baseInfo';
                 },
-                // 删除列表中的一条数据
+                // 删除团队列表中的一条数据
                 handleDelete(index, row) {
                     // this.$message.error('删除第' + (index + 1) + '行');
                     const h = this.$createElement;
@@ -588,7 +594,7 @@ export default {
                             h('span', null, '是否删除 '),
                             h('i', {
                                 style: 'color: teal'
-                            }, row.doctorName)
+                            }, row.teamName)
                         ]),
                         showCancelButton: true,
                         confirmButtonText: '确定',
@@ -602,7 +608,7 @@ export default {
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
                                     }, 300);
-                                }, 3000);
+                                }, 1000);
                             } else {
                                 done();
                             }
@@ -614,9 +620,8 @@ export default {
                                 message: "取消删除"
                             });
                         } else {
-                            commonAjax("cas.doctorService", "deleteDoctorOrg", `['${row.id}']`).then(res => {
+                            commonAjax("cas.teamManageService", "deleteTeamInfo", `['${row.teamId}']`).then(res => {
                                 if (res.code == 200) {
-                                    this.param.deptId = row.deptId;
                                     this.getTableData();
                                     this.$message({
                                         type: 'success',
@@ -634,95 +639,45 @@ export default {
 
                     })
                 },
-                //选择医生
-                selectSizeChange(val) {
-                    this.selectparam.pageSize = val;
-                    this.getalldoc()
-                },
-                selectCurrentChange(val) {
-                    this.selectparam.pageNo = val;
-                    this.getalldoc()
-                },
-                selectsearchClick() {
-                    this.getalldoc();
-                },
-                // 医生详细信息
-                lookdoc(id) {
-                    this.docdetaildialogFormVisible = true;
-                    if (id != 0) {
-                        let params = `['${this.editDocformdata.doctorId}']`;
-                        commonAjax("cas.doctorService", "getDoctorInfo", params).then(res => {
-                            if (res.code == 200) {
-                                this.imageUrl = res.body.avatarFileId ?imgview + res.body.avatarFileId : "";
-                                this.editdetailDocformdata = {
-                                    "doctorId": res.body.doctorId,
-                                    "doctorName": res.body.doctorName,
-                                    "sex": res.body.sex,
-                                    "idCard": res.body.idCard,
-                                    "dob": res.body.dob,
-                                    "phoneNo": res.body.phoneNo ? res.body.phoneNo : "",
-                                    "nation": res.body.nation ? res.body.nation : "",
-                                    "nationality": res.body.nationality ? res.body.nationality : "",
-                                    "email": res.body.email ? res.body.email : "",
-                                    "academic": res.body.academic ? res.body.academic : "",
-                                    "avatarFileId": res.body.avatarFileId ? res.body.avatarFileId : 0,
-                                    "introduce": res.body.introduce ? res.body.introduce : "",
-                                    "speciality": res.body.speciality ? res.body.speciality : "",
-                                    "doctorLevel": res.body.doctorLevel ? res.body.doctorLevel : "",
-                                    "certifiy": res.body.certifiy ? res.body.certifiy : "",
-                                    "certifiyNo": res.body.certifiyNo,
-                                    "certifiyAddress": res.body.certifiyAddress ? res.body.certifiyAddress : "",
-                                    "certifiyScope": res.body.certifiyScope ? res.body.certifiyScope : "",
-                                    "checkOrg": res.body.checkOrg ? res.body.checkOrg : "",
-                                    "diseaseName": res.body.diseaseName ? res.body.diseaseName : "",
-                                    // "summary":res.body.summary
-                                }
-
-                            } else {
-                                this.$message({
-                                    type: 'error',
-                                    message: res.msg
-                                });
-                            }
-                        });
-
-                    } else {
-                        this.imageUrl = ""
-                        this.editdetailDocformdata = {
-                            "doctorId": "",
-                            "doctorName": "",
-                            "sex": "",
-                            "idCard": "",
-                            "dob": "",
-                            "phoneNo": "",
-                            "nation": "",
-                            "nationality": "",
-                            "email": "",
-                            "academic": "",
-                            "avatarFileId": 0,
-                            "introduce": "",
-                            "speciality": "",
-                            "doctorLevel": "",
-                            "certifiy": "",
-                            "certifiyNo": "",
-                            "certifiyAddress": "",
-                            "certifiyScope": "",
-                            "checkOrg": "",
-                            "diseaseName": "",
-                            // "summary":""
+                // 团队成员包开始-----------------------------------------------------
+                //获取团队成员列表
+                getTeamDoc() {
+                    let params = `['${this.curteamId}',1,100]`
+                    commonAjax("cas.teamManageService", "queryTeamDoctByTeamId", params).then(res => {
+                        if (res.code == 200) {
+                            this.teamDoclist = res.body.items;
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: res.msg
+                            });
                         }
+                    });
+                },
+                teamMemberEdit() {
+                    this.selectdialogFormVisible = true
+                },
+
+                //设置团队长弹框
+                setLeader(index, row) {
+                    this.setleaderdialogFormVisible = true;
+                    this.setleaderformdata = {
+                        teamId: row.teamId,
+                        doctorId: row.memberObjId,
+                        reason: "",
                     }
                 },
-                //医生信息信息提交
-                editdetailDocsubmitForm(formName) {
+                //设置团队长
+                setleadersubmitForm(formName) {
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
-                            commonAjax('cas.doctorService', 'addOrUpdateDoctor', '[' + JSON.stringify(this.editdetailDocformdata) + ']').then(res => {
+                            let {
+                                teamId, doctorId, reason
+                            } = this.setleaderformdata;
+                            commonAjax('cas.teamManageService', 'setTeamLeader', `['${teamId}','${doctorId}','${reason}']`).then(res => {
                                 if (res.code == 200) {
-                                    this.docdetaildialogFormVisible = false;
-                                    this.param.orgId = this.editdetailDocformdata.orgId;
-                                    this.param.deptId = this.editdetailDocformdata.deptId;
-                                    this.getTableData();
+                                    this.setleaderdialogFormVisible = false;
+                                    this.getTeamDoc();
                                     this.$message({
                                         type: 'success',
                                         message: "保存成功"
@@ -739,43 +694,74 @@ export default {
                         }
                     });
                 },
-                closeeditdetailDocinfo(formName) {
-                    this.$refs[formName].resetFields();
-                    this.docdetaildialogFormVisible = false;
-                },
-                dateformat2(val) {
-                    this.editdetailDocformdata.dob = val
-                },
-                //通用的
-                resetForm(formName) {
-                    this.$refs[formName].resetFields();
-                },
-                //字典请求
-                dictionaryRequest() {
-                    let arr = ["cfs.dic.base_sex", "cfs.dic.base_nation", "cfs.dic.base_nationality", "cfs.dic.base_education", "cfs.dic.base_doctorTitle", "cfs.dic.base_practiceCategory"];
-                    commonAjax("cas.multipleDictionaryService", "findDic", '[' + JSON.stringify(arr) + ']').then((res) => {
-                        if (res.code == 200) {
-                            var that = this;
-                            $.each(res.body, function(index, el) {
-                                if (el.dicId == arr[0]) {
-                                    that.dictionary.sex = el.items;
-                                }
-                                if (el.dicId == arr[1]) {
-                                    that.dictionary.nation = el.items;
-                                }
-                                if (el.dicId == arr[2]) {
-                                    that.dictionary.nationality = el.items;
-                                }
-                                if (el.dicId == arr[3]) {
-                                    that.dictionary.education = el.items;
-                                }
-                                if (el.dicId == arr[4]) {
-                                    that.dictionary.doctorTitle = el.items;
-                                }
-                                if (el.dicId == arr[5]) {
-                                    that.dictionary.practiceCategory = el.items;
+                // 删除团队成员中的一条数据
+                teamMemberDelete(index, row) {
+                    // this.$message.error('删除第' + (index + 1) + '行');
+                    const h = this.$createElement;
+                    this.$msgbox({
+                        title: '确认删除',
+                        message: h('p', null, [
+                            h('span', null, '是否删除 '),
+                            h('i', {
+                                style: 'color: teal'
+                            }, row.memberName)
+                        ]),
+                        showCancelButton: true,
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 1000);
+                            } else {
+                                done();
+                            }
+                        }
+                    }).then(action => {
+                        if (action == 'cancel') {
+                            this.$message({
+                                type: 'info',
+                                message: "取消删除"
+                            });
+                        } else {
+                            commonAjax("cas.teamManageService", "deleteTeamDoct", `['${row.teamId}','${row.memberObjId}']`).then(res => {
+                                if (res.code == 200) {
+                                    this.getTeamDoc();
+                                    this.$message({
+                                        type: 'success',
+                                        message: "删除成功"
+                                    });
+
+                                } else {
+                                    this.$message({
+                                        type: 'error',
+                                        message: res.msg
+                                    });
                                 }
                             });
+                        }
+
+                    })
+                },
+                // 点击医生列表选择医生
+                selecteddoctor(index, row) {
+                    this.selectdialogFormVisible = false;
+                    let param = {
+                        "teamId": this.curteamId, //团队Id
+                        "memberObjId": row.doctorId, //doctorId
+                        "memberName": row.doctorName, //doctorName
+                        "memberType": row.docType //成员对象类型：HCN_docType
+                    }
+                    commonAjax("cas.teamManageService", "addTeamDoct", "[" + JSON.stringify(param) + "]").then(res => {
+                        if (res.code == 200) {
+
+                            this.getTeamDoc();
                         } else {
                             this.$message({
                                 type: 'error',
@@ -784,74 +770,324 @@ export default {
                         }
                     });
                 },
+                //选择医生
+                selectSizeChange(val) {
+                    this.selectparam.pageSize = val;
+                    this.getalldoc()
+                },
+                selectCurrentChange(val) {
+                    this.selectparam.pageNo = val;
+                    this.getalldoc()
+                },
+                selectsearchClick() {
+                    this.getalldoc();
+                },
+                closesetleader(formName) {
+                    this.$refs[formName].resetFields();
+                    this.setleaderdialogFormVisible = false;
+                },
+
+
+                // 团队服务包开始-----------------------------------------------------
+                closeedassciationdialog(formName) {
+                    this.$refs[formName].resetFields();
+                    this.editserpackldialogFormVisible = false;
+                },
+                // 获取基础服务包列表
+                getbaseserlist() {
+                    let param = {
+                        "pageNo": 1,
+                        "pageSize": 500,
+                        "tenantId": sessionStorage.getItem('tenantId'),
+                        "packName": "",
+                        "status": "1",
+                    }
+                    commonAjax("cas.baseServiceService", "getBasePackList", "[" + JSON.stringify(param) + "]").then(res => {
+                        if (res.code == 200) {
+                            $.each(res.body.items, function(index, el) {
+                                el.spPackName = "";
+                                el.price = "";
+                                el.spId = this.curteamId;
+
+                            });
+                            this.baseserlist = res.body.items;
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: res.msg
+                            });
+                        }
+                    });
+                },
+                //获取指定家医团队服务包列表
+                getSpPack() {
+                    this.spPackParam.spId = this.curteamId;
+                    commonAjax("cas.teamManageService", "findSpPack", "[" + JSON.stringify(this.spPackParam) + "]").then(res => {
+                        if (res.code == 200) {
+                            this.spPacklist = res.body.items;
+                            this.spPacktotal = res.body.total;
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: res.msg
+                            });
+                        }
+                    });
+                },
+                //搜索服务包列表
+                sersearchClick() {
+                    this.getSpPack()
+                },
+                spPackEdit(index, row) {
+                    this.editserpackldialogFormVisible = true;
+                    if (row) {
+                        this.dialogtitle2 = "编辑服务包";
+                        commonAjax("cas.teamManageService", "getSpPackServiceBySpPackId", `[${row.spPackId}]`).then(res => {
+                            if (res.code == 200) {
+                                $.each(res.body.assciationVos,function(index, el) {
+                                            el.checked=true;
+                                        });
+                                this.editserpackformdata = {
+                                    "assciationVos": res.body.assciationVos,
+                                    "spPack": {
+                                        "packId": res.body.spPack.packId,
+                                        "spPackName": res.body.spPack.spPackName,
+                                        "packCode": res.body.spPack.packCode,
+                                        "price": res.body.spPack.price,
+                                        "suitableObject": res.body.spPack.suitableObject,
+                                        "startDt": res.body.spPack.startDt,
+                                        "spPackId": res.body.spPack.spPackId,
+                                        "spId": res.body.spPack.spId,
+                                        "validPeriod": res.body.spPack.validPeriod,
+                                        "packDesc": res.body.spPack.packDesc
+                                    }
+                                }
+                                commonAjax("cas.teamManageService", "querySpServiceBySpPackId", `[${res.body.spPack.packId},${res.body.spPack.spPackId}]`).then(res2 => {
+                                    if (res2.code == 200) {
+                                        $.each(res2.body,function(index, el) {
+                                            el.checked=false;
+                                        });
+                                        this.assciationlist = res2.body
+                                       this.allassciationlist=this.editserpackformdata.assciationVos.concat(this.assciationlist);
+                                    } else {
+                                        this.$message({
+                                            type: 'error',
+                                            message: res2.msg
+                                        });
+                                    }
+                                });
+
+                            } else {
+                                this.$message({
+                                    type: 'error',
+                                    message: res.msg
+                                });
+                            }
+                        });
+                    } else {
+                        this.dialogtitle2 = "新增服务包";
+                        this.editserpackformdata = {
+                            "assciationVos": [],
+                            "spPack": {
+                                "packId": "",
+                                "spPackName": "",
+                                "packCode": "",
+                                "price": "",
+                                "suitableObject": "",
+                                "startDt": "",
+                                "spPackId": undefined,
+                                "spId": this.curteamId,
+                                "validPeriod": "",
+                                "packDesc": ""
+                            }
+                        }
+
+                    }
+                },
+                editserpacksubmitForm(formName) {
+                    this.$refs[formName].validate((valid) => {
+                        if (valid) {
+                            if (this.editserpackformdata.spPack.packId) {
+                                console.log(this.editserpackformdata);
+                                commonAjax('cas.teamManageService', 'saveSpPack', '[' + JSON.stringify(this.editserpackformdata) + ']').then(res => {
+                                    if (res.code == 200) {
+                                        this.editserpackldialogFormVisible = false;
+                                        this.getSpPack();
+                                        this.$message({
+                                            type: 'success',
+                                            message: "保存成功"
+                                        });
+                                    } else {
+                                        this.$message({
+                                            type: 'error',
+                                            message: res.msg
+                                        });
+                                    };
+                                })
+                            } else {
+                                this.$message({
+                                    type: 'error',
+                                    message: "请选择基础服务包"
+                                });
+                            }
+
+                        } else {
+                            return false;
+                        }
+                    });
+                },
+                spPackhandleDelete(index, row) {
+                    const h = this.$createElement;
+                    let status = row.status == "1" ? "0" : "1";
+                    let param = `[${row.spPackId},'${status}']`
+                    this.$msgbox({
+                        title: '确认删除',
+                        message: h('p', null, [
+                            h('span', null, '是否禁用 '),
+                            h('i', {
+                                style: 'color: teal'
+                            }, row.spPackName)
+                        ]),
+                        showCancelButton: true,
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 1000);
+                            } else {
+                                done();
+                            }
+                        }
+                    }).then(action => {
+                        if (action == 'cancel') {
+                            this.$message({
+                                type: 'info',
+                                message: "取消删除"
+                            });
+                        } else {
+                            commonAjax("cas.teamManageService", "updateSpSpckStatus", param).then(res => {
+                                if (res.code == 200) {
+                                    this.getSpPack()
+                                } else {
+                                    this.$message({
+                                        type: 'error',
+                                        message: res.msg
+                                    });
+                                }
+                            });
+
+                        }
+
+                    })
+
+
+                },
+                spPackhandleSizeChange(val) {
+                    this.spPackParam.pageSize = val;
+                    this.getSpPack()
+                },
+
+                // 团队列表输入框翻页效果
+                spPackhandleCurrentChange(val) {
+                    this.spPackParam.pageNo = val;
+                    this.getSpPack()
+                },
+                //选择基础服务包的select改变
+                baseserchange(val) {
+                    if (!this.editserpackformdata.spPack.spPackId) {
+                        $.each(this.baseserlist, function(index, el) {
+                            if (el.packId == val) {
+                                this.editserpackformdata.spPack.packCode = el.packCode;
+                                this.editserpackformdata.spPack.spId = this.curteamId;
+                                this.editserpackformdata.spPack.suitableObject = el.suitableObject;
+                                this.editserpackformdata.spPack.startDt = el.startDt;
+                                this.editserpackformdata.spPack.spPackId = 0;
+                                this.editserpackformdata.spPack.validPeriod = el.validPeriod
+                                this.editserpackformdata.spPack.packDesc = el.packDesc
+                            }
+                        }.bind(this));
+                    }
+
+                },
+                //添加服务项
+                assciationhandleEdit() {
+                    this.assciationdialog=true
+                },
+                //删除服务项
+                assciationVoshandleDelete(index, row) {
+                    // this.allassciationlist
+                    row.checked=false;
+                    this.assciationlist.push(row);
+                    this.editserpackformdata.assciationVos.splice(index, 1)
+                },
+                //点击取消关闭模态框
+                closeedassciationdialog() {
+                    this.assciationdialog = false;
+                },
+                // 选中服务项目后点添加
+                selectassciation(){
+                    let temarr=this.assciationlist.filter(function(el) {
+                        return el.checked==true
+                    });
+                    let temarr2=this.assciationlist.filter(function(el) {
+                        return el.checked==false
+                    });
+                    this.assciationlist=temarr2;//选中的下次就不能选了
+                     this.editserpackformdata.assciationVos=this.editserpackformdata.assciationVos.concat(temarr);
+                      this.assciationdialog = false;
+                      console.log(this.editserpackformdata.assciationVos);
+                },
+                //通用的
+                resetForm(formName) {
+                    this.$refs[formName].resetFields();
+                },
+
                 //数据请求并且赋值
                 ajaxDataFilter(treeId, parentNode, responseData) {
                     responseData = responseData.body.info;
-                    if (parentNode) {
-                        $.each(responseData, function(index, el) {
-                            el.name = el.deptName;
-                            el.isParent = true;
-                            el.nodeType = "2"
-                        })
-                    } else {
-                        $.each(responseData, function(index, el) {
-                            el.name = el.orgFullName;
-                            el.isParent = true;
-                            el.nodeType = "1"
-                        })
-                    }
-
+                    // if (parentNode) {
+                    //     $.each(responseData, function(index, el) {
+                    //         el.name = el.orgFullName;
+                    //         el.isParent = true;
+                    //         el.nodeType = "2"
+                    //     })
+                    // } else {
+                    //     $.each(responseData, function(index, el) {
+                    //         el.name = el.orgFullName;
+                    //         el.isParent = true;
+                    //         el.nodeType = "1"
+                    //     })
+                    // }
+                    $.each(responseData, function(index, el) {
+                        el.name = el.orgFullName;
+                        el.isParent = true;
+                        el.nodeType = "1"
+                    })
                     return responseData;
                 },
                 //树状节点左击
                 zTreeOnClick(event, treeId, treeNode, msg) {
-                    //清空查询条件
-                    this.param.doctorName = '';
-                    this.param.localDoctorId = '';
-                    this.curorgName = treeNode.orgFullName
-                    if (treeNode.nodeType == "1") {
-                        this.param.orgId = treeNode.id;
-                        this.param.deptId = "";
-                    } else {
-                        this.param.orgId = treeNode.orgId;
-                        this.param.deptId = treeNode.id;
-                    }
+                    this.param.orgId = treeNode.id;
                     this.getTableData();
-
                 },
                 //树状节点右击
                 OnRightClick(event, treeId, treeNode) {
-                    //不能为机构直接添加医生
-                    if (treeNode.nodeType == '1') {
-                        this.$message({
-                            type: 'error',
-                            message: '请选择科室进行添加医生'
-                        });
-                        return false;
-                    } else {
-                        this.editDocformdata.orgId = treeNode.orgId;
-                        this.editDocformdata.deptId = treeNode.id; //deptId后台已经赋值给id
-                        this.editDocformdata.localDeptId = treeNode.localDeptId;
-                        this.showRMenu("node", event.clientX, event.clientY);
-                        this.zTree.selectNode(treeNode);
-                    }
+                    this.curorgId = treeNode.id;
+                    this.curbeloneorg = treeNode.name;
+                    this.showRMenu(event.clientX, event.clientY);
+                    this.zTree.selectNode(treeNode);
                 },
 
                 //右键菜单部分
-                showRMenu(type, x, y) {
+                showRMenu(x, y) {
                     $("#rMenu ul").show();
-                    if (type == "root") {
-                        // $("#m_del").hide();
-                        $("#m_add").show();
-                    } else if (type == "noadd") {
-                        // $("#m_del").show();
-                        $("#m_add").hide();
-
-                    } else {
-                        // $("#m_del").show();
-                        $("#m_add").show();
-
-                    }
                     $("#rMenu").css({
                         "top": y + "px",
                         "left": x + "px",
@@ -875,80 +1111,19 @@ export default {
                         });
                     }
                 },
-                handleAvatarSuccess(res, file) { //上传图片成功后
-                    this.imageUrl = imgview + res.body;
-                    this.editdetailDocformdata.avatarFileId = res.body;
 
-                },
-                beforeAvatarUpload(file) { //上传图片之前通用
-                    // const isJPG = file.type === 'image/jpeg';
-                    // const isLt2M = file.size / 1024 / 1024 < 2;
 
-                    // if (!isJPG) {
-                    //     this.$message.error('上传头像图片只能是 JPG 格式!');
-                    // }
-                    // if (!isLt2M) {
-                    //     this.$message.error('上传头像图片大小不能超过 2MB!');
-                    // }
-                    // return isJPG && isLt2M;
-                },
-                //验证
-                // validationData() {
-                //     $('.msg-without-complete').modal('show');
-                //     //必填验证
-                //     let name = this.formdata.deptName;
-                //     let code = this.formdata.localDeptId;
-                //     let type = this.formdata.deptType;
-                //     let dscp = this.formdata.description;
-                //     let code_exp = /^[0-9a-zA-Z]+$/;
-                //     if (name == '') {
-                //         this.subErrorMsg = "请填写科室名称!";
-                //         return false
-                //     }
-                //     if (code_exp.test(code) != true) {
-                //         this.subErrorMsg = "科室代码只能为数字或字母!";
-                //         return false
-                //     }
-                //     if (type == '') {
-                //         this.subErrorMsg = "请选择科室类型!";
-                //         return false
-                //     }
-                //     if (dscp == '') {
-                //         this.subErrorMsg = "请填写科室介绍!";
-                //         return false
-                //     }
-                //     //选择性验证
-                //     let telp = this.formdata.contactNo;
-                //     let email = this.formdata.email;
-                //     let telp_exp = /^(\(\d{3,4}\)|\d{3,4}-|\s)?\d{7,14}$/;
-                //     let email_exp = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/;
-                //     if (telp != '') {
-                //         if (telp_exp.test(telp) != true) {
-                //             this.subErrorMsg = "电话号码格式不正确!";
-                //             return false
-                //         }
-                //     }
-                //     if (email != '') {
-                //         if (email_exp.test(email) != true) {
-                //             this.subErrorMsg = "邮箱格式不正确!";
-                //             return false
-                //         }
-                //     }
-                // },
 
         },
         components: {
 
         },
         mounted() {
-
-            //初始化科室列表
+            //初始化社区机构列表
             $.fn.zTree.init($("#hospitalLists"), this.setting);
             this.zTree = $.fn.zTree.getZTreeObj("hospitalLists");
-            //标准科室
-            this.getalldoc();
-            // //字典请求
-            this.dictionaryRequest();
+            this.getbaseserlist();
+
         },
         beforeMount() {
 
@@ -1021,5 +1196,27 @@ div#rMenu ul li:nth-child(2) {
 
 .el-picker-panel__icon-btn {
     margin-left: 20px
+}
+
+.addorg button {
+    float: right;
+}
+
+.mb20 {
+    margin-bottom: 20px;
+}
+.mt20{
+      margin-top: 20px;
+}
+h2.account-title {
+    font-size: 16px;
+    border-bottom: 2px #EEE solid;
+    padding: 5px 5%;
+    margin-bottom: 20px;
+    height: 40px;
+}
+
+h2.account-title button {
+    float: right;
 }
 </style>

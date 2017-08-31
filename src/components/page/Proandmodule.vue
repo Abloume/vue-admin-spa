@@ -29,7 +29,13 @@
                 </div>
                 <div class="right-con">
                     <el-row class="search_con" :gutter="20">
-                        <el-col :span="6" class="addorg" :offset="16">
+                        <el-col :span="8">
+                            <el-input v-model="params.keyWord" placeholder="请输入模块名称或模块编码"></el-input>
+                        </el-col>
+                        <el-col :span="6">
+                            <el-button type="primary" icon="search" @click="searchClick">搜索</el-button>
+                        </el-col>
+                        <el-col :span="6" class="addorg" >
                             <el-button type="primary" @click="submitForm">保存</el-button>
                         </el-col>
                     </el-row>
@@ -66,6 +72,8 @@ export default {
                 prolists: [],
                 tableData: [],
                 params: {
+                    "keyWord": "",
+                    "productCode": "",
                     pageNo: 1,
                     pageSize: 10,
                 },
@@ -90,10 +98,10 @@ export default {
         methods: {
             // //获取产品列表数据
             getprolists() {
-                    commonAjax("cas.productRelatedService", "productTreeList", '[]').then(res => {
+                    commonAjax("cas.productRelatedService", "productSecondLevelList", '[]').then(res => {
                         if (res.code == 200) {
                             this.prolists = res.body;
-                            this.clickitem(this.prolists[0],0);
+                            this.clickitem(this.prolists[0], 0);
                         } else {
                             this.$message({
                                 type: 'error',
@@ -103,7 +111,7 @@ export default {
                     });
                 },
                 // 点击左侧产品列表
-                clickitem(item,index) {
+                clickitem(item, index) {
                     $(".productslist").find('li').eq(index).addClass('cur').siblings('li').removeClass('cur');
                     this.curproductCode = item.code;
                     this.getproductModules();
@@ -113,7 +121,7 @@ export default {
                 getproductModules() {
                     commonAjax("cas.productRelatedService", "moduleSelected", `['${this.curproductCode}']`).then(res => {
                         if (res.code == 200) {
-                            this.objectlist={};
+                            this.objectlist = {};
                             $.each(res.body, function(index, el) {
                                 this.objectlist[el] = "test"
                             }.bind(this));
@@ -190,6 +198,9 @@ export default {
                 handleCurrentChange(val) {
                     this.params.pageNo = val;
                     this.getTableData()
+                },
+                searchClick() {
+                    this.getTableData();
                 },
 
         },

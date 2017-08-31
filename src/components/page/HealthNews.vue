@@ -85,7 +85,7 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="资讯内容" :label-width="formLabelWidth" prop="peopleClassifyIds">
+                <el-form-item label="资讯内容" :label-width="formLabelWidth" prop="newsdesc">
                     <quill-editor ref="myTextEditor" v-model="formdata.newsdesc" :config="editorOption" @showImageUI="imageHandler" @change="onEditorChange">
                     </quill-editor>
                     <!-- 必须带上这个input 上传图片用-->
@@ -423,12 +423,12 @@ export default {
                     });
                 },
                 // 表单常用的方法结束--------------------------------------------------------------------------
-                // onEditorChange({
-                //     editor, html, text
-                // }) {
-                //     this.content = html;
-                //     console.log(this.content);
-                // },
+                onEditorChange({
+                    editor, html, text
+                }) {
+                    // this.content = html;
+                    // console.log(this.content);
+                },
 
                 // changeedit() {
                 //     this.editor.enable(true);

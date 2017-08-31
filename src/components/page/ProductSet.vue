@@ -23,6 +23,7 @@
                 <template scope="scope">
                     <el-button size="small" @click="gohistorylist(scope.$index, scope.row)">查看</el-button>
                     <el-button size="small" type="success" @click="handleEdit(scope.$index, scope.row,'outadd')">新增</el-button>
+                    <el-button size="small" @click="showqrcode(scope.$index, scope.row)">二维码</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -94,6 +95,12 @@
                 </el-pagination>
             </div>
         </el-dialog>
+        <!-- 二维码显示 -->
+        <el-dialog :title="qrcodetit" v-model="qrcodeVisible">
+            <div id="qrcode">
+                <vue-qrcode-component :text="qrcodevalue" size="200"></vue-qrcode-component>
+            </div>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -101,6 +108,11 @@ import {
     commonAjax
 }
 from '../../api/api';
+import {
+    Base64
+}
+from 'assets/lib/qrcode/Base64';
+import vueQrcodeComponent from 'vue-qrcode-component'
 export default {
     data() {
             return {
@@ -150,7 +162,10 @@ export default {
                 historydialogFormVisible: false,
                 historytableData: [],
                 curpro: null,
-                statue: "add"
+                statue: "add",
+                qrcodeVisible: false,
+                qrcodevalue: "",
+                qrcodetit: "",
             }
         },
         computed: {
@@ -166,16 +181,15 @@ export default {
                             this.statue = "add";
                             this.dialogtitle = "新增产品版本";
                             this.formdata = {
-                            "id": undefined,
-                            "content": "",
-                            "platform": row.platform,
-                            "productCode": row.productCode,
-                            "productName": row.productName,
-                            "updateType": "",
-                            "url": "",
-                            "version": ""
-                        }
-
+                                "id": undefined,
+                                "content": "",
+                                "platform": row.platform,
+                                "productCode": row.productCode,
+                                "productName": row.productName,
+                                "updateType": "",
+                                "url": "",
+                                "version": ""
+                            }
                         } else {
                             if (row.enableFlag != 1) {
                                 this.dialogtitle = "编辑产品版本";
@@ -256,6 +270,21 @@ export default {
                         }
                     });
                 },
+                // 点击生成二维码
+                showqrcode(index, row) {
+                    this.qrcodeVisible = true;
+                    this.qrcodetit = row.productName;
+                    let temobj = {
+                        type: "4", //二维码类型，必传
+                        pCode: row.productCode, //产品编码，必传
+                    };
+                    temobj = JSON.stringify(temobj);
+                    let b = new Base64();
+                    this.qrcodevalue = "https://app.bshcn.com.cn/download/apk/appdowmload.html?data=" + b.encode(temobj);
+                    // this.qrcodevalue="http://wwww.baidu.com";
+                    // let str = b.decode("eyJ0eXBlIjoiNCIsInBDb2RlIjoiaGNuLnRvbmd4aWFuZy5wYXRpZW50X2FuZHJvaWQifQ==");//解码
+                    // alert(str);
+                },
                 //获取某个产品所有版本的列表数据
                 gohistorylist(index, row) {
                     this.curpro = row;
@@ -295,6 +324,7 @@ export default {
                     this.params.pageNo = val;
                     this.gethistoryTableData()
                 },
+
                 // 列表常用的方法结束-------------------------------------------------------------------------------
                 // 表单常用的方法开始
                 //保存按钮提交数据
@@ -309,12 +339,12 @@ export default {
                                         type: 'success',
                                         message: "保存成功"
                                     });
-                                    if(this.historydialogFormVisible){
-                                    	 this.gohistorylist('', this.curpro);
-                                    	}else{
-                                    		this.getTableData()
-                                    	}
-                                   
+                                    if (this.historydialogFormVisible) {
+                                        this.gohistorylist('', this.curpro);
+                                    } else {
+                                        this.getTableData()
+                                    }
+
 
                                 } else {
                                     this.$message({
@@ -380,7 +410,7 @@ export default {
 
         },
         components: {
-
+            vueQrcodeComponent
         },
         mounted() {
             this.getTableData();
@@ -402,5 +432,11 @@ export default {
 
 .search_con {
     margin: 0 0 20px 0
+}
+
+#qrcode {
+    width: 300px;
+    height: 300px;
+    margin: 30px auto;
 }
 </style>

@@ -12,8 +12,11 @@
             <el-row class="search_con" :gutter="20">
                 <el-col :span="18">
                     <el-select v-model="params.type" placeholder="请选择热门对象类别">
-                        <el-option v-for="item in dictionary.objectType" :key="item.key" :label="item.text" :value="item.key">
-                        </el-option>
+                        <el-option label="全部" value=""></el-option>
+                        <el-option label="机构" value="021"></el-option>
+                        <el-option label="医生" value="031"></el-option>
+                        <!-- <el-option v-for="item in dictionary.objectType" :key="item.key" :label="item.text" :value="item.key">
+                        </el-option> -->
                     </el-select>
                     <el-button type="primary" icon="search" @click="searchClick">搜索</el-button>
                 </el-col>
@@ -23,13 +26,13 @@
             </el-row>
         </div>
         <el-table :data="tableData" border style="width: 100%">
-            <el-table-column prop="hotObjType" label="热门对象类别" width="100">
+            <el-table-column prop="hotObjType" label="热门对象类别">
             </el-table-column>
-            <el-table-column prop="hotObjName" label="对象名称" width="300">
+            <el-table-column prop="hotObjName" label="对象名称" >
             </el-table-column>
-            <el-table-column prop="hotObjCnt" label="统计数量" width="200">
+            <el-table-column prop="hotObjCnt" label="统计数量" >
             </el-table-column>
-            <el-table-column prop="enableDate" label="启用时间" width="200">
+            <el-table-column prop="enableDate" label="启用时间" >
             </el-table-column>
             <el-table-column label="操作">
                 <template scope="scope">
@@ -45,8 +48,9 @@
             <el-row :gutter="20" class="search_con">
                 <el-col :span="6">
                     <el-select v-model="params2.type" placeholder="请选择对象类别" :label-width="formLabelWidth">
-                        <el-option v-for="item in dictionary.objectType2" :key="item.key" :label="item.text" :value="item.key">
-                        </el-option>
+                        <!-- <el-option label="全部" value=""></el-option> -->
+                        <el-option label="机构" value="021"></el-option>
+                        <el-option label="医生" value="031"></el-option>
                     </el-select>
                 </el-col>
                 <el-col :span="12">
@@ -71,11 +75,11 @@
                 </el-row>
             </el-form>
             <el-table :data="tableData2" border style="width: 100%">
-                <el-table-column prop="doctorName" label="结构" width="100">
+                <el-table-column prop="doctorName" label="结果" >
                 </el-table-column>
-                <el-table-column prop="orgName" label="机构" width="300">
+                <el-table-column prop="orgName" label="机构">
                 </el-table-column>
-                <el-table-column prop="deptName" label="科室" width="200">
+                <el-table-column prop="deptName" label="科室">
                 </el-table-column>
                 <el-table-column label="操作">
                     <template scope="scope">
@@ -119,7 +123,7 @@ export default {
                 // 表单数据开始
                 dialogFormVisible: false, //模态框显示隐藏用
                 formdata: { //表单绑定数据用
-                    "hotObjCnt": 0, //统计数量
+                    "hotObjCnt": "", //统计数量
                     "enableDate": "", //启用时间
                 },
                 dialogtitle: "", //模态框动态标题
@@ -136,22 +140,22 @@ export default {
                     // }],
                 },
                 //字典查询数据
-                dictionary: {
-                    objectType: [], //
-                    objectType2: [{
-                        key: "021",
-                        text: "机构",
-                        leaf: true,
-                        index: 0,
-                        mcode: "jg"
-                    }, {
-                        key: "031",
-                        text: "医生",
-                        leaf: true,
-                        index: 0,
-                        mcode: "ys"
-                    }]
-                },
+                // dictionary: {
+                //     objectType: [], //
+                //     objectType2: [{
+                //         key: "021",
+                //         text: "机构",
+                //         leaf: true,
+                //         index: 0,
+                //         mcode: "jg"
+                //     }, {
+                //         key: "031",
+                //         text: "医生",
+                //         leaf: true,
+                //         index: 0,
+                //         mcode: "ys"
+                //     }]
+                // },
                 protableData: [],
             }
         },
@@ -164,6 +168,7 @@ export default {
             handleEdit(index, row) {
                     this.dialogFormVisible = true;
                     this.dialogtitle = "新增热门对象";
+
                 },
                 //点击所有对象里面的列表的添加按钮
                 handleEdit2(index, row) {
@@ -171,7 +176,7 @@ export default {
                     let temparams = `['${this.params2.type}','${row.doctorId}','${row.doctorName}',${this.formdata.hotObjCnt},'${this.formdata.enableDate}']`;
                     commonAjax("cas.hotObjectService", "addHotObject", temparams).then(res => {
                         if (res.code == 200) {
-                             this.getTableData()
+                            this.getTableData()
                         } else {
                             this.$message({
                                 type: 'error',
@@ -184,7 +189,7 @@ export default {
                     this.formdata.enableDate = val
                 },
                 // 删除列表中的一条数据
-               handleDelete(index, row) {
+                handleDelete(index, row) {
                     const h = this.$createElement;
                     this.$msgbox({
                             title: '确认删除',
@@ -226,7 +231,7 @@ export default {
                                             type: 'success',
                                             message: "删除成功"
                                         });
-                                    this.getTableData();
+                                        this.getTableData();
                                     } else {
                                         this.$message({
                                             type: 'error',
@@ -254,7 +259,7 @@ export default {
                 },
                 //获取所有对象列表数据
                 getTableData2() {
-                    this.params2.type = this.dictionary.objectType2[1].key;
+                   
                     var temparams = `['${this.params2.type}','${this.params2.content}',${this.params2.pageNo},${this.params2.pageSize}]`;
                     commonAjax("cas.hotObjectService", "getObjectList", temparams).then(res => {
                         if (res.code == 200) {
@@ -305,27 +310,27 @@ export default {
 
                 },
                 //获取字典
-                dictionaryRequest() {
-                    let arr = ["cfs.dic.base_objectType"];
-                    commonAjax("cas.multipleDictionaryService", "findDic", '[' + JSON.stringify(arr) + ']').then(res => {
-                        if (res.code == 200) {
-                            var that = this;
-                            res.body.forEach(function(ele, index) {
-                                if (ele.dicId == arr[0]) {
-                                    that.dictionary.objectType = ele.items;
-                                }
+                // dictionaryRequest() {
+                //     let arr = ["cfs.dic.base_objectType"];
+                //     commonAjax("cas.multipleDictionaryService", "findDic", '[' + JSON.stringify(arr) + ']').then(res => {
+                //         if (res.code == 200) {
+                //             var that = this;
+                //             res.body.forEach(function(ele, index) {
+                //                 if (ele.dicId == arr[0]) {
+                //                     that.dictionary.objectType = ele.items;
+                //                 }
 
 
-                            })
+                //             })
 
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            });
-                        }
-                    });
-                },
+                //         } else {
+                //             this.$message({
+                //                 type: 'error',
+                //                 message: res.msg
+                //             });
+                //         }
+                //     });
+                // },
                 // 表单常用的方法结束--------------------------------------------------------------------------
 
         },
@@ -333,9 +338,10 @@ export default {
 
         },
         mounted() {
+            this.params2.type = "021";
             this.getTableData();
             this.getTableData2();
-            this.dictionaryRequest();
+            // this.dictionaryRequest();
         },
 
 }

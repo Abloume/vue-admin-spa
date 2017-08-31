@@ -31,7 +31,7 @@
                     <el-row :gutter="20" class="search_con">
                         <el-col :span="24">
                             <el-select v-model="orgId" filterable placeholder="请选择机构名称">
-                                <el-option v-for="item in orglist" :key="item.id" :label="item.orgFullName" :value="item.id">
+                                <el-option v-for="item in orglist" :key="item.orgId" :label="item.orgFullName" :value="item.orgId">
                                 </el-option>
                             </el-select>
                         </el-col>

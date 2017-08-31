@@ -215,3 +215,7 @@ table {
 .center-foot {
     text-align: center;
 }
+.el-table td, .el-table th {
+    padding: 5px;
+}
+

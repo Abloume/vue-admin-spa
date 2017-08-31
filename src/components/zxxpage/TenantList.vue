@@ -9,30 +9,24 @@
                         <el-breadcrumb-item>租户维护</el-breadcrumb-item>
                     </el-breadcrumb>
                 </el-col>
-                <!-- <el-col :span="12" class="return_prev">
-                        <router-link to="/">
-                            <span class="return">
-                                <img src="../../assets/img/return.png">
-                            </span>返回上一级</router-link>
-                    </el-col> -->
             </el-row>
             <el-row class="search_con">
                 <el-col :span="24" class="addorg">
-                    <el-button type="primary" icon="plus" @click="handleAddOrCheck('', '', 'baseInfo', 1)">添加租户</el-button>
+                    <el-button type="primary" icon="plus" @click="handleAddOrCheck('', '', 1)">添加租户</el-button>
                 </el-col>
             </el-row>
         </div>
         <!--列表-->
         <el-table :data="tenantListData" border style="width: 100%">
-            <el-table-column label="序号" prop="number" width="160"></el-table-column>
-            <el-table-column label="租户标识" prop="tenantId" width="160"></el-table-column>
-            <el-table-column label="类型" prop="tenantType" width="160"></el-table-column>
-            <el-table-column label="名称" prop="tenantName" width="160"></el-table-column>
+            <el-table-column label="序号" prop="number"></el-table-column>
+            <el-table-column label="租户标识" prop="tenantId"></el-table-column>
+            <el-table-column label="类型" prop="tenantType"></el-table-column>
+            <el-table-column label="名称" prop="tenantName"></el-table-column>
             <el-table-column label="操作">
                 <template scope="scope">
-                    <el-button size="small" @click="handleAddOrCheck(scope.$index, scope.row, 'baseInfo', 2)">查看</el-button>
-                    <el-button v-if="isEnaleStatus" size="small" type="success" @click="handleForbidden(scope.$index, scope.row, 'enable')">启用</el-button>
-                    <el-button v-if="!isEnaleStatus" size="small" type="danger" @click="handleForbidden(scope.$index, scope.row, 'disable')">禁用</el-button>
+                    <el-button size="small" @click="handleAddOrCheck(scope.$index, scope.row, 2)">查看</el-button>
+                    <el-button v-show="scope.row.status==0" size="small" type="success" @click="handleForbidden(scope.$index, scope.row)">启用</el-button>
+                    <el-button v-show="scope.row.status==1" size="small" type="danger" @click="handleForbidden(scope.$index, scope.row)">禁用</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -58,19 +52,18 @@ export default {
             }
         }
     },
-    created() {
+    activated() {
         this.getTenantListData();
     },
     methods: {
-        //获取机构列表数据
+        //获取租户列表数据
         getTenantListData() {
-            // 参数
             let params = [{
-                "pageNo": this.params.pageNo,
-                "pageSize": this.params.pageSize
+                // tenantId: 'hcn.zhongshan',
+                pageNo: this.params.pageNo,
+                pageSize: this.params.pageSize
             }];
             
-            // 调用服务
             commonAjax("cas.tenantManageService", "tenantList", params).then(res => {
                 if (res.code == 200) {
                     $.each(res.body.data, function(index, el) {
@@ -88,11 +81,10 @@ export default {
         },
 
         //添加租户或者查看租户
-        handleAddOrCheck(index, row, activeName, type) { //第三个参数是为了到orgInfo组件的tab传参;type表示新增或者查看
-            // 参数
+        handleAddOrCheck(index, row, type) { // 第三个参数是为了到orgInfo组件的tab传参;type表示1新增或者2查看
             var tenantId = row.tenantId;
             var type = type;
-            // 跳转
+            
             this.$router.push({
                 name: 'TenantInfo',
                 params: {
@@ -102,10 +94,9 @@ export default {
             });
         },
 
-        //禁用/启用按钮
+        //禁用和启用按钮
         handleForbidden(index, row, status) {
-            
-            if (status == "disable") {
+            if (row.status == 1) { // 禁用
                 const h = this.$createElement;
 
                 this.$msgbox({
@@ -143,7 +134,7 @@ export default {
                         // 禁用服务
                         commonAjax('cas.tenantManageService', 'tenantDisable', [row.tenantId, 0]).then(res => {
                             if (res.code == 200) {
-                                this.isEnaleStatus = true;
+                                row.status = 0;
                                 this.$message({
                                     type: 'success',
                                     message: '禁用成功！'
@@ -157,7 +148,7 @@ export default {
                         })
                     }
                 })
-            } else {
+            } else {    // 啓用
                 const h = this.$createElement;
 
                 this.$msgbox({
@@ -191,11 +182,10 @@ export default {
                             type: 'info',
                             message: "取消启用"
                         });
-                    } else {
-                        // 启用服务
+                    } else { // 启用服务
                         commonAjax('cas.tenantManageService', 'tenantDisable', [row.tenantId, 1]).then(res => {
                             if (res.code == 200) {
-                                this.isEnaleStatus = false;
+                                row.status = 1;
                                 this.$message({
                                     type: 'success',
                                     message: '启用成功！'
@@ -217,6 +207,7 @@ export default {
             this.params.pageSize = val;
             this.getTenantListData();
         },
+
         // 输入框翻页效果
         handleCurrentChange(val) {
             this.params.pageNo = val;

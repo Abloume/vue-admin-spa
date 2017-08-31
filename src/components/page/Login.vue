@@ -11,7 +11,7 @@
                 </el-form-item>
                 <div class="login-btn">
                     <el-button type="primary" @click="submitForm('ruleForm')" v-loading.lock="loading">登录</el-button>
-                  <!--   <div class="selectrole" id="selectrole">
+                    <!--   <div class="selectrole" id="selectrole">
                         <h3>请选择一个登录角色</h3>
                         <ul>
                             <li :class="{'maindoc':item.roleId=='main_doctor','choicdoc':item.roleId=='chronic_doctor','healthdoc':item.roleId=='health_doctor'}" @click="getrid(item)" v-for="(item,index) in role_list">
@@ -38,7 +38,6 @@ export default {
                 username: 'hcn.admin',
                 password: 'qwerty'
             },
-            role_list: [],
             rules: {
                 username: [{
                     required: true,
@@ -58,87 +57,112 @@ export default {
         // 点击登录按钮，如果只有一个角色（过滤掉APP中病人的角色），直接根据角色ID登录
         submitForm(formName) {
                 this.loading = true;
-                // let loginParams = {
-                //     tenantId:'hcn',
-                //     loginName: this.ruleForm.username,
-                //     pwd: md5(this.ruleForm.password),
-                //     forAccessToken: true
-                // }
+                var  tenantId="";
+                let url = window.location.href;
+                 console.log(url);
+                if (url.length > 0) {
+                    let paramStr= url.substring(url.indexOf('=') + 1);
+                     let paramStr2= url.substring(url.indexOf('?'));
+                     console.log(paramStr2);
+                    sessionStorage.setItem('loginurl', paramStr2)
+                    sessionStorage.setItem('peoCode', paramStr);
+                    let temarr=paramStr.split(".");
+                    if(temarr.length==3){
+                        tenantId=temarr[0]+"."+temarr[1]
+                    }else{
+                        tenantId=temarr[0]
+                    }
+                }
 
+                let loginParams = {
+                    tenantId: tenantId,
+                    loginName: this.ruleForm.username,
+                    pwd: md5(this.ruleForm.password),
+                    forAccessToken: true
+                }
+
+                // let tenantIdIndex=url.indexof(".",-1)
 
                 //桐乡租户
                 // let loginParams = {
                 //    "tenantId":"hcn.tongxiang","loginName":"hcn.tongxiang.admin","pwd":"d8578edf8458ce06fbc5bb76a58c5ca4","forAccessToken":true
                 // }
 
-                let loginParams = {
-                   "tenantId":"hcn.tongxiang","loginName":"15924139771","pwd":md5("qwerty"),"forAccessToken":true
-                }
-               
+                // let loginParams = {
+                //    "tenantId":"hcn.tongxiang","loginName":"15924139771","pwd":md5("qwerty"),"forAccessToken":true
+                // }
+
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         requestLoginon(loginParams).then(res => {
                             if (res.code == 200) {
                                 this.loading = false;
-                                  sessionStorage.setItem('accessToken', res.properties.accessToken);
-                                    sessionStorage.setItem('tenantId', res.body.tenantId);
-                                    sessionStorage.setItem('roleIds', "01,02,03,04,05,06");
-                                 this.$router.push('/readme');
-                            } else if(res.code == 501){ 
+                                sessionStorage.setItem('accessToken', res.properties.accessToken);
+                                sessionStorage.setItem('tenantId', res.body.tenantId);
+                                sessionStorage.setItem('userId', res.body.userId);
+                                sessionStorage.setItem('userName', res.body.userName);
+                                sessionStorage.setItem('userAvatar', res.body.userAvatar); //用户图像
+                                // sessionStorage.setItem('roleIds', "01,02,03,04,05,06,admin"); //数据权限
+                                this.$router.push('/readme');
+                            } else if (res.code == 501) {
                                 this.loading = false;
                                 this.$message({
                                     type: 'error',
                                     message: "密码不正确"
                                 });
-                            } else if(res.code == 404){
+                            } else if (res.code == 404) {
                                 this.loading = false;
                                 this.$message({
                                     type: 'error',
                                     message: "用户ID不存在"
                                 });
-                            }else{
-                                 this.$message({
+                            } else {
+                                this.$message({
                                     type: 'error',
                                     message: res.msg
                                 });
                             }
                         })
                     } else {
-                         this.loading = false;
-                         return false;
+                        this.loading = false;
+                        return false;
                     }
                 });
             },
             // 点击角色列表中的某个角色
-            getrid(item) {
-                this.loading = true;
-                this.loginon(item.roleId)
-            },
+            // getrid(item) {
+            //     this.loading = true;
+            //     this.loginon(item.roleId)
+            // },
             // 获取角色ID登录
-            loginon(roleId) {
-                let temopt = {
-                    tenantId: 'coms.xiangtan',
-                    loginName: this.ruleForm.username,
-                    rid: roleId,
-                    pwd: md5(this.ruleForm.password),
-                    forAccessToken: true
-                };
-                requestLoginon(temopt).then((res) => {
-                    this.loading = false;
-                    if (res.code == 200) {
-                        sessionStorage.setItem('accessToken', res.properties.accessToken);
-                        sessionStorage.setItem('userName', res.body.userName);
-                        sessionStorage.setItem('rid', res.body.roleId);
-                        this.$router.push('/readme');
-                    } else {
-                        this.$message({
-                            type: 'error',
-                            message: res.msg
-                        });
-                    }
+            // loginon(roleId) {
+            //     let temopt = {
+            //         tenantId: 'coms.xiangtan',
+            //         loginName: this.ruleForm.username,
+            //         rid: roleId,
+            //         pwd: md5(this.ruleForm.password),
+            //         forAccessToken: true
+            //     };
+            //     requestLoginon(temopt).then((res) => {
+            //         this.loading = false;
+            //         if (res.code == 200) {
+            //             sessionStorage.setItem('accessToken', res.properties.accessToken);
+            //             sessionStorage.setItem('userName', res.body.userName);
+            //             sessionStorage.setItem('rid', res.body.roleId);
+            //             this.$router.push('/readme');
+            //         } else {
+            //             this.$message({
+            //                 type: 'error',
+            //                 message: res.msg
+            //             });
+            //         }
 
-                })
-            }
+            //     })
+            // }
+    },
+    mounted(){
+
+        
     }
 }
 </script>
@@ -181,14 +205,14 @@ export default {
     height: 36px;
 }
 
-.selectrole {
+
+/*.selectrole {
     width: 300px;
     height: 240px;
     position: absolute;
     top: -157px;
     left: -344px;
     border-radius: 5px 0 0 5px;
-    /*  box-shadow: 0 0 8px #ddd;*/
     z-index: 99;
     background: rgba(29, 196, 153, 0.8);
     display: none;
@@ -242,5 +266,5 @@ export default {
 .selectrole ul li:hover {
     background: rgba(255, 255, 255, 0.7);
     color: #0677eb
-}
+}*/
 </style>

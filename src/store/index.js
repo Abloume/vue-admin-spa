@@ -52,6 +52,7 @@ export default new Vuex.Store({
 			activeName: "", //传列表tab定位
 			ishowtab: false //新增的时候不显示除基本信息外的tab
 		},
+		rolemenulists: [],
 	},
 	getters: {
 		// isdisable: state => {
@@ -67,6 +68,10 @@ export default new Vuex.Store({
 		tenantOption(state, tenantOption) {
 			state.tenantOption = tenantOption
 		},
+		//头部角色列表
+		rolemenulists(state, rolemenulists) {
+			state.rolemenulists = rolemenulists
+		},
 	},
 	actions: {
 		//机构列表传值到机构维护组件
@@ -80,6 +85,12 @@ export default new Vuex.Store({
 			commit
 		}, tenantOption) {
 			commit("tenantOption", tenantOption)
+		},
+		//头部角色列表
+		rolemenulists({
+			commit
+		}, rolemenulists) {
+			commit("rolemenulists", rolemenulists)
 		},
 
 	}

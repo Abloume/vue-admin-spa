@@ -49,9 +49,9 @@
                     <p v-show="scope.row.defaultFlag==0">否</p>
                 </template>
             </el-table-column>
-            <el-table-column prop="hitCount" label="点击统计">
+            <el-table-column prop="hitCount" label="点击统计" >
             </el-table-column>
-            <el-table-column label="操作">
+            <el-table-column label="操作" width="180">
                 <template scope="scope">
                     <el-button size="small" @click="handleEdit(scope.$index, scope.row)">查看</el-button>
                     <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)" v-if=" scope.row.status==1">禁用</el-button>
@@ -80,7 +80,7 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="上传图片" :label-width="formLabelWidth" prop="">
+                <el-form-item label="上传图片" :label-width="formLabelWidth" prop="picture">
                     <el-upload class="avatar-uploader" :action="imguploadurl" :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :headers="headers" :data="imguploaddata">
                         <img v-if="imageUrl" :src="imageUrl" class="avatar">
                         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -139,7 +139,7 @@ export default {
                 params: {
                     bannerPostion: "",
                     proCode: "",
-                    isEnable: "",
+                    isEnable: "1",
                     pageNo: 1,
                     pageSize: 10,
                 },
@@ -159,22 +159,53 @@ export default {
                     "orderNo": 0, //排序
                     "description": "", //备注
                     id: 0,
+                    "picture":0,
                 },
                 imguploaddata: {
                     catalog: "banner"
                 },
                 dialogtitle: "", //模态框动态标题
                 formrules: { //表单验证规则
-                    // orgFullName: [{
-                    //     required: true,
-                    //     message: '请输入机构全称',
-                    //     trigger: 'blur'
-                    // }],
-                    // province: [{
-                    //     required: true,
-                    //     message: '请选择省',
-                    //     trigger: 'blur'
-                    // }],
+                    productCode: [{
+                        required: true,
+                        message: '请选择产品名称',
+                       
+                    }],
+                    name: [{
+                        required: true,
+                        message: '请输入广告名称',
+                        trigger: 'blur'
+                    }],
+                    position: [{
+                        required: true,
+                        message: '请选择广告位置',
+                       
+                    }],
+                    linkType: [{
+                        required: true,
+                        message: '请选择链接类型',
+                       
+                    }],
+                    linkAddress: [{
+                        required: true,
+                        message: '请输入链接地址',
+                       
+                    }],
+                    picture: [{
+                        required: true,
+                        message: '请上传图片',
+                       
+                    }],
+                    valid_startDate: [{
+                        required: true,
+                        message: '请选择开始日期',
+                       
+                    }],
+                    valid_endDate: [{
+                        required: true,
+                        message: '请选择结束日期',
+                       
+                    }],
                 },
                 imguploadurl: imguploadurl, //文件或者图片上传的url
                 headers: { //文件或者图片上传的headers
@@ -318,7 +349,10 @@ export default {
                     var temparams = `['${this.params.bannerPostion}','${this.params.proCode}','${this.params.isEnable}',${this.params.pageNo},${this.params.pageSize}]`;
                     commonAjax("cas.productbannerService", "searchProductBannerList", temparams).then(res => {
                         if (res.code == 200) {
-
+                            $.each(res.body.list,function(index, el) {
+                                el.valid_startDate=el.valid_startDate.substring(0,10)
+                                el.valid_endDate=el.valid_endDate.substring(0,10)
+                            }.bind(this));
                             this.tableData = res.body.list;
                             this.total = res.body.count;
                         } else {
@@ -347,6 +381,12 @@ export default {
                 // 表单常用的方法开始
                 //保存按钮提交数据
                 submitForm(formName) {
+                    if(!this.formdata.picture){
+                          this.$message({
+                                        type: 'error',
+                                        message:"请上传图片"
+                                    });
+                    }
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
                             commonAjax("cas.productbannerService", "addAndUpdate", '[' + JSON.stringify(this.formdata) + ']', ).then(res => {
@@ -480,4 +520,6 @@ export default {
     background: url(../../assets/img/zuhu.png) no-repeat left center;
     padding-left: 30px
 }
+.el-table td, .el-table th{padding: 5px;}
+
 </style>

@@ -75,43 +75,7 @@ export default new Router({
                         },
                         component: resolve => require(['../components/zxxpage/TenantInfo.vue'], resolve),
                     }, ]
-                },
-                // {
-                //     path: '/tenantManage', //租户维护
-                //     component: resolve => require(['../components/page/TenantManage.vue'], resolve),
-                //     children: [{
-                //         path: '/',
-                //         name: 'TenantManage',
-                //         meta: {
-                //             keepAlive: true
-                //         },
-                //         component: resolve => require(['../components/page/TenantList.vue'], resolve)
-                //     }, {
-                //         path: '/tenantList',
-                //         name: 'TenantList',
-                //         meta: {
-                //             keepAlive: true
-                //         },
-                //         component: resolve => require(['../components/page/TenantList.vue'], resolve)
-                //     }, {
-                //         path: '/tenantinfo',
-                //         name: 'TenantInfo',
-                //         meta: {
-                //             keepAlive: false
-                //         },
-                //         component: resolve => require(['../components/page/TenantInfo.vue'], resolve),
-                //     }, ]
-                // },
-                //{
-                //     path: '/userSet', //用户管理
-                //     name: 'UserSet',
-                //     component: resolve => require(['../components/page/UserSet.vue'], resolve)
-                // }, {
-                //     path: '/productSet', //产品管理
-                //     name: 'ProductSet',
-                //     component: resolve => require(['../components/page/ProductSet.vue'], resolve)
-                // }, 
-                {
+                }, {
                     path: '/userSet', //用户管理
                     name: 'UserSet',
                     component: resolve => require(['../components/page/UserSet.vue'], resolve)
@@ -167,7 +131,48 @@ export default new Router({
                     path: '/doctorTeam', //健康资讯类别
                     name: 'DoctorTeam',
                     component: resolve => require(['../components/page/DoctorTeam.vue'], resolve)
-                },
+                }, {
+                    path: '/doctorsignset', //健康资讯类别
+                    name: 'DoctorSignSet',
+                    component: resolve => require(['../components/page/DoctorSignSet.vue'], resolve)
+                }, {
+                    path: '/doctorReview', //医生审核
+                    name: 'DoctorReview',
+                    component: resolve => require(['../components/page/DoctorReview.vue'], resolve)
+                }, {
+                    path: '/serviceItem',
+                    component: resolve => require(['../components/zxxpage/ServiceItem.vue'], resolve),
+                    children: [{
+                        path: '/',
+                        name: 'ServiceItem',
+                        meta: {
+                            keepAlive: true
+                        },
+                        component: resolve => require(['../components/zxxpage/ServiceItemList.vue'], resolve)
+                    }]
+                }, {
+                    path: '/servicePackage',
+                    component: resolve => require(['../components/zxxpage/ServicePackage.vue'], resolve),
+                    children: [{
+                        path: '/',
+                        name: 'ServicePackage',
+                        meta: {
+                            keepAlive: true
+                        },
+                        component: resolve => require(['../components/zxxpage/ServicePackageList.vue'], resolve)
+                    }]
+                }, {
+                    path: '/protocolManage',
+                    component: resolve => require(['../components/zxxpage/ProtocolManage.vue'], resolve),
+                    children: [{
+                        path: '/',
+                        name: 'ProtocolManage',
+                        meta: {
+                            keepAlive: true
+                        },
+                        component: resolve => require(['../components/zxxpage/ProtocolManageList.vue'], resolve)
+                    }]
+                }
 
             ]
         }, {
@@ -175,5 +180,6 @@ export default new Router({
             name: 'Login',
             component: resolve => require(['../components/page/Login.vue'], resolve)
         },
+
     ]
 })

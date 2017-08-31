@@ -16,9 +16,9 @@
                         </el-option>
                     </el-select>
                 </el-col>
-                <el-col :span="6" class="addorg">
-                    <el-button type="primary" icon="plus" @click="handleEdit">添加广告</el-button>
-                </el-col>
+                <!-- <el-col :span="6" class="addorg">
+                    <el-button type="primary" icon="plus" @click="handleEdit">添加</el-button>
+                </el-col> -->
             </el-row>
         </div>
         <el-row :gutter="20">
@@ -80,7 +80,7 @@
         <el-dialog title="选择对应模块" v-model="dialogFormVisible">
             <el-row class="search_con" :gutter="20">
                 <el-col :span="8">
-                    <el-input v-model="params.moduleName" placeholder="请输入模块名称" @blur="getserchval"></el-input>
+                    <el-input v-model="params.keyWord" placeholder="请输入模块名称" ></el-input>
                 </el-col>
                <!--  <el-col :span="8">
                     <el-input v-model="params.moduleCode" placeholder="请输入模块编码"></el-input>
@@ -138,8 +138,8 @@ export default {
                 dialogFormVisible: false,
                 total: "",
                 params: {
-                    "moduleCode": "",
-                    "moduleName": "",
+                    "productCode":"",
+                    "keyWord":"",
                     "pageNo": 1,
                     "pageSize": 10,
                 },
@@ -197,15 +197,12 @@ export default {
 
         },
         methods: {
-        	//搜索框赋值
-        	getserchval(){
-        		this.params.moduleCode=this.params.moduleName
-        	},
             getprolist() {
                     commonAjax('cas.productRelatedService', 'productSecondLevelList', '[]').then(res => {
                         if (res.code == 200) {
                             this.prolist = res.body;
                             this.curprocode = this.prolist[0].code;
+                            this.getTableData();
                         } else {
                             this.$message({
                                 type: 'error',
@@ -380,7 +377,7 @@ export default {
                     this.getTableData();
                 },
                 getTableData() {
-                 
+                    this.params.productCode=this.curprocode;
                     commonAjax("cas.productRelatedService", "moduleList", '[' + JSON.stringify(this.params) + ']').then(res => {
                         if (res.code == 200) {
                             this.tableData = res.body.data;
@@ -397,8 +394,7 @@ export default {
                     this.formdata.moduleId = row.moduleId;
                     this.formdata.moduleName = row.moduleName;
                     this.dialogFormVisible = false;
-                    this.params.moduleCode= "";
-                    this.params.moduleName= "";
+                    this.params.keyWord= "";
                 },
                 //删除菜单
                 removeTreeNode() {
@@ -483,7 +479,7 @@ export default {
         },
         mounted() {
             this.getprolist();
-            this.getTableData();
+           
         },
         watch: {
             'curprocode' (val, oldval) {

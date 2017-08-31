@@ -254,9 +254,9 @@
                         </el-pagination>
                     </div> -->
                 </el-tab-pane>
-                <el-tab-pane label="机构二维码" name="qrCode" class="eltabpane" v-if="orgOption.ishowtab">
+               <!--  <el-tab-pane label="机构二维码" name="qrCode" class="eltabpane" v-if="orgOption.ishowtab">
                     <img :src="imgview+orgOption.qrAvatarFileId" class="qrimg">
-                </el-tab-pane>
+                </el-tab-pane> -->
             </el-tabs>
         </el-row>
         <!-- 导航模态框 -->
@@ -1564,6 +1564,7 @@ export default {
             AreaText
         },
         mounted() {
+           console.log(this.orgOption.partnerId);
             let params = [{}];
             commonAjax("cas.departmentService", "deptTree", params).then(res => {
                 if (res.code == 200) {
