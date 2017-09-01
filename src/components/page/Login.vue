@@ -119,7 +119,7 @@ export default {
                             } else {
                                 this.$message({
                                     type: 'error',
-                                    message: res.msg
+                                    message: "登录失败，请确认账号密码是否正确！"
                                 });
                             }
                         })
@@ -153,7 +153,7 @@ export default {
             //         } else {
             //             this.$message({
             //                 type: 'error',
-            //                 message: res.msg
+            //                 message: ""
             //             });
             //         }
 

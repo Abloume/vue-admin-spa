@@ -60,7 +60,45 @@
                                 </el-option>
                             </el-select>
                         </el-form-item>
-                        <Area-Text v-on:getareadata="getareadata" :defaultarea="defaultarea"></Area-Text>
+                        <!--  <Area-Text v-on:getareadata="getareadata" :defaultarea="defaultarea"></Area-Text> -->
+                        <div id="areatext">
+                            <el-row>
+                                <el-col :span="12">
+                                    <el-form-item label="省级" :label-width="formLabelWidth" prop="province">
+                                        <el-select v-model="editarea.province" placeholder="请选择省">
+                                            <el-option v-for="item in provincelist" :label="item.text" :value="item.key" :key="item.key">
+                                            </el-option>
+                                        </el-select>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="市级" :label-width="formLabelWidth" prop="city">
+                                        <el-select v-model="editarea.city" placeholder="请选择市">
+                                            <el-option v-for="item in citylist" :label="item.text" :value="item.key" :key="item.key">
+                                            </el-option>
+                                        </el-select>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-row>
+                                <el-col :span="12">
+                                    <el-form-item label="地区" :label-width="formLabelWidth" prop="district">
+                                        <el-select v-model="editarea.district" placeholder="请选择地区">
+                                            <el-option v-for="item in districtlist" :label="item.text" :value="item.key" :key="item.key">
+                                            </el-option>
+                                        </el-select>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="街道" :label-width="formLabelWidth" prop="city">
+                                        <el-select v-model="editarea.street" placeholder="请选择街道">
+                                            <el-option v-for="item in streetlist" :label="item.text" :value="item.key" :key="item.key">
+                                            </el-option>
+                                        </el-select>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                        </div>
                         <el-form-item label="机构地址" :label-width="formLabelWidth" prop="orgAddress">
                             <el-input v-model="orgOption.orgAddress" :disabled="orgOption.isdisabled"></el-input>
                         </el-form-item>
@@ -127,7 +165,7 @@
                         </el-pagination>
                     </div>
                 </el-tab-pane>
-                <el-tab-pane label="账号信息" name="countInfo" class="eltabpane" v-if="orgOption.ishowtab">
+                 <!--<el-tab-pane label="账号信息" name="countInfo" class="eltabpane" v-if="orgOption.ishowtab">
                     <h2 class="account-title">支付宝</h2>
                     <el-form :model="countformdata" :rules="conutinformrules" ref="countForm" auto-complete="off">
                         <el-form-item label="支付宝账号" :label-width="formLabelWidth" prop="AliPay.account">
@@ -196,8 +234,8 @@
                             <el-button type="primary" @click="countsubmitForm('orginfoForm')" v-if="!orgOption.isdisabled">保 存</el-button>
                             <el-button type="primary" @click="editForm()" v-if="orgOption.isdisabled">我要编辑</el-button>
                         </div>
-                    </el-form>
-                </el-tab-pane>
+                    </el-form> 
+                </el-tab-pane>-->
                 <el-tab-pane label="报告说明" name="reportDes" class="eltabpane" v-if="orgOption.ishowtab">
                     <el-row class="addbtn">
                         <el-col :span="24">
@@ -254,7 +292,7 @@
                         </el-pagination>
                     </div> -->
                 </el-tab-pane>
-               <!--  <el-tab-pane label="机构二维码" name="qrCode" class="eltabpane" v-if="orgOption.ishowtab">
+                <!--  <el-tab-pane label="机构二维码" name="qrCode" class="eltabpane" v-if="orgOption.ishowtab">
                     <img :src="imgview+orgOption.qrAvatarFileId" class="qrimg">
                 </el-tab-pane> -->
             </el-tabs>
@@ -445,7 +483,7 @@
 <script>
 import BMap from 'BMap'
 import {
-    commonAjax, imguploadurl, imgview
+    commonAjax, imguploadurl, imgview, areaAjax
 }
 from '../../api/api';
 import {
@@ -508,6 +546,11 @@ export default {
                         message: '请选择地区',
                         trigger: 'blur'
                     }],
+                    localOrgId:[{
+                        required: true,
+                        message: '请输入机构本地代码',
+                        trigger: 'blur'
+                    }],
                     // street: [{
                     //     required: true,
                     //     message: '请选择街道',
@@ -537,12 +580,12 @@ export default {
                 mapsearchtext: "", //百度地图搜索关键字
 
 
-                defaultarea: { //地区组件父组件传值
-                    province: "",
-                    city: "",
-                    district: "",
-                    street: "",
-                },
+                // defaultarea: { //地区组件父组件传值
+                //     province: "",
+                //     city: "",
+                //     district: "",
+                //     street: "",
+                // },
 
                 //机构基本信息结束--------------------------------------------------
 
@@ -704,11 +747,21 @@ export default {
                         'accountType': '06'
                     },
                 },
-                fileList3: []
-                    // 账号信息结束--------------------------------------------------
-                    // 机构二维码开始
+                fileList3: [],
+                // 账号信息结束--------------------------------------------------
+                // 机构二维码开始
 
                 // 账号信息结束--------------------------------------------------
+                provincelist: [],
+                citylist: [],
+                districtlist: [],
+                streetlist: [],
+                editarea: {
+                    province: "",
+                    city: "",
+                    district: "",
+                    street: "",
+                }
             }
         },
         computed: {
@@ -826,7 +879,7 @@ export default {
                 handleAvatarSuccess(res, file) { //上传图片成功后
                     this.imageUrl = imgview + res.body;
                     this.orgOption.avatarField = res.body;
-                     this.$message.success('上传成功');
+                    this.$message.success('上传成功');
                 },
 
                 //百度地图(经纬度)
@@ -905,15 +958,15 @@ export default {
                     this.$router.push('organizationList')
                 },
                 // 获取地区信息代码
-                getareadata(editarea) {
-                    this.orgOption.province = editarea.province;
-                    this.orgOption.city = editarea.city;
-                    this.orgOption.district = editarea.district;
-                    this.orgOption.street = editarea.street;
-                },
+                // getareadata(editarea) {
+                //     this.orgOption.province = editarea.province;
+                //     this.orgOption.city = editarea.city;
+                //     this.orgOption.district = editarea.district;
+                //     this.orgOption.street = editarea.street;
+                // },
                 //传递数据都地区组件
                 postdefaultarea() {
-                    this.defaultarea = {
+                    this.editarea = {
                         province: this.orgOption.province,
                         city: this.orgOption.city,
                         district: this.orgOption.district,
@@ -988,7 +1041,7 @@ export default {
                             "description": row.description ? row.description : "",
                             "navigatorField": row.navigatorField ? row.navigatorField : 0
                         };
-                         this.navimageUrl = imgview + this.navformdata.navigatorField;
+                        this.navimageUrl = imgview + this.navformdata.navigatorField;
                     } else {
                         this.dialogtitle = "添加导航";
                         this.navformdata = {
@@ -998,9 +1051,9 @@ export default {
                             "description": "",
                             "navigatorField": 0
                         }
-                         this.navimageUrl ="";
+                        this.navimageUrl = "";
                     }
-                   
+
                 },
                 //提交机构导航
                 navsubmitForm(formName) {
@@ -1064,7 +1117,7 @@ export default {
                 navhandleAvatarSuccess(res, file) { //上传图片成功后
                     this.navimageUrl = imgview + res.body;
                     this.navformdata.navigatorField = res.body;
-                     this.$message.success('上传成功');
+                    this.$message.success('上传成功');
                 },
                 closenavmodal(formName) {
                     this.$refs[formName].resetFields();
@@ -1140,7 +1193,7 @@ export default {
                             "remark": row.remark ? row.remark : "",
                             "status": row.status ? row.status : "",
                         };
-                         this.repimageUrl = imgview + this.repformdata.instructionPicture;
+                        this.repimageUrl = imgview + this.repformdata.instructionPicture;
                     } else {
                         this.dialogtitle = "添加报告";
                         this.repformdata = {
@@ -1153,9 +1206,9 @@ export default {
                             "remark": "",
                             "status": "",
                         };
-                         this.repimageUrl = "";
+                        this.repimageUrl = "";
                     }
-                   
+
 
                 },
                 //提交报告
@@ -1216,7 +1269,7 @@ export default {
                 rephandleAvatarSuccess(res, file) { //上传图片成功后
                     this.repimageUrl = imgview + res.body;
                     this.repformdata.instructionPicture = res.body;
-                     this.$message.success('上传成功');
+                    this.$message.success('上传成功');
                 },
                 closerepmodal(formName) {
                     this.$refs[formName].resetFields();
@@ -1558,13 +1611,31 @@ export default {
                     this.fileList3 = fileList.slice(-3);
                 },
 
-            //账号管理结束---------------------------------------------------------
+                //账号管理结束---------------------------------------------------------
+                getchilddata(val, sign) {
+                    var params = {
+                        limit: 50,
+                        parentKey: val,
+                    };
+                    areaAjax(params).then(res => {
+                        if (sign == "city") {
+                            this.citylist = res.items;
+                        } else if (sign == "district") {
+                            this.districtlist = res.items;
+                        } else if (sign == "street") {
+                            this.streetlist = res.items;
+                        } else {
+                            this.provincelist = res.items;
+                        }
+
+                    });
+
+                },
         },
         components: {
             AreaText
         },
         mounted() {
-           console.log(this.orgOption.partnerId);
             let params = [{}];
             commonAjax("cas.departmentService", "deptTree", params).then(res => {
                 if (res.code == 200) {
@@ -1578,16 +1649,62 @@ export default {
             });
             this.dictionaryRequest();
             this.getServicePacklist();
+            this.getchilddata(null, 'province');
         },
         beforeRouteEnter(to, from, next) {
             next(vm => {
+                vm.citylist= [];
+                vm.districtlist= [];
+                vm.streetlist=[];
                 vm.postdefaultarea();
-                vm.imageUrl = vm.orgOption.avatarField?imgview + vm.orgOption.avatarField:"";
+                vm.imageUrl = vm.orgOption.avatarField ? imgview + vm.orgOption.avatarField : "";
                 vm.navgetTableData()
                 vm.repgetTableData()
                 vm.sergetTableData()
             })
-        }
+        },
+        watch: {
+            'editarea.province' (val, oldval) {
+                if (val != "") {
+                    this.getchilddata(val, "city");
+                }
+                //通过省获取市
+
+                // if (oldval != "") {
+                //     this.editarea.city = "";
+                //     this.editarea.district = "";
+                //     this.editarea.street = ""
+                // }
+            },
+            'editarea.city' (val, oldval) {
+                // //通过市区县
+                if (val != "") {
+                    this.getchilddata(val, "district");
+                }
+
+                // if (oldval != "") {
+                //     this.editarea.district = "";
+                //     this.editarea.street = ""
+                // }
+            },
+            'editarea.district' (val, oldval) {
+                // //通过区县获取街道
+
+                if (val != "") {
+                    this.getchilddata(val, "street");
+                }
+                // if (oldval != "") {
+                //     this.editarea.street = ""
+                // }
+            },
+            'editarea.street' (val, oldval) {
+                if (val != "") {
+                   
+                }
+
+            },
+
+        },
 }
 </script>
 <style type="text/css">

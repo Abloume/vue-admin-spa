@@ -17,7 +17,7 @@
                     <h2>医院列表</h2>
                 </div>
                 <div class="left-con">
-                    <ul id="hospitalLists" class="ztree" style="width:240px"></ul>
+                    <ul id="hospitalLists2" class="ztree" style="width:240px"></ul>
                 </div>
             </el-col>
             <el-col :span="16">
@@ -219,8 +219,8 @@
                                     <el-input v-model="editdetailDocformdata.certifiyNo"></el-input>
                                 </el-form-item>
                             </el-col>
-                            <el-col :span="6">
-                                <el-button>查看证书</el-button>
+                            <el-col :span="6" v-show="editDocformdata.doctorId">
+                                <el-button @click="showcertifiy">查看证书</el-button>
                             </el-col>
                         </el-row>
                         <el-form-item label="执业地点" :label-width="formLabelWidth" prop="certifiyAddress">
@@ -251,6 +251,10 @@
                     <el-button type="primary" @click="editdetailDocsubmitForm('editDocdetailinfoForm')">确 定</el-button>
                 </div>
             </el-form>
+        </el-dialog>
+        <!-- 证书弹框 -->
+        <el-dialog title="执业证书" v-model="certifiyFormVisible" class="certifiy">
+            <img :src="111" />
         </el-dialog>
     </div>
 </template>
@@ -456,6 +460,7 @@ export default {
                 },
                 zTree: {},
                 zNodes: [],
+                certifiyFormVisible:false,
             }
         },
         computed: {
@@ -493,6 +498,7 @@ export default {
                 },
                 //添加编辑医生
                 addTreeNode(index, row) {
+                    console.log(row);
                     this.hideRMenu();
                     this.editDocdialogFormVisible = true;
                     if (row) {
@@ -535,7 +541,7 @@ export default {
                         this.editDocformdata.doctorName = "";
                         this.editDocformdata.doctorId = "";
                     }
-
+                    console.log( this.editDocformdata.id);
                 },
 
                 //点击选择医生
@@ -909,6 +915,10 @@ export default {
                     // }
                     // return isJPG && isLt2M;
                 },
+                // 点击查看证书
+                showcertifiy(){
+                    this.certifiyFormVisible=true;
+                },
                 //验证
                 // validationData() {
                 //     $('.msg-without-complete').modal('show');
@@ -960,8 +970,8 @@ export default {
         mounted() {
 
             //初始化科室列表
-            $.fn.zTree.init($("#hospitalLists"), this.setting);
-            this.zTree = $.fn.zTree.getZTreeObj("hospitalLists");
+            $.fn.zTree.init($("#hospitalLists2"), this.setting);
+            this.zTree = $.fn.zTree.getZTreeObj("hospitalLists2");
             //标准科室
             this.getalldoc();
             // //字典请求
@@ -1039,4 +1049,5 @@ div#rMenu ul li:nth-child(2) {
 .el-picker-panel__icon-btn {
     margin-left: 20px
 }
+.certifiy img {display: block;margin:20px auto; width: 100%; height: auto}
 </style>

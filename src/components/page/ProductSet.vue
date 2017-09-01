@@ -136,16 +136,16 @@ export default {
 
                 dialogtitle: "", //模态框动态标题
                 formrules: { //表单验证规则
-                    // orgFullName: [{
-                    //     required: true,
-                    //     message: '请输入机构全称',
-                    //     trigger: 'blur'
-                    // }],
-                    // province: [{
-                    //     required: true,
-                    //     message: '请选择省',
-                    //     trigger: 'blur'
-                    // }],
+                    version: [{
+                        required: true,
+                        message: '请输入版本',
+                        trigger: 'blur'
+                    }],
+                    url: [{
+                        required: true,
+                        message: '请输入下载地址',
+                        trigger: 'blur'
+                    }],
                 },
                 dictionary: {
                     appPlatformType: [], //平台类型

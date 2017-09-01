@@ -290,7 +290,7 @@ export default {
                 generatePlanTime: 0,  // 生成计划时机
                 serviceDesc: '',      // 简介
                 helpDoc: '',          // 服务指导
-                tenantId: 'hcn',      // 租户ID
+                tenantId: '',      // 租户ID
                 createUser: '3c41b79e-6484-11e7-8229-005056c00008' // 登录用户ID
             },
             addTplForm: {             // 添加服务说明模板表单
@@ -362,17 +362,17 @@ export default {
         /**
          *  查看 
          */ 
-        // 获取列表
+        // 获取服务项列表
         getServItemList() {
             if (this.searchContent.name==""&&this.searchContent.status=="") {
                 var params = [{
-                    tenantId: 'hcn',
+                    tenantId: sessionStorage.getItem('tenantId'),
                     pageNo: this.page.pageNo,
                     pageSize: this.page.pageSize
                 }];
             } else {
                 var params = [{
-                    tenantId: 'hcn',
+                    tenantId: sessionStorage.getItem('tenantId'),
                     pageNo: this.page.pageNo,
                     pageSize: this.page.pageSize,
                     serviceName: this.searchContent.name,
@@ -598,6 +598,7 @@ export default {
             this.$refs[formName].validate((valid) => {
                 if (valid) {
                     if (this.isAddOrEdit == 1) { // 添加数据
+                        this.addServItemForm.tenantId = sessionStorage.getItem('tenantId');
                         this.addServItemForm.content = this.servExplModule; // 服务说明模板内容
                         this.addServItemForm.allowanceRatio = parseInt(this.addServItemForm.allowanceRatio);
                         this.addServItemForm.generatePlanTime = parseFloat(this.addServItemForm.generatePlanTime);

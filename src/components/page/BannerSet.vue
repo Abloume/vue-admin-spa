@@ -92,7 +92,7 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="链接地址" :label-width="formLabelWidth" prop="linkAddress">
+                <el-form-item label="链接地址" :label-width="formLabelWidth" prop="linkAddress" v-if="formdata.linkType!='00'">
                     <el-input v-model="formdata.linkAddress"></el-input>
                 </el-form-item>
                 <el-form-item label="正文" :label-width="formLabelWidth" prop="linkText">

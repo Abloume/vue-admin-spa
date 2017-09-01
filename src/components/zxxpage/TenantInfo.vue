@@ -109,7 +109,6 @@
                                 <el-button size="small" type="success" @click="checkProduct(scope.$index, scope.row)">查看</el-button>
                                 <el-button size="small" type="success" @click="handleForbidden(scope.$index, scope.row)" v-show="scope.row.status==0">启用</el-button>
                                 <el-button size="small" type="danger" @click="handleForbidden(scope.$index, scope.row)" v-show="scope.row.status==1">禁用</el-button>
-                                
                             </template>
                         </el-table-column>
                     </el-table>
@@ -1498,13 +1497,13 @@ export default {
                     let temobj = {
                         type: "1", //二维码类型，必传
                         tenantId: this.$route.params.id, //租户ID，必传
-                        orgId:row.orgId, //机构ID，必传
+                        orgId: row.orgId, //机构ID，必传
                         t: new Date().getTime() //时间戳，必传
                     };
                     temobj = JSON.stringify(temobj);
                     let b = new Base64();
                     this.qrcodevalue = "https://app.bshcn.com.cn/download/apk/appdowmload.html?data=" + b.encode(temobj);
-                    let str = b.decode(b.encode(temobj));//解码
+                    let str = b.decode(b.encode(temobj)); //解码
                 },
 
                 /**
@@ -1854,7 +1853,7 @@ export default {
                                     });
                                 }
                             });
-                           
+
                         } else {
                             return false;
                         }
@@ -1995,12 +1994,15 @@ export default {
                     // };
                 },
         },
-         components: {
+        components: {
             vueQrcodeComponent
         },
         beforeRouteEnter(to, from, next) {
             next(vm => {
                 vm.postdefaultarea();
+                vm.OrgTableData = [];
+                vm.ProductTableData = [];
+                vm.ServiceTableData = [];
             })
         }
 }
@@ -2151,6 +2153,7 @@ h2.account-title {
 .serv_check {
     width: 175px;
 }
+
 #qrcode {
     width: 300px;
     height: 300px;

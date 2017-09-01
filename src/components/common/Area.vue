@@ -73,10 +73,13 @@ export default {
         },
         mounted() {
             this.getchilddata(null, 'province');
+            console.log(this.citylist)
 
         },
         methods: {
             getchilddata(val, sign) {
+                console.log(sign);
+                console.log(sign);
                 var params = {
                     limit: 50,
                     parentKey: val,
@@ -99,8 +102,11 @@ export default {
         },
         watch: {
             'editarea.province' (val, oldval) {
+                if (val != "") {
+                    this.getchilddata(val, "city");
+                }
                 //通过省获取市
-                this.getchilddata(val, "city");
+
                 // if (oldval != "") {
                 //     this.editarea.city = "";
                 //     this.editarea.district = "";
@@ -109,8 +115,10 @@ export default {
             },
             'editarea.city' (val, oldval) {
                 // //通过市区县
-
-                this.getchilddata(val, "district");
+                 if (val != "") {
+                    this.getchilddata(val, "district");
+                }
+               
                 // if (oldval != "") {
                 //     this.editarea.district = "";
                 //     this.editarea.street = ""
@@ -118,13 +126,19 @@ export default {
             },
             'editarea.district' (val, oldval) {
                 // //通过区县获取街道
-                this.getchilddata(val, "street");
+                
+                 if (val != "") {
+                    this.getchilddata(val, "street");
+                }
                 // if (oldval != "") {
                 //     this.editarea.street = ""
                 // }
             },
             'editarea.street' (val, oldval) {
-                this.$emit('getareadata', this.editarea)
+                if (val != "") {
+                     this.$emit('getareadata', this.editarea)
+                }
+               
             },
 
         },

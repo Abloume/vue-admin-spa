@@ -481,7 +481,7 @@ export default {
                 price: "",            // 价格
                 startDt: "",          // 启用时间
                 suitableObject: "",   // 签约适合对象
-                tenantId: "hcn",      // 租户id
+                tenantId: "",      // 租户id
                 validPeriod: "",      // 有效期（天）
                 discount: [{          // 优惠信息
                     discountType: 1
@@ -1018,13 +1018,13 @@ export default {
         getServPackList() {
             if (this.searchContent.name == "" && this.searchContent.status == "") {
                 var params = [{
-                    tenantId: 'hcn',
+                    tenantId: sessionStorage.getItem('tenantId'),
                     pageNo: this.page.pageNo,
                     pageSize: this.page.pageSize
                 }];
             } else {
                 var params = [{
-                    tenantId: 'hcn',
+                    tenantId: sessionStorage.getItem('tenantId'),
                     pageNo: this.page.pageNo,
                     pageSize: this.page.pageSize,
                     packName: this.searchContent.name,
@@ -1099,6 +1099,7 @@ export default {
                         return;
                     }
 
+                    this.addPackFormData.tenantId = sessionStorage.getItem('tenantId');
                     this.addPackFormData.price = parseInt(this.addPackFormData.price);
                     this.addPackFormData.startDt = this.curPickDate;
 

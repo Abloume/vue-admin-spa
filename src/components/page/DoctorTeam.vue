@@ -17,7 +17,7 @@
                     <h2>医院列表</h2>
                 </div>
                 <div class="left-con">
-                    <ul id="hospitalLists" class="ztree" style="width:240px"></ul>
+                    <ul id="hospitalLists3" class="ztree" style="width:240px"></ul>
                 </div>
             </el-col>
             <el-col :span="16">
@@ -1120,8 +1120,8 @@ export default {
         },
         mounted() {
             //初始化社区机构列表
-            $.fn.zTree.init($("#hospitalLists"), this.setting);
-            this.zTree = $.fn.zTree.getZTreeObj("hospitalLists");
+            $.fn.zTree.init($("#hospitalLists3"), this.setting);
+            this.zTree = $.fn.zTree.getZTreeObj("hospitalLists3");
             this.getbaseserlist();
 
         },

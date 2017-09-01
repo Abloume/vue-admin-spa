@@ -28,7 +28,7 @@
                     <h2>菜单列表</h2>
                 </div>
                 <div class="left-con">
-                    <ul id="hospitalLists" class="ztree" style="width:240px"></ul>
+                    <ul id="hospitalLists4" class="ztree" style="width:240px"></ul>
                 </div>
             </el-col>
             <el-col :span="16">
@@ -202,7 +202,6 @@ export default {
                         if (res.code == 200) {
                             this.prolist = res.body;
                             this.curprocode = this.prolist[0].code;
-                            this.getTableData();
                         } else {
                             this.$message({
                                 type: 'error',
@@ -484,6 +483,7 @@ export default {
         watch: {
             'curprocode' (val, oldval) {
                 this.eventOrg = true;
+                this.getTableData();
                 commonAjax('cas.productRelatedService', 'productMemuList', `['${val}']`).then(res => {
                     if (res.code == 200) {
                         $.each(res.body, function(index, el) {
@@ -505,8 +505,8 @@ export default {
                         };
                         res.body.unshift(temobj);
                         this.zNodes = res.body;
-                        $.fn.zTree.init($("#hospitalLists"), this.setting, this.zNodes);
-                        this.zTree = $.fn.zTree.getZTreeObj("hospitalLists");
+                        $.fn.zTree.init($("#hospitalLists4"), this.setting, this.zNodes);
+                        this.zTree = $.fn.zTree.getZTreeObj("hospitalLists4");
                     } else {
                         this.$message({
                             type: 'error',

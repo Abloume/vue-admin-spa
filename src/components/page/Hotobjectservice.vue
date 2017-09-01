@@ -28,11 +28,11 @@
         <el-table :data="tableData" border style="width: 100%">
             <el-table-column prop="hotObjType" label="热门对象类别">
             </el-table-column>
-            <el-table-column prop="hotObjName" label="对象名称" >
+            <el-table-column prop="hotObjName" label="对象名称">
             </el-table-column>
-            <el-table-column prop="hotObjCnt" label="统计数量" >
+            <el-table-column prop="hotObjCnt" label="统计数量">
             </el-table-column>
-            <el-table-column prop="enableDate" label="启用时间" >
+            <el-table-column prop="enableDate" label="启用时间">
             </el-table-column>
             <el-table-column label="操作">
                 <template scope="scope">
@@ -75,7 +75,7 @@
                 </el-row>
             </el-form>
             <el-table :data="tableData2" border style="width: 100%">
-                <el-table-column prop="doctorName" label="结果" >
+                <el-table-column prop="doctorName" label="结果">
                 </el-table-column>
                 <el-table-column prop="orgName" label="机构">
                 </el-table-column>
@@ -128,16 +128,15 @@ export default {
                 },
                 dialogtitle: "", //模态框动态标题
                 formrules: { //表单验证规则
-                    // orgFullName: [{
-                    //     required: true,
-                    //     message: '请输入机构全称',
-                    //     trigger: 'blur'
-                    // }],
-                    // province: [{
-                    //     required: true,
-                    //     message: '请选择省',
-                    //     trigger: 'blur'
-                    // }],
+                    hotObjCnt: [{
+                        required: true,
+                        message: '请输入统计数量',
+                        trigger: 'blur'
+                    }],
+                    enableDate: [{
+                        required: true,
+                        message: '请输入启用时间',
+                    }],
                 },
                 //字典查询数据
                 // dictionary: {
@@ -172,18 +171,34 @@ export default {
                 },
                 //点击所有对象里面的列表的添加按钮
                 handleEdit2(index, row) {
-                    this.dialogFormVisible = false;
-                    let temparams = `['${this.params2.type}','${row.doctorId}','${row.doctorName}',${this.formdata.hotObjCnt},'${this.formdata.enableDate}']`;
-                    commonAjax("cas.hotObjectService", "addHotObject", temparams).then(res => {
-                        if (res.code == 200) {
-                            this.getTableData()
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
+                   
+                    let temparams = "";
+                    if (this.params2.type == '021') {
+                        temparams = `['${this.params2.type}','${row.orgId}','${row.orgName}',${this.formdata.hotObjCnt},'${this.formdata.enableDate}']`;
+                    } else {
+                        temparams = `['${this.params2.type}','${row.doctorId}','${row.doctorName}',${this.formdata.hotObjCnt},'${this.formdata.enableDate}']`;
+                    }
+                    this.$refs['adinfoForm'].validate((valid) => {
+                        if (valid) {
+                             commonAjax("cas.hotObjectService", "addHotObject", temparams).then(res => {
+                                if (res.code == 200) {
+                                     this.dialogFormVisible = false;
+                                    this.getTableData()
+                                } else {
+                                    this.$message({
+                                        type: 'error',
+                                        message: res.msg
+                                    });
+                                }
                             });
+                           
+                        } else {
+                            console.log('error submit!!');
+                            return false;
                         }
                     });
+                 
+
                 },
                 dateformat(val) {
                     this.formdata.enableDate = val
@@ -259,7 +274,6 @@ export default {
                 },
                 //获取所有对象列表数据
                 getTableData2() {
-                   
                     var temparams = `['${this.params2.type}','${this.params2.content}',${this.params2.pageNo},${this.params2.pageSize}]`;
                     commonAjax("cas.hotObjectService", "getObjectList", temparams).then(res => {
                         if (res.code == 200) {

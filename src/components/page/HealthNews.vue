@@ -31,7 +31,7 @@
         <el-table :data="tableData" border style="width: 100%">
             <el-table-column prop="title" label="资讯标题">
             </el-table-column>
-            <el-table-column prop="category" label="类别">
+            <el-table-column prop="tagName" label="类别">
             </el-table-column>
             <el-table-column prop="created" label="保存时间">
             </el-table-column>
@@ -51,7 +51,7 @@
             </el-table-column>
             <el-table-column label="操作" width="260">
                 <template scope="scope">
-                    <el-button size="small" @click="handleEdit(scope.$index, scope.row)">查看</el-button>
+                    <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                     <el-button size="small" type="success" @click="publish(scope.$index, scope.row)" v-if=" scope.row.newsStatus==0">发布</el-button>
                     <el-button size="small" type="danger" @click="publish(scope.$index, scope.row)" v-if=" scope.row.newsStatus==1">取消发布</el-button>
                     <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
@@ -65,22 +65,22 @@
         <el-dialog :title="dialogtitle" v-model="dialogFormVisible" @close="resetForm('adinfoForm')">
             <el-form :model="formdata" :rules="formrules" ref="adinfoForm" auto-complete="off" id="adinfoForm">
                 <el-form-item label="资讯标题" :label-width="formLabelWidth" prop="title">
-                    <el-input v-model="formdata.title" :disabled="isedit"></el-input>
+                    <el-input v-model="formdata.title" ></el-input>
                 </el-form-item>
                 <el-form-item label="资讯标题图片" :label-width="formLabelWidth" prop="">
-                    <el-upload class="avatar-uploader" :action="imguploadurl" :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :headers="headers" :data="imguploaddata" :disabled="isedit">
+                    <el-upload class="avatar-uploader" :action="imguploadurl" :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :headers="headers" :data="imguploaddata" >
                         <img v-if="imageUrl" :src="imageUrl" class="avatar">
                         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                     </el-upload>
                 </el-form-item>
                 <el-form-item label="资讯类别" :label-width="formLabelWidth" prop="category">
-                    <el-select v-model="formdata.category" placeholder="请选择" :disabled="isedit">
+                    <el-select v-model="formdata.category" placeholder="请选择" >
                         <el-option v-for="item in typetableData" :key="item.tagCode" :label="item.tagName" :value="item.tagCode">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="适合人群" :label-width="formLabelWidth" prop="peopleClassifyIds">
-                    <el-select v-model="formdata.peopleClassifyIds" multiple filterable allow-create placeholder="请选择标签" :disabled="isedit">
+                    <el-select v-model="formdata.peopleClassifyIds" multiple filterable allow-create placeholder="请选择标签" >
                         <el-option v-for="item in dictionary.peopleClassify" :key="item.key" :label="item.text" :value="item.key">
                         </el-option>
                     </el-select>
@@ -92,7 +92,7 @@
                     <input type="file" name="file" id="fileinput" @change="customimgupload($event)" style="display:none">
                 </el-form-item>
             </el-form>
-            <div class="dialog-footer center-foot" v-show="!isedit">
+            <div class="dialog-footer center-foot">
                 <el-button @click="closemodal('adinfoForm')">取 消</el-button>
                 <el-button type="primary" @click="submitForm('adinfoForm')">确 定</el-button>
             </div>
@@ -163,7 +163,7 @@ export default {
                 },
                 typetableData: [],
                 fileformdata: "",
-                isedit:false,
+               
             }
         },
         computed: {
@@ -177,8 +177,8 @@ export default {
             handleEdit(index, row) {
                     if (row) {
                         this.dialogFormVisible = true;
-                        this.dialogtitle = "编辑广告";
-                        this.isedit=true;
+                        this.dialogtitle = "编辑新闻";
+                  
                         commonAjax("cas.healthNewService", "getHealthNews", `[${row.id}]`, ).then(res => {
                             if (res.code == 200) {
                                 this.formdata = {
@@ -201,7 +201,7 @@ export default {
                         });
 
                     } else {
-                        this.isedit=false;
+                       
                         this.imageUrl = "";
                         this.dialogFormVisible = true;
                         this.dialogtitle = "新增广告";

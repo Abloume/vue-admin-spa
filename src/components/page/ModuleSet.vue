@@ -72,7 +72,7 @@
                     <el-input v-model="formdata.moduleDesc" type="textarea" :autosize="{ minRows: 4, maxRows: 8}"></el-input>
                 </el-form-item>
                 <el-form-item label="模块权限" prop="selectaction" :label-width="formLabelWidth">
-                    <el-checkbox-group v-model="selectaction">
+                    <el-checkbox-group v-model="formdata.selectaction">
                         <el-checkbox :label="item.actionValue" name="action" v-for="item in allAction">{{item.actionName}}</el-checkbox>
                     </el-checkbox-group>
                 </el-form-item>
@@ -114,6 +114,7 @@ export default {
                     "linkedUrl": "",
                     "moduleOrder": undefined,
                     "moduleDesc": "",
+                    "selectaction": [],
                 },
                 dialogtitle: "", //模态框动态标题
                 formrules: { //表单验证规则
@@ -154,9 +155,10 @@ export default {
                         message: '最长100字符',
                         trigger: 'blur'
                     }],
+                    selectaction:[
+                    { type: 'array', required: true, message: '请选着模块权限', trigger: 'change' }],
                 },
                 allAction: [],
-                selectaction: [],
                 dictionary: {
                     linkedTypes: []
                 },
@@ -180,10 +182,11 @@ export default {
                             "linkedUrl": row.linkedUrl,
                             "moduleOrder": row.moduleOrder,
                             "moduleDesc": row.moduleDesc,
+                            "selectaction":[],
                         }
                         commonAjax("cas.productRelatedService", "actionValueByModuleId", `['${row.moduleId}']`).then(res => {
                             if (res.code == 200) {
-                                this.selectaction = res.body;
+                                this.formdata.selectaction = res.body;
                             } else {
                                 this.$message({
                                     type: 'error',
@@ -194,7 +197,6 @@ export default {
 
 
                     } else {
-                        this.selectaction = [];
                         this.dialogtitle = "新增模块";
                         this.formdata = {
                             "moduleId": undefined,
@@ -204,6 +206,7 @@ export default {
                             "linkedUrl": "",
                             "moduleOrder": undefined,
                             "moduleDesc": "",
+                            "selectaction":[],
                         }
                     }
 
@@ -343,7 +346,7 @@ export default {
                 submitForm(formName) {
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
-                            commonAjax("cas.productRelatedService", "moduleaddedOrUpdated", '[' + JSON.stringify(this.formdata) + ',' + JSON.stringify(this.selectaction) + ']').then(res => {
+                            commonAjax("cas.productRelatedService", "moduleaddedOrUpdated", '[' + JSON.stringify(this.formdata) + ',' + JSON.stringify(this.formdata.selectaction) + ']').then(res => {
                                 if (res.code == 200) {
                                     this.dialogFormVisible = false;
                                     this.$message({
@@ -371,6 +374,8 @@ export default {
             this.dictionaryRequest();
             this.getallAction();
             this.getTableData();
+            var obj1 = { 100: "a", 2: "b", 7: "c"};
+console.log(Object.keys(obj1)); // console: ["2", "7", "100"]
         },
 
 }
