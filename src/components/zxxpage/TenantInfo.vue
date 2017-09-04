@@ -109,6 +109,7 @@
                                 <el-button size="small" type="success" @click="checkProduct(scope.$index, scope.row)">查看</el-button>
                                 <el-button size="small" type="success" @click="handleForbidden(scope.$index, scope.row)" v-show="scope.row.status==0">启用</el-button>
                                 <el-button size="small" type="danger" @click="handleForbidden(scope.$index, scope.row)" v-show="scope.row.status==1">禁用</el-button>
+                                
                             </template>
                         </el-table-column>
                     </el-table>
@@ -534,39 +535,39 @@ export default {
 
                 // Tab基本信息标签页
                 hasBeenEdited: false, // 表单是否被编辑过
-                basicData: { // 租户基本信息表单属性
+                basicData: {          // 租户基本信息表单属性
                     status: 1,
                     tenantDesc: '',
-                    tenantId: 'hcn',
+                    tenantId: '',
                     tenantName: '',
                     tenantPhone: '',
                     tenantType: ''
                 },
 
                 // Tab机构列表标签页
-                orgKeyword: '', // 机构列表搜索关键字
-                addedOrgKeyword: '', // 添加机构搜索关键字
-                addedParentOrgKeyword: '', // 添加上级机构搜索关键字
-                OrgTableData: [], // 机构列表返回数据
-                OrgTableDataNum: '', // 条数
-                addedOrgTableData: [], // 添加机构列表
-                addedOrgTableDataNum: '', // 添加机构条数
-                addedParentOrgTableData: [], // 添加上级机构列表
-                addedParentOrgTableDataNum: '', // 添加上级机构条数
-                isHasParentOrg: false, // 是否有上级机构名称，无：添加；有：显示名称
-                childOrgId: '', // 具有上级机构的机构ID
-                parentOrgLabel: '', // 上级机构名称
-                navdialogFormVisible: false, // 添加机构模态框
-                navdialogParentFormVisible: false, // 添加上级机构模态框
-                orgListPagination: { // 机构列表分页
+                orgKeyword: '',                     // 机构列表搜索关键字
+                addedOrgKeyword: '',                // 添加机构搜索关键字
+                addedParentOrgKeyword: '',          // 添加上级机构搜索关键字
+                OrgTableData: [],                   // 机构列表返回数据
+                OrgTableDataNum: '',                // 条数
+                addedOrgTableData: [],              // 添加机构列表
+                addedOrgTableDataNum: '',           // 添加机构条数
+                addedParentOrgTableData: [],        // 添加上级机构列表
+                addedParentOrgTableDataNum: '',     // 添加上级机构条数
+                isHasParentOrg: false,              // 是否有上级机构名称，无：添加；有：显示名称
+                childOrgId: '',                     // 具有上级机构的机构ID
+                parentOrgLabel: '',                 // 上级机构名称
+                navdialogFormVisible: false,        // 添加机构模态框
+                navdialogParentFormVisible: false,  // 添加上级机构模态框
+                orgListPagination: {                // 机构列表分页
                     pageNo: 1,
                     pageSize: 10,
                 },
-                addedOrgListPagination: { // 添加医院列表分页
+                addedOrgListPagination: {           // 添加医院列表分页
                     pageNo: 1,
                     pageSize: 10,
                 },
-                addedParentOrgListPagination: { // 添加上级医院列表分页
+                addedParentOrgListPagination: {     // 添加上级医院列表分页
                     pageNo: 1,
                     pageSize: 10,
                 },
@@ -807,7 +808,7 @@ export default {
                 /**
                  *  基本信息 
                  */
-                // 基本信息 - 保存按钮
+                // 基本信息 - 租户添加保存按钮
                 saveBasicInfo() {
                     let params = [this.basicData];
 
@@ -850,8 +851,7 @@ export default {
                 // 基本信息 - 保存新增或者保存修改后的内容
                 submitForm(formName) {
                     this.$refs[formName].validate((valid) => {
-                        if (valid) { //数据合法
-                            // 
+                        if (valid) {
                             if (!this.hasBeenEdited) {
                                 this.saveBasicInfo();
                             } else {
@@ -879,10 +879,8 @@ export default {
                     }
 
                     let params = [tenantId]
-                    let serviceId = 'cas.tenantManageService'
-                    let serviceMethod = 'tenantDetail'
 
-                    commonAjax(serviceId, serviceMethod, params).then(res => {
+                    commonAjax('cas.tenantManageService', 'tenantDetail', params).then(res => {
                         if (res.code == 200) {
                             this.basicData.tenantId = res.body.tenantId
                             this.basicData.tenantType = res.body.tenantType
@@ -1497,14 +1495,16 @@ export default {
                     let temobj = {
                         type: "1", //二维码类型，必传
                         tenantId: this.$route.params.id, //租户ID，必传
-                        orgId: row.orgId, //机构ID，必传
+                        orgId:row.orgId, //机构ID，必传
                         t: new Date().getTime() //时间戳，必传
                     };
                     temobj = JSON.stringify(temobj);
                     let b = new Base64();
                     this.qrcodevalue = "https://app.bshcn.com.cn/download/apk/appdowmload.html?data=" + b.encode(temobj);
-                    let str = b.decode(b.encode(temobj)); //解码
+                    let str = b.decode(b.encode(temobj));//解码
+                    // alert(str);
                 },
+
 
                 /**
                  *  服务信息 
@@ -1652,34 +1652,12 @@ export default {
                             });
                         }
                     });
-
-                    /* this.$refs[formName].validate((valid) => {
-                        if (valid) {
-                            this.serformdata.tenantId = this.basicData.tenantId;
-                            commonAjax("cas.tenantManageService", "tenantServicAdded", '[' + JSON.stringify(this.serformdata) + ']', ).then(res => {
-                                if (res.code == 200) {
-                                    this.$message({
-                                        type: 'success',
-                                        message: "保存成功"
-                                    });
-                                    this.sergetTableData();
-                                    this.serdialogFormVisible = false;
-                                } else {
-                                    this.$message({
-                                        type: 'error',
-                                        message: res.msg
-                                    });
-                                }
-                            });
-                        } else {
-                            return false;
-                        }
-                    }); */
                 },
                 // 服务列表开始
                 sergetTableData() {
                     if (this.orgOption.orgId) {
-                        var tenantId = sessionStorage.getItem('tenantId');
+                        // var tenantId = sessionStorage.getItem('tenantId');
+                        var tenantId = this.basicData.tenantId;
                         let params = `["${tenantId}","${this.orgOption.orgId}"]`;
                         commonAjax("cas.serviceOpenService", "queryOrgService", params).then(res => {
                             if (res.code == 200) {
@@ -1853,7 +1831,7 @@ export default {
                                     });
                                 }
                             });
-
+                            // alert('submit!');
                         } else {
                             return false;
                         }
@@ -1994,7 +1972,7 @@ export default {
                     // };
                 },
         },
-        components: {
+         components: {
             vueQrcodeComponent
         },
         beforeRouteEnter(to, from, next) {
@@ -2153,7 +2131,6 @@ h2.account-title {
 .serv_check {
     width: 175px;
 }
-
 #qrcode {
     width: 300px;
     height: 300px;

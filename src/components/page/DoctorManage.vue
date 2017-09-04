@@ -254,7 +254,8 @@
         </el-dialog>
         <!-- 证书弹框 -->
         <el-dialog title="执业证书" v-model="certifiyFormVisible" class="certifiy">
-            <img :src="111" />
+            <img :src="imgview+editdetailDocformdata.certificateHead" />
+            <img :src="imgview+editdetailDocformdata.certificateBack" />
         </el-dialog>
     </div>
 </template>
@@ -304,6 +305,7 @@ export default {
             // }
             return {
                 //通用
+                imgview:imgview,
                 formLabelWidth: '160px',
                 dialogtitle: "",
                 //字典查询数据
@@ -416,6 +418,8 @@ export default {
                     "certifiyScope": "",
                     "checkOrg": "",
                     "diseaseName": "",
+                    "certificateHead":"",
+                    "certificateBack":""
                     // "summary":"",
                 },
                 // 医生详细信息结束-------------------------------------------------
@@ -698,6 +702,8 @@ export default {
                                     "certifiyScope": res.body.certifiyScope ? res.body.certifiyScope : "",
                                     "checkOrg": res.body.checkOrg ? res.body.checkOrg : "",
                                     "diseaseName": res.body.diseaseName ? res.body.diseaseName : "",
+                                    "certificateHead" :res.body.certificateHead ? res.body.certificateHead : "",
+                                    "certificateBack":res.body.certificateBack ? res.body.certificateBack : "",
                                     // "summary":res.body.summary
                                 }
 
@@ -732,6 +738,8 @@ export default {
                             "certifiyScope": "",
                             "checkOrg": "",
                             "diseaseName": "",
+                            "certificateHead" : "",
+                            "certificateBack":"",
                             // "summary":""
                         }
                     }

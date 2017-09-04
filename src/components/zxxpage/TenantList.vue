@@ -59,9 +59,9 @@ export default {
         //获取租户列表数据
         getTenantListData() {
             let params = [{
-                // tenantId: 'hcn.zhongshan',
                 pageNo: this.params.pageNo,
                 pageSize: this.params.pageSize
+                 // tenantId: 'hcn.zhongshan',  // 非必传
             }];
             
             commonAjax("cas.tenantManageService", "tenantList", params).then(res => {

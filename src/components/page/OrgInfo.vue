@@ -165,7 +165,7 @@
                         </el-pagination>
                     </div>
                 </el-tab-pane>
-                 <!--<el-tab-pane label="账号信息" name="countInfo" class="eltabpane" v-if="orgOption.ishowtab">
+                <!--<el-tab-pane label="账号信息" name="countInfo" class="eltabpane" v-if="orgOption.ishowtab">
                     <h2 class="account-title">支付宝</h2>
                     <el-form :model="countformdata" :rules="conutinformrules" ref="countForm" auto-complete="off">
                         <el-form-item label="支付宝账号" :label-width="formLabelWidth" prop="AliPay.account">
@@ -546,7 +546,7 @@ export default {
                         message: '请选择地区',
                         trigger: 'blur'
                     }],
-                    localOrgId:[{
+                    localOrgId: [{
                         required: true,
                         message: '请输入机构本地代码',
                         trigger: 'blur'
@@ -1373,12 +1373,12 @@ export default {
                         this.serformdata = {
                             "serviceCode": "",
                             serviceDesc: "",
-                            "mainFlag": "",
+                            "mainFlag": "1",
                             "tenantId": sessionStorage.getItem('tenantId'),
                             "serviceName": "",
                             "serviceId": "",
                             "orgId": this.orgOption.orgId,
-                            "effectiveFlag": "",
+                            "effectiveFlag": "1",
                             "id": 0,
                             "objectType": "",
                         };
@@ -1443,7 +1443,14 @@ export default {
                 },
                 // 请求服务包
                 getServicePacklist() {
-                    commonAjax("cas.serviceService", "queryServices", '[]', ).then(res => {
+                    let temobj = {
+                        "pageNo": 200,
+                        "pageSize": 1,
+                        "serviceName": "",
+                        "status": "",
+                        "tenantId": sessionStorage.getItem('tenantId')
+                    };
+                    commonAjax("cas.baseServiceService", "getBaseServiceitemsList", '['+JSON.stringify(temobj)+']' ).then(res => {
                         if (res.code == 200) {
                             this.servicePacklist = res.body;
                         } else {
@@ -1653,9 +1660,9 @@ export default {
         },
         beforeRouteEnter(to, from, next) {
             next(vm => {
-                vm.citylist= [];
-                vm.districtlist= [];
-                vm.streetlist=[];
+                vm.citylist = [];
+                vm.districtlist = [];
+                vm.streetlist = [];
                 vm.postdefaultarea();
                 vm.imageUrl = vm.orgOption.avatarField ? imgview + vm.orgOption.avatarField : "";
                 vm.navgetTableData()
@@ -1699,7 +1706,7 @@ export default {
             },
             'editarea.street' (val, oldval) {
                 if (val != "") {
-                   
+
                 }
 
             },

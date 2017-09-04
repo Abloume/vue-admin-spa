@@ -150,7 +150,7 @@ export default new Router({
                         },
                         component: resolve => require(['../components/zxxpage/ServiceItemList.vue'], resolve)
                     }]
-                }, {
+                }, { //服务管理
                     path: '/servicePackage',
                     component: resolve => require(['../components/zxxpage/ServicePackage.vue'], resolve),
                     children: [{
@@ -161,7 +161,7 @@ export default new Router({
                         },
                         component: resolve => require(['../components/zxxpage/ServicePackageList.vue'], resolve)
                     }]
-                }, {
+                }, { //协议管理
                     path: '/protocolManage',
                     component: resolve => require(['../components/zxxpage/ProtocolManage.vue'], resolve),
                     children: [{
@@ -171,6 +171,17 @@ export default new Router({
                             keepAlive: true
                         },
                         component: resolve => require(['../components/zxxpage/ProtocolManageList.vue'], resolve)
+                    }]
+                }, { // 意见反馈
+                    path: '/feedback',
+                    component: resolve => require(['../components/zxxpage/Feedback.vue'], resolve),
+                    children: [{
+                        path: '/',
+                        name: 'Feedback',
+                        meta: {
+                            keepAlive: true
+                        },
+                        component: resolve => require(['../components/zxxpage/FeedbackList.vue'], resolve)
                     }]
                 }
 
