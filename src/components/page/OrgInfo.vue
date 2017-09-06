@@ -1447,16 +1447,16 @@ export default {
                 },
                 // 请求服务包
                 getServicePacklist() {
-                    let temobj = {
-                        "pageNo": 1,
-                        "pageSize": 200,
-                        "serviceName": "",
-                        "status": "1",
-                        "tenantId": sessionStorage.getItem('tenantId')
-                    };
-                    commonAjax("cas.baseServiceService", "getBaseServiceitemsList", '[' + JSON.stringify(temobj) + ']').then(res => {
+                    // let temobj = {
+                    //     "pageNo": 1,
+                    //     "pageSize": 200,
+                    //     "serviceName": "",
+                    //     "status": "1",
+                    //     "tenantId": sessionStorage.getItem('tenantId')
+                    // };
+                    commonAjax("cas.serviceService", "queryServices", '[]').then(res => {
                         if (res.code == 200) {
-                            this.servicePacklist = res.body.items;
+                            this.servicePacklist = res.body;
                         } else {
                             this.$message({
                                 type: 'error',

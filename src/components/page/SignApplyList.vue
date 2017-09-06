@@ -10,8 +10,8 @@
                 </el-col>
                 <el-col :span="12" class="addorg fr">
                     <el-select v-model="params.tenantId" placeholder="请选择租户">
-                        <el-option label="云平台管理" value="1"></el-option>
-                        <el-option label="桐乡租户" value="0"></el-option>
+                        <el-option v-for="item in tenantIdtableData" :key="item.tenantId" :label="item.tenantName" :value="item.tenantId">
+                        </el-option>
                     </el-select>
                 </el-col>
             </el-row>
@@ -68,7 +68,7 @@
             </el-table-column>
             <el-table-column label="操作" width="180">
                 <template scope="scope">
-                    <el-button size="small" @click="lookapply(scope.$index, scope.row)" v-if=" scope.row.signState!=11">查看</el-button>
+                    <el-button size="small" @click="confirmapply(scope.$index, scope.row)" v-if=" scope.row.signState!=11">查看</el-button>
                     <el-button size="small" type="success" @click="confirmapply(scope.$index, scope.row)" v-if=" scope.row.signState==11">确认</el-button>
                     <el-button size="small" @click.native="print(scope.$index, scope.row)">打印</el-button>
                 </template>
@@ -83,87 +83,147 @@
                 <h2 class="account-title">
                     <span>居民信息</span>
                 </h2>
-                <el-form-item label="姓名" :label-width="formLabelWidth" prop="name">
-                    <el-input v-model="formdata.name" disabled></el-input>
+                <el-form-item label="头像" :label-width="formLabelWidth">
+                    <img :src="imgview+formdata.personHeader" width="100" height="150">
                 </el-form-item>
-                <el-form-item label="性别" :label-width="formLabelWidth" prop="phoneNo">
-                    <el-input v-model="formdata.phoneNo" disabled></el-input>
+                <el-form-item label="姓名" :label-width="formLabelWidth" prop="personName">
+                    <el-input v-model="formdata.personName" disabled></el-input>
                 </el-form-item>
-                <el-form-item label="国籍" :label-width="formLabelWidth" prop="idCard">
+                <el-form-item label="性别" :label-width="formLabelWidth" prop="sex">
+                    <el-select v-model="formdata.sex" placeholder="请选择性别" disabled>
+                        <el-option v-for="item in dictionary.gender" :key="item.key" :label="item.text" :value="item.key">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="国籍" :label-width="formLabelWidth" prop="nationality">
+                    <el-select v-model="formdata.nationality" placeholder="请选择国籍" disabled>
+                        <el-option v-for="item in dictionary.nationality" :key="item.key" :label="item.text" :value="item.key">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="出生日期" :label-width="formLabelWidth" prop="dob">
+                    <el-input v-model="formdata.dob" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="证件类型" :label-width="formLabelWidth" prop="idCardType">
+                    <el-select v-model="formdata.idCardType" placeholder="请选择证件类型" disabled>
+                        <el-option v-for="item in dictionary.certificateType" :key="item.key" :label="item.text" :value="item.key">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="证件号码" :label-width="formLabelWidth" prop="idCard">
                     <el-input v-model="formdata.idCard" disabled></el-input>
                 </el-form-item>
-                <el-form-item label="出生日期" :label-width="formLabelWidth" prop="sex">
-                    <el-input v-model="formdata.sex" disabled></el-input>
-                </el-form-item>
-                <el-form-item label="证件类型" :label-width="formLabelWidth" prop="orgName">
-                    <el-input v-model="formdata.orgName" disabled></el-input>
-                </el-form-item>
-                <el-form-item label="证件号码" :label-width="formLabelWidth" prop="deptName">
-                    <el-input v-model="formdata.deptName" disabled></el-input>
-                </el-form-item>
-                <el-form-item label="电话号码" :label-width="formLabelWidth" prop="teamNames">
-                    <el-input v-model="formdata.teamNames" disabled></el-input>
+                <el-form-item label="电话号码" :label-width="formLabelWidth" prop="tel">
+                    <el-input v-model="formdata.tel" disabled></el-input>
                 </el-form-item>
                 <h2 class="account-title">
                     <span>签约信息</span>
                 </h2>
-                <el-form-item label="签约机构" :label-width="formLabelWidth" prop="name">
-                    <el-input v-model="formdata.name" disabled></el-input>
-                </el-form-item>
-                <el-form-item label="签约团队" :label-width="formLabelWidth" prop="phoneNo">
-                    <el-input v-model="formdata.phoneNo" disabled></el-input>
-                </el-form-item>
-                <el-form-item label="团队长" :label-width="formLabelWidth" prop="idCard">
-                    <el-input v-model="formdata.idCard" disabled></el-input>
-                </el-form-item>
-                <el-form-item label="签约周期" :label-width="formLabelWidth" prop="sex">
-                    <el-input v-model="formdata.sex" disabled></el-input>
-                </el-form-item>
-                <el-form-item label="服务包" :label-width="formLabelWidth" prop="orgName">
+                <el-form-item label="签约机构" :label-width="formLabelWidth" prop="orgName">
                     <el-input v-model="formdata.orgName" disabled></el-input>
                 </el-form-item>
-                <el-form-item label="申请时间" :label-width="formLabelWidth" prop="deptName">
-                    <el-input v-model="formdata.deptName" disabled></el-input>
+                <el-form-item label="签约团队" :label-width="formLabelWidth" prop="teamName">
+                    <el-input v-model="formdata.teamName" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="团队长" :label-width="formLabelWidth" prop="teamLeaderName">
+                    <el-input v-model="formdata.teamLeaderName" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="签约周期" :label-width="formLabelWidth" prop="signCycle">
+                    <el-input v-model="formdata.signCycle" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="服务包" :label-width="formLabelWidth" prop="packages">
+                    <el-select v-model="formdata.packages" multiple filterable allow-create placeholder="请选择标签" :disabled="islook">
+                        <el-option v-for="item in packageslist" :key="item.spPackId" :label="item.spPackName" :value="item.spPackId">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="申请时间" :label-width="formLabelWidth" prop="createAt">
+                    <el-input v-model="formdata.createAt" disabled></el-input>
                 </el-form-item>
                 <el-form-item label="状态" :label-width="formLabelWidth" prop="teamNames">
-                    <el-input v-model="formdata.teamNames" disabled></el-input>
+                    <el-select v-model="formdata.signState" placeholder="" disabled>
+                        <el-option label="待确认" value="11"></el-option>
+                        <el-option label="已取消" value="12"></el-option>
+                        <el-option label="已签约" value="13"></el-option>
+                        <el-option label="未通过" value="14"></el-option>
+                    </el-select>
                 </el-form-item>
-                 <h2 class="account-title">
+                <h2 class="account-title">
                     <span>签约确认</span>
                 </h2>
-                <el-form-item label="确认意见" prop="checkStatus" :label-width="formLabelWidth" v-show="formdata.checkStatus==0">
-                    <el-radio-group v-model="subformdata.checkStatus" >
-                        <el-radio label="1">同意</el-radio>
-                        <el-radio label="2">不同意</el-radio>
-                    </el-radio-group>
+                <el-form-item label="确认意见" prop="signState2" :label-width="formLabelWidth">
+                    <el-select v-model="formdata.signState2" placeholder="请选择产品" :disabled="islook">
+                        <el-option label="同意" value="13"></el-option>
+                        <el-option label="不同意" value="14"></el-option>
+                    </el-select>
                 </el-form-item>
-                 <el-form-item label="确认方式" :label-width="formLabelWidth" prop="checkStatus" v-show="formdata.checkStatus!=0">
-                   <el-radio-group v-model="formdata.checkStatus">
-                        <el-radio label="1" disabled>同意</el-radio>
-                        <el-radio label="2" disabled>未通过</el-radio>
-                    </el-radio-group>
+                <el-form-item label="确认方式" :label-width="formLabelWidth" prop="checkWay">
+                    <el-select v-model="formdata.checkWay" placeholder="请选择确认方式" :disabled="islook">
+                        <el-option v-for="item in dictionary.channelType" :key="item.key" :label="item.text" :value="item.key">
+                        </el-option>
+                    </el-select>
                 </el-form-item>
-                 <el-form-item label="签约生效日期" :label-width="formLabelWidth" prop="checkTime" v-show="formdata.checkStatus!=0">
-                    <el-input v-model="formdata.checkTime" :disabled="formdata.checkStatus!=0"></el-input>
+                <el-form-item label="签约生效日期" :label-width="formLabelWidth" prop="signValidDate">
+                    <el-date-picker type="date" placeholder="选择日期" v-model="formdata.signValidDate" style="width: 100%;" @change="dateformat" format="yyyy-MM-dd" :disabled="islook"></el-date-picker>
                 </el-form-item>
-                <el-form-item label="管理类型：" :label-width="formLabelWidth" prop="checkUser" v-show="formdata.checkStatus!=0">
-                    <el-input v-model="formdata.checkUser" :disabled="formdata.checkStatus!=0"></el-input>
+                <el-form-item label="管理类型" :label-width="formLabelWidth" prop="personGroup">
+                    <el-select v-model="formdata.personGroup" placeholder="请选择管理类型" :disabled="islook">
+                        <el-option v-for="item in dictionary.group" :key="item.key" :label="item.text" :value="item.key">
+                        </el-option>
+                    </el-select>
                 </el-form-item>
-                  <el-form-item label="备注" :label-width="formLabelWidth" prop="checkInfo">
-                    <el-input v-model="formdata.checkInfo" type="textarea" :autosize="{ minRows: 4, maxRows: 8}" :disabled="formdata.checkStatus!=0"></el-input>
+                <el-form-item label="区级医院" :label-width="formLabelWidth" prop="districtOrgName" v-if="formdata.openOneFlag==1">
+                    <el-input v-model="formdata.districtOrgName" :disabled="islook"></el-input>
                 </el-form-item>
-               
+                <el-form-item label="市级医院" :label-width="formLabelWidth" prop="cityOrgName" v-if="formdata.openOneFlag==1">
+                    <el-input v-model="formdata.cityOrgName" :disabled="islook"></el-input>
+                </el-form-item>
+                <el-form-item label="备注" :label-width="formLabelWidth" prop="operInfo">
+                    <el-input v-model="formdata.operInfo" type="textarea" :autosize="{ minRows: 4, maxRows: 8}" :disabled="islook"></el-input>
+                </el-form-item>
             </el-form>
             <div class="dialog-footer center-foot">
-                <el-button @click="closemodal('adinfoForm')">取 消</el-button>
-                <el-button type="primary" @click="submitForm('adinfoForm')">确 定</el-button>
+                <el-button @click="closemodal('adinfoForm')" v-show="!islook">取 消</el-button>
+                <el-button type="primary" @click="submitForm('adinfoForm')" v-show="!islook">确 定</el-button>
+                <el-button type="info" @click="lookprotoco">查看协议</el-button>
             </div>
+        </el-dialog>
+        <el-dialog title="查看协议" v-model="curprotocoldialog">
+            <div v-html="curprotocolcontent"></div>
+        </el-dialog>
+        <!-- cityOrglist -->
+        <el-dialog title="" v-model="cityOrglistdialog">
+            <el-table :data="cityOrglist" border style="width: 100%">
+                <el-table-column prop="orgId" label="机构ID">
+                </el-table-column>
+                <el-table-column prop="orgFullName" label="机构名称">
+                </el-table-column>
+                <el-table-column label="操作" width="180">
+                    <template scope="scope">
+                        <el-button size="small" @click="selectcityOrg(scope.$index, scope.row)">选择</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-dialog>
+        <!-- districtOrglist -->
+        <el-dialog title="" v-model="districtOrglistdialog">
+            <el-table :data="districtOrglist" border style="width: 100%">
+                <el-table-column prop="orgId" label="机构ID">
+                </el-table-column>
+                <el-table-column prop="orgFullName" label="机构名称">
+                </el-table-column>
+                <el-table-column label="操作" width="180">
+                    <template scope="scope">
+                        <el-button size="small" @click="selectdistrictOrg(scope.$index, scope.row)">选择</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
         </el-dialog>
     </div>
 </template>
 <script>
 import {
-    commonAjax, imguploadurl, imgview
+    commonAjax, imgview
 }
 from '../../api/api';
 import 'assets/lib/print/jquery.jqprint-0.3.js';
@@ -174,6 +234,7 @@ export default {
             return {
                 // 通用
                 formLabelWidth: '120px',
+                imgview: imgview,
                 // 列表常用的数据开始
                 tableData: [],
                 params: {
@@ -185,174 +246,263 @@ export default {
                     "teamLeaderName": "",
                     "teamName": "",
                     "tel": "",
-                    "tenantId": "hcn"
+                    "tenantId": ""
                 },
                 total: 1,
                 // 表单数据开始
                 dialogFormVisible: false, //模态框显示隐藏用
                 formdata: { //表单绑定数据用
-                    "productCode": "", //产品编码
-                    "name": "", //广告名称
-                    "position": "", //广告位置
-                    "linkType": "", //链接类型
-                    "linkAddress": "", //链接地址
-                    "linkText": "", //链接文本
-                    "defaultFlag": "", //默认标识
-                    "valid_startDate": "",
-                    "valid_endDate": "", //结束日期 格式yyyy-MM-dd
-                    "orderNo": 0, //排序
-                    "description": "", //备注
-                    id: 0,
-                    "picture": 0,
-                },
-                imguploaddata: {
-                    catalog: "banner"
+                    "packages": [],
+                    "teamLeaderName": "",
+                    "address": "",
+                    "teamId": 0,
+                    "teamName": "",
+                    "orgId": "",
+                    "orgName": "",
+                    "signCycle": 1,
+                    "contactName": "",
+                    "contactPhone": "",
+                    "protocolId": 0,
+                    "signId": 0,
+                    "mpiId": "",
+                    "idCardType": "",
+                    "idCard": "",
+                    "personHeader": 0,
+                    "personName": "",
+                    "sex": "",
+                    "dob": "",
+                    "tel": "",
+                    "operPersonType": "",
+                    "operPersonName": "",
+                    "operTime": "",
+                    "operInfo": "",
+                    "createAt": "",
+                    "checkWay": "",
+                    "cityOrgId": "",
+                    "cityOrgName": "",
+                    "districtOrgId": "",
+                    "districtOrgName": "",
+                    "openOneFlag": "",
+                    "personGroup": "",
+                    "signState": "",
+                    "signValidDate": "",
+                    "signState2": "", //确认方式绑定
                 },
                 dialogtitle: "", //模态框动态标题
                 formrules: { //表单验证规则
-                    productCode: [{
+                    packages: [{
                         required: true,
-                        message: '请选择产品名称',
+                        message: '请选择服务包',
 
                     }],
-                    name: [{
+                    checkWay: [{
                         required: true,
-                        message: '请输入广告名称',
+                        message: '请选择确认方式',
                         trigger: 'blur'
                     }],
-                    position: [{
+                    cityOrgName: [{
                         required: true,
-                        message: '请选择广告位置',
+                        message: '请选择市医院',
 
                     }],
-                    linkType: [{
+                    districtOrgName: [{
                         required: true,
-                        message: '请选择链接类型',
+                        message: '请选择区医院',
+                    }],
+                    signValidDate: [{
+                        required: true,
+                        message: '请选择签约生效日期',
 
                     }],
-                    linkAddress: [{
+                    personGroup: [{
                         required: true,
-                        message: '请输入链接地址',
+                        message: '请选择管理类型',
 
                     }],
-                    picture: [{
+                    signState2: [{
                         required: true,
-                        message: '请上传图片',
-
-                    }],
-                    valid_startDate: [{
-                        required: true,
-                        message: '请选择开始日期',
-
-                    }],
-                    valid_endDate: [{
-                        required: true,
-                        message: '请选择结束日期',
-
-                    }],
-                },
-                imguploadurl: imguploadurl, //文件或者图片上传的url
-                headers: { //文件或者图片上传的headers
-                    "X-Access-Token": sessionStorage.getItem("accessToken")
+                        message: '请选择确认意见',
+                    }]
                 },
                 imageUrl: "", //文件或者图片上传预览图片的src地址
                 //字典查询数据
                 dictionary: {
-                    bannerPostion: [], //广告位置
-                    hyperLink: [], //链接类型
+                    channelType: [],
+                    nationality: [],
+                    certificateType: [],
+                    gender: [],
+                    group: [],
                 },
                 tenantIdtableData: [],
-                fileformdata: "",
-
+                islook: false,
+                packageslist: [],
+                curteamId: "",
+                cursignId: "",
+                curorgId: "",
+                curprotocolcontent: "",
+                curprotocoldialog: false,
+                "cityOrglist": [],
+                "districtOrglist": [],
+                cityOrglistdialog: false,
+                districtOrglistdialog: false,
             }
         },
         computed: {
 
         },
         methods: {
-            // 列表常用的方法开始
-            //点击编辑的方法
+
             dateformat(val) {
-                    this.formdata.valid_startDate = val
-                },
-                dateformat2(val) {
-                    this.formdata.valid_endDate = val
+                    this.formdata.signValidDate = val
                 },
                 print(index, row) {
-                    // $("#ddd").html("11111111111111111111111111")
-                    $("<span>ninhao</span>").jqprint();
-                },
-                confirmapply() {
+                    var params = `[${row.signId}]`
+                    commonAjax("cas.signService", "signedProtocolContent", params).then(res => {
+                        if (res.code == 200) {
+                            var temcont = `'<div>${res.body}</div>'`;
+                            $(temcont).jqprint();
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: res.msg
+                            });
+                        }
+                    });
 
                 },
-                lookapply() {
+                confirmapply(index, row) {
+                    this.cursignId = row.signId;
+                    this.curorgId = row.orgId;
+                    this.curteamId = row.teamId;
+                    this.getpackageslist()
+                    if (row.signState == 11) {
+                        this.islook = false;
+                        this.dialogtitle = "签约确认";
+                        this.getsign111()
+                    } else {
+                        this.dialogtitle = "签约查看"
+                        this.islook = true
+                    }
+                    let param = `[${row.signId}]`;
+                    commonAjax("cas.signService", "signDetail", param).then(res => {
+                        if (res.code == 200) {
+                            this.dialogFormVisible = true;
+
+                            let temarr = [];
+                            $.each(res.body.packages, function(index, el) {
+                                temarr.push(el.spPackId);
+                            });
+                            this.formdata = { //表单绑定数据用
+                                "packages": temarr,
+                                "address": res.body.address,
+                                "teamId": res.body.teamId,
+                                "teamName": res.body.teamName,
+                                "teamLeaderName": res.body.teamLeaderName,
+                                "orgId": res.body.orgId,
+                                "orgName": res.body.orgName,
+                                "signCycle": res.body.signCycle,
+                                "contactName": res.body.contactName,
+                                "contactPhone": res.body.contactPhone,
+                                "protocolId": res.body.protocolId,
+                                "signId": res.body.signId,
+                                "mpiId": res.body.mpiId,
+                                "idCardType": res.body.idCardType,
+                                "idCard": res.body.idCard,
+                                "personHeader": res.body.personHeader,
+                                "personName": res.body.personName,
+                                "sex": res.body.sex,
+                                "dob": res.body.dob,
+                                "tel": res.body.tel,
+                                "operPersonType": res.body.operPersonType,
+                                "operPersonName": res.body.operPersonName,
+                                "operTime": res.body.operTime,
+                                "operInfo": res.body.operInfo,
+                                "createAt": res.body.createAt,
+                                "signState": row.signState, //直接才从列表带过来
+                                "checkWay": this.islook ? res.body.checkWay : "",
+                                "cityOrgId": this.islook ? res.body.cityOrgId : "",
+                                "cityOrgName": this.islook ? res.body.cityOrgName : "",
+                                "districtOrgId": this.islook ? res.body.districtOrgId : "",
+                                "districtOrgName": this.islook ? res.body.districtOrgName : "",
+                                "openOneFlag": this.islook ? res.body.openOneFlag : "",
+                                "personGroup": this.islook ? res.body.personGroup : "",
+                                "signValidDate": this.islook ? res.body.signValidDate : "",
+                                "signState2": this.islook ? row.signState : "",
+                            }
+                            console.log(this.formdata.packages)
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: res.msg
+                            });
+                        }
+                    });
 
                 },
-                // 删除列表中的一条数据
-                // handleDelete(index, row) {
-                //     // this.$message.error('删除第' + (index + 1) + '行');
-                //     const h = this.$createElement;
-                //     this.$msgbox({
-                //             title: '确认删除',
-                //             message: h('p', null, [
-                //                 h('span', null, '是否删除 '),
-                //                 h('i', {
-                //                     style: 'color: teal'
-                //                 }, row.name)
-                //             ]),
-                //             showCancelButton: true,
-                //             confirmButtonText: '确定',
-                //             cancelButtonText: '取消',
-                //             beforeClose: (action, instance, done) => {
-                //                 if (action === 'confirm') {
-                //                     instance.confirmButtonLoading = true;
-                //                     instance.confirmButtonText = '执行中...';
-                //                     setTimeout(() => {
-                //                         done();
-                //                         setTimeout(() => {
-                //                             instance.confirmButtonLoading = false;
-                //                         }, 300);
-                //                     }, 3000);
-                //                 } else {
-                //                     done();
-                //                 }
-                //             }
-                //         })
-                //         .then(action => {
-                //             if (action == 'cancel') {
-                //                 this.$message({
-                //                     type: 'info',
-                //                     message: "取消删除"
-                //                 });
-                //             } else {
-                //                 let params = `[${row.id}]`;
-                //                 commonAjax("cas.productbannerService", "banProductbanner", params).then(res => {
-                //                     if (res.code == 200) {
-                //                         this.$message({
-                //                             type: 'success',
-                //                             message: "删除成功"
-                //                         });
-                //                         this.getTableData();
-                //                     } else {
-                //                         this.$message({
-                //                             type: 'error',
-                //                             message: res.msg
-                //                         });
-                //                     }
-                //                 });
-                //             }
 
-                //         })
-                // },
                 //获取搜索下拉框的租户列表
                 gettenantIdlist() {
                     let params = {
                         "pageNo": 1,
                         "pageSize": 300,
                     }
-                    commonAjax("cas.tenantManageService", "tenantList", '['+JSON.stringify(params)+']', ).then(res => {
+                    commonAjax("cas.tenantManageService", "tenantList", '[' + JSON.stringify(params) + ']', ).then(res => {
                         if (res.code == 200) {
-                            this.tenantIdtableData = res.body;
+                            this.tenantIdtableData = res.body.data;
+                            this.params.tenantId = res.body.data[0].tenantId
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: res.msg
+                            });
+                        }
+                    });
+                },
+                //获取服务包下拉框
+                getpackageslist() {
+                    let params = `[${this.curteamId},${this.cursignId}]`
+                    commonAjax("cas.signService", "spPackApplyChecked", params).then(res => {
+                        if (res.code == 200) {
+                            this.packageslist = res.body;
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: res.msg
+                            });
+                        }
+                    });
+                },
+                //获取是否有1+1+1签约
+                getsign111() {
+                    let params = `['${this.curorgId}']`
+                    commonAjax("cas.signService", "hasService", params).then(res => {
+                        if (res.code == 200) {
+                            // this.formdata.openOneFlag = res.body ? "1" : 0
+                            this.formdata.openOneFlag = 1
+                            if (this.formdata.openOneFlag ==1) {
+                                this.getorgbelong(2);
+                                this.getorgbelong(3);
+                            }
+
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: res.msg
+                            });
+                        }
+                    });
+                },
+                // 查询市级医院或者区级医院
+                getorgbelong(nubmerstr) {
+                    let params = `['',${this.curorgId}','${nubmerstr}']`
+                    commonAjax("cas.signService", "queryOrgInfoByAreaLevel", params).then(res => {
+                        if (res.code == 200) {
+                            if (nubmerstr == 2) {
+                                this.districtOrglist = res.body
+                            } else {
+                                this.cityOrglist = res.body
+                            }
+
                         } else {
                             this.$message({
                                 type: 'error',
@@ -369,8 +519,8 @@ export default {
                             //     el.valid_startDate = el.valid_startDate.substring(0, 10)
                             //     el.valid_endDate = el.valid_endDate.substring(0, 10)
                             // }.bind(this));
-                            this.tableData = res.body;
-                            this.total = res.body.count;
+                            this.tableData = res.body.data;
+                            this.total = res.body.total;
                         } else {
                             this.$message({
                                 type: 'error',
@@ -397,15 +547,31 @@ export default {
                 // 表单常用的方法开始
                 //保存按钮提交数据
                 submitForm(formName) {
-                    if (!this.formdata.picture) {
-                        this.$message({
-                            type: 'error',
-                            message: "请上传图片"
-                        });
-                    }
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
-                            commonAjax("cas.productbannerService", "addAndUpdate", '[' + JSON.stringify(this.formdata) + ']', ).then(res => {
+                            let temarr = [];
+                            $.each(this.formdata.packages, function(index, el) {
+                                $.each(this.packageslist, function(index2, el2) {
+                                    if (el.spPackId == el2.spPackId) {
+                                        temarr.push(el2)
+                                    }
+                                });
+                            });
+                            let temsubmitdata = {
+                                "checkWay": this.formdata.checkWay,
+                                "cityOrgId": this.formdata.cityOrgId,
+                                "cityOrgName": this.formdata.cityOrgName,
+                                "districtOrgId": this.formdata.districtOrgId,
+                                "districtOrgName": this.formdata.districtOrgName,
+                                "openOneFlag": this.formdata.openOneFlag,
+                                "operInfo": this.formdata.operInfo,
+                                "packages": temarr,
+                                "personGroup": this.formdata.personGroup,
+                                "signId": this.formdata.signId,
+                                "signState": this.formdata.signState2,
+                                "signValidDate": this.formdata.signValidDate,
+                            }
+                            commonAjax("cas.signService", "signApplyConfirmed", '[' + JSON.stringify(this.formdata) + ']', ).then(res => {
                                 if (res.code == 200) {
                                     this.dialogFormVisible = false;
                                     this.$message({
@@ -436,39 +602,48 @@ export default {
                     this.$refs[formName].resetFields();
 
                 },
-                //上传文件或者图片成功后
-                handleAvatarSuccess(res, file) {
-                    this.imageUrl = imgview + res.body;
-                    this.formdata.picture = res.body;
-                    this.$message.success('上传成功');
-                },
-                //上传上传文件或者图片之前
-                beforeAvatarUpload(file) {
+                // //上传文件或者图片成功后
+                // handleAvatarSuccess(res, file) {
+                //     this.imageUrl = imgview + res.body;
+                //     this.formdata.picture = res.body;
+                //     this.$message.success('上传成功');
+                // },
+                // //上传上传文件或者图片之前
+                // beforeAvatarUpload(file) {
 
-                    // const isJPG = file.type === 'image/jpeg';
-                    // const isLt2M = file.size / 1024 / 1024 < 2;
+                //     // const isJPG = file.type === 'image/jpeg';
+                //     // const isLt2M = file.size / 1024 / 1024 < 2;
 
-                    // if (!isJPG) {
-                    //     this.$message.error('上传头像图片只能是 JPG 格式!');
-                    // }
-                    // if (!isLt2M) {
-                    //     this.$message.error('上传头像图片大小不能超过 2MB!');
-                    // }
-                    // return isJPG && isLt2M;
+                //     // if (!isJPG) {
+                //     //     this.$message.error('上传头像图片只能是 JPG 格式!');
+                //     // }
+                //     // if (!isLt2M) {
+                //     //     this.$message.error('上传头像图片大小不能超过 2MB!');
+                //     // }
+                //     // return isJPG && isLt2M;
 
-                },
+                // },
                 //获取字典
                 dictionaryRequest() {
-                    let arr = ["cfs.dic.base_bannerPostion", "cfs.dic.base_hyperLink"];
+                    let arr = ["cfs.dic.base_channelType", "cfs.dic.base_nationality", "cfs.dic.base_certificateType", "cfs.dic.base_gender", "cfs.dic.base_group"];
                     commonAjax("cas.multipleDictionaryService", "findDic", '[' + JSON.stringify(arr) + ']').then(res => {
                         if (res.code == 200) {
                             var that = this;
                             res.body.forEach(function(ele, index) {
                                 if (ele.dicId == arr[0]) {
-                                    that.dictionary.bannerPostion = ele.items;
+                                    that.dictionary.channelType = ele.items;
                                 }
                                 if (ele.dicId == arr[1]) {
-                                    that.dictionary.hyperLink = ele.items;
+                                    that.dictionary.nationality = ele.items;
+                                }
+                                if (ele.dicId == arr[2]) {
+                                    that.dictionary.certificateType = ele.items;
+                                }
+                                if (ele.dicId == arr[3]) {
+                                    that.dictionary.gender = ele.items;
+                                }
+                                if (ele.dicId == arr[4]) {
+                                    that.dictionary.group = ele.items;
                                 }
 
                             })
@@ -481,6 +656,31 @@ export default {
                         }
                     });
                 },
+                lookprotoco() {
+                    this.curprotocoldialog = true;
+                    this.getprotococont();
+                },
+                getprotococont() {
+                    var params = `[${this.cursignId}]`
+                    commonAjax("cas.signService", "signedProtocolContent", params).then(res => {
+                        if (res.code == 200) {
+                            this.curprotocolcontent = res.body;
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: res.msg
+                            });
+                        }
+                    });
+                },
+                selectdistrictOrg(index,row){
+                    this.formdata.cityOrgId=row.orgId;
+                    this.formdata.cityOrgName=row.orgFullName
+                },
+                selectcityOrg(index,row){
+                     this.formdata.districtOrgId=row.orgId;
+                     this.formdata.districtOrgId=row.orgFullName
+                },
                 // 表单常用的方法结束--------------------------------------------------------------------------
 
         },
@@ -488,10 +688,15 @@ export default {
 
         },
         mounted() {
-            this.getTableData();
+
             this.gettenantIdlist();
             this.dictionaryRequest();
         },
+        watch: {
+            'params.tenantId' (val, oldval) {
+                this.getTableData();
+            }
+        }
 
 }
 </script>
@@ -545,6 +750,7 @@ export default {
 .fr {
     float: right
 }
+
 h2.account-title {
     font-size: 16px;
     border-bottom: 2px #EEE solid;
@@ -556,5 +762,4 @@ h2.account-title {
 h2.account-title button {
     float: right;
 }
-
 </style>

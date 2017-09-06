@@ -66,7 +66,7 @@
         <el-dialog :title="dialogtitle" v-model="dialogFormVisible" @close="resetForm('adinfoForm')">
             <el-form :model="formdata" :rules="formrules" ref="adinfoForm" auto-complete="off" id="adinfoForm">
                 <el-form-item label="发布医院" :label-width="formLabelWidth" prop="orgFullName">
-                    <el-select v-model="formdata.orgFullName" filterable placeholder="请选择机构名称" :disabled="isdisabled">
+                    <el-select v-model="formdata.orgFullName" filterable placeholder="请选择机构名称" :disabled="isdisabled||isedit">
                         <el-option v-for="item in orglist" :key="item.orgId" :label="item.orgFullName" :value="item.orgFullName">
                         </el-option>
                     </el-select>
@@ -78,7 +78,7 @@
                     </el-upload> -->
                     <el-row>
                         <el-col :span="6">
-                            <el-upload class="upload-demo" :action="imguploadurl" :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :headers="headers" :disabled="isdisabled||filesrc!=''">
+                            <el-upload class="upload-demo" :action="imguploadurl" :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :headers="headers" >
                                 <el-button size="small" type="primary">点击上传</el-button>
                             </el-upload>
                         </el-col>
@@ -181,6 +181,7 @@ export default {
                 filesrc:"",//文件的src地址
                 isdisabled: false,
                 activeName: "messagerecord",
+                isedit:false
             }
         },
         computed: {
@@ -205,7 +206,7 @@ export default {
                 },
                 //点击编辑的方法
                 handleEdit(index, row) {
-
+                    this.isedit=true;
                     if (row) {
                         this.dialogFormVisible = true;
                         this.dialogtitle = "查看医讯";
@@ -222,6 +223,7 @@ export default {
                         this.filesrc = filedowned + this.formdata.fileId;
                       
                     } else {
+                        this.isedit=false;
                         this.fileName = "";
                         this.dialogFormVisible = true;
                         this.dialogtitle = "新增医讯";
