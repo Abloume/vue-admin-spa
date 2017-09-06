@@ -78,7 +78,7 @@
                     </el-upload> -->
                     <el-row>
                         <el-col :span="6">
-                            <el-upload class="upload-demo" :action="imguploadurl" :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :headers="headers" :disabled="isdisabled">
+                            <el-upload class="upload-demo" :action="imguploadurl" :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :headers="headers" :disabled="isdisabled||filesrc!=''">
                                 <el-button size="small" type="primary">点击上传</el-button>
                             </el-upload>
                         </el-col>
@@ -234,6 +234,7 @@ export default {
                             "remark": "", //备注
                             "recordId": 0 //记录id
                         }
+                        this.filesrc = ""
                     }
 
                 },
@@ -364,6 +365,13 @@ export default {
                 submitForm(formName) {
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
+                            if(!this.filesrc){
+                                this.$message({
+                                        type: 'error',
+                                        message: "请上传文件"
+                                    });
+                                return
+                            }
                             commonAjax("cas.doctormessagerecordService", "addOrUpdateDoctormessagerecord", '[' + JSON.stringify(this.formdata) + ']', ).then(res => {
                                 if (res.code == 200) {
                                     this.dialogFormVisible = false;

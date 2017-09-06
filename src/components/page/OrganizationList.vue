@@ -72,7 +72,7 @@ export default {
 
         },
         mounted() {
-            this.getTableData();
+            // this.getTableData();
         },
         methods: {
             handleEdit(index, row, activeName) { //第三个参数是为了到orgInfo组件的tab传参

@@ -48,7 +48,7 @@
             <el-table-column label="操作">
                 <template scope="scope">
                     <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-                    <el-button size="small" type="danger" @click="userDisable(scope.$index, scope.row)" v-if=" scope.row.status==1">禁用</el-button>
+                    <el-button size="small" type="danger" @click="userDisable(scope.$index, scope.row)" v-if="scope.row.status==1">禁用</el-button>
                     <el-button size="small" type="success" @click="userDisable(scope.$index, scope.row)" v-if=" scope.row.status==0">启用</el-button>
                 </template>
             </el-table-column>
@@ -462,10 +462,16 @@ export default {
                 // 禁用用户
                 userDisable(index, row) {
                     const h = this.$createElement;
+                    let textstatus="";
+                    if(row.status==1){
+                        textstatus="禁用"
+                    }else{
+                        textstatus="启用"
+                    }
                     this.$msgbox({
-                        title: '确认删除',
+                        title: '确认'+textstatus,
                         message: h('p', null, [
-                            h('span', null, '是否删除 '),
+                            h('span', null, '是否'+textstatus),
                             h('i', {
                                 style: 'color: teal'
                             }, row.loginName + "(" + row.name + ")")
@@ -680,19 +686,11 @@ export default {
 
                 },
 
-                //获取字典
+                //获取数据权限的列表
                 dictionaryRequest() {
-                    let arr = ["cfs.dic.base_dataAuthorityLevel"];
-                    commonAjax("cas.multipleDictionaryService", "findDic", '[' + JSON.stringify(arr) + ']').then(res => {
+                    commonAjax("cas.userManageService", "dataAuthorityLevel", '[]').then(res => {
                         if (res.code == 200) {
-                            var that = this;
-                            res.body.forEach(function(ele, index) {
-                                if (ele.dicId == arr[0]) {
-                                    that.dictionary.dataAuthorityLevel = ele.items.filter(function(el) {
-                                        return el.key != "03";
-                                    });;
-                                }
-                            })
+                          this.dictionary.dataAuthorityLevel=res.body
 
                         } else {
                             this.$message({
@@ -712,6 +710,7 @@ export default {
                     commonAjax("cas.tenantManageService", "tenantList", '[' + JSON.stringify(params) + ']').then(res => {
                         if (res.code == 200) {
                             this.tenantData = res.body.data;
+                            this.params.tenantId=res.body.data[0].tenantId
                         } else {
                             this.$message({
                                 type: 'error',
@@ -885,12 +884,16 @@ export default {
 
         },
         mounted() {
-            this.getTableData();
             this.dictionaryRequest();
             this.gettenantData();
             this.getteamtData();
             this.getorgData();
         },
+        watch:{
+            'params.tenantId'(val,oldval){
+                 this.getTableData();
+            }
+        }
 
 }
 </script>

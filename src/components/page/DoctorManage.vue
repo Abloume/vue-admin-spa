@@ -166,7 +166,7 @@
                             <el-input v-model="editdetailDocformdata.doctorName"></el-input>
                         </el-form-item>
                         <el-form-item label="身份证号" :label-width="formLabelWidth" prop="idCard">
-                            <el-input v-model="editdetailDocformdata.idCard"></el-input>
+                            <el-input v-model="editdetailDocformdata.idCard" @blur="getBrithdayandsex"></el-input>
                         </el-form-item>
                         <el-form-item label="性别" :label-width="formLabelWidth" prop="sex">
                             <el-select v-model="editdetailDocformdata.sex" placeholder="请选择">
@@ -219,7 +219,7 @@
                                     <el-input v-model="editdetailDocformdata.certifiyNo"></el-input>
                                 </el-form-item>
                             </el-col>
-                            <el-col :span="6" v-show="editDocformdata.doctorId">
+                            <el-col :span="6" v-show="curID!=0">
                                 <el-button @click="showcertifiy">查看证书</el-button>
                             </el-col>
                         </el-row>
@@ -301,11 +301,11 @@ export default {
             //     }else{
             //        callback(); 
             //     }
-               
+
             // }
             return {
                 //通用
-                imgview:imgview,
+                imgview: imgview,
                 formLabelWidth: '160px',
                 dialogtitle: "",
                 //字典查询数据
@@ -368,7 +368,7 @@ export default {
                     }],
                     sex: [{
                         required: true,
-                        message: '请选择出生日期',
+                        message: '请选择性别',
                         trigger: 'change'
                     }],
                     dob: [{
@@ -418,9 +418,9 @@ export default {
                     "certifiyScope": "",
                     "checkOrg": "",
                     "diseaseName": "",
-                    "certificateHead":"",
-                    "certificateBack":""
-                    // "summary":"",
+                    "certificateHead": 0,
+                    "certificateBack": 0,
+                        // "summary":"",
                 },
                 // 医生详细信息结束-------------------------------------------------
                 //上传图像用
@@ -464,7 +464,8 @@ export default {
                 },
                 zTree: {},
                 zNodes: [],
-                certifiyFormVisible:false,
+                certifiyFormVisible: false,
+                curID:0,
             }
         },
         computed: {
@@ -502,7 +503,6 @@ export default {
                 },
                 //添加编辑医生
                 addTreeNode(index, row) {
-                    console.log(row);
                     this.hideRMenu();
                     this.editDocdialogFormVisible = true;
                     if (row) {
@@ -545,7 +545,6 @@ export default {
                         this.editDocformdata.doctorName = "";
                         this.editDocformdata.doctorId = "";
                     }
-                    console.log( this.editDocformdata.id);
                 },
 
                 //点击选择医生
@@ -675,12 +674,13 @@ export default {
                 },
                 // 医生详细信息
                 lookdoc(id) {
+                    this.curID=id;
                     this.docdetaildialogFormVisible = true;
                     if (id != 0) {
                         let params = `['${this.editDocformdata.doctorId}']`;
                         commonAjax("cas.doctorService", "getDoctorInfo", params).then(res => {
                             if (res.code == 200) {
-                                this.imageUrl = res.body.avatarFileId ?imgview + res.body.avatarFileId : "";
+                                this.imageUrl = res.body.avatarFileId ? imgview + res.body.avatarFileId : "";
                                 this.editdetailDocformdata = {
                                     "doctorId": res.body.doctorId,
                                     "doctorName": res.body.doctorName,
@@ -702,8 +702,8 @@ export default {
                                     "certifiyScope": res.body.certifiyScope ? res.body.certifiyScope : "",
                                     "checkOrg": res.body.checkOrg ? res.body.checkOrg : "",
                                     "diseaseName": res.body.diseaseName ? res.body.diseaseName : "",
-                                    "certificateHead" :res.body.certificateHead ? res.body.certificateHead : "",
-                                    "certificateBack":res.body.certificateBack ? res.body.certificateBack : "",
+                                    "certificateHead": res.body.certificateHead ? res.body.certificateHead : 0,
+                                    "certificateBack": res.body.certificateBack ? res.body.certificateBack :0,
                                     // "summary":res.body.summary
                                 }
 
@@ -735,11 +735,11 @@ export default {
                             "certifiy": "",
                             "certifiyNo": "",
                             "certifiyAddress": "",
-                            "certifiyScope": "",
+                            "certifiyScope": "", 
                             "checkOrg": "",
                             "diseaseName": "",
-                            "certificateHead" : "",
-                            "certificateBack":"",
+                            "certificateHead": 0,
+                            "certificateBack": 0,
                             // "summary":""
                         }
                     }
@@ -753,7 +753,7 @@ export default {
                                     this.docdetaildialogFormVisible = false;
                                     this.param.orgId = this.editdetailDocformdata.orgId;
                                     this.param.deptId = this.editdetailDocformdata.deptId;
-                                    this.getTableData();
+                                    this.getalldoc();
                                     this.$message({
                                         type: 'success',
                                         message: "保存成功"
@@ -924,8 +924,50 @@ export default {
                     // return isJPG && isLt2M;
                 },
                 // 点击查看证书
-                showcertifiy(){
-                    this.certifiyFormVisible=true;
+                showcertifiy() {
+                    this.certifiyFormVisible = true;
+                },
+                //根据身份证获取生日和性别
+                getBrithdayandsex(){
+                    this.editdetailDocformdata.dob = this.getBirthdatByIdNo(this.editdetailDocformdata.idCard);
+                    this.editdetailDocformdata.sex = this.getSexByIdNo(this.editdetailDocformdata.idCard);
+                },
+                // 通过身份证获取生日
+                getBirthdatByIdNo(iIdNo) {
+                    let tmpStr = "";
+                    iIdNo = $.trim(iIdNo);
+                    if (iIdNo.length == 0) {
+                        return tmpStr
+                    }
+                    if (iIdNo.length == 15) {
+                        tmpStr = iIdNo.substring(6, 12);
+                        tmpStr = "19" + tmpStr;
+                        tmpStr = tmpStr.substring(0, 4) + "-" + tmpStr.substring(4, 6) + "-" + tmpStr.substring(6)
+                        return tmpStr;
+                    } else {
+                        tmpStr = iIdNo.substring(6, 14);
+                        tmpStr = tmpStr.substring(0, 4) + "-" + tmpStr.substring(4, 6) + "-" + tmpStr.substring(6)
+                        return tmpStr;
+                    }
+                },
+                // 通过身份证获取性别
+                getSexByIdNo(iIdNo) {
+                    let tmpStr = "";
+                    iIdNo = $.trim(iIdNo);
+                    if (iIdNo.length == 0) {
+                        return tmpStr
+                    }
+                    if (iIdNo.length == 15) {
+                        tmpStr = iIdNo.substring(14)+'';
+
+                    } else {
+                        tmpStr = iIdNo.substring(16, 17)+'';
+                    }
+                    if (parseInt(tmpStr) % 2 == 0) {
+                        return 2+'';
+                    } else {
+                        return 1+''
+                    }
                 },
                 //验证
                 // validationData() {
@@ -980,7 +1022,7 @@ export default {
             //初始化科室列表
             $.fn.zTree.init($("#hospitalLists2"), this.setting);
             this.zTree = $.fn.zTree.getZTreeObj("hospitalLists2");
-            //标准科室
+         
             this.getalldoc();
             // //字典请求
             this.dictionaryRequest();
@@ -1057,5 +1099,11 @@ div#rMenu ul li:nth-child(2) {
 .el-picker-panel__icon-btn {
     margin-left: 20px
 }
-.certifiy img {display: block;margin:20px auto; width: 100%; height: auto}
+
+.certifiy img {
+    display: block;
+    margin: 20px auto;
+    width: 100%;
+    height: auto
+}
 </style>

@@ -173,7 +173,7 @@ export default {
                     for (let key in this.objectlist) {
                         param.moduleIds.push(key)
                     }
-                    console.log(param)
+                  if(param.moduleIds.length>0){
                     commonAjax("cas.productRelatedService", "productModuleSaved", '[' + JSON.stringify(param) + ']').then(res => {
                         if (res.code == 200) {
                             this.$message({
@@ -187,6 +187,12 @@ export default {
                             });
                         }
                     });
+                  }else{
+                     this.$message({
+                                type: 'error',
+                                message: "请至少选择一个模块"
+                         });
+                  }
 
                 },
                 //页面显示的条数变化

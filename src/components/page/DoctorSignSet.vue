@@ -1371,6 +1371,7 @@ export default {
                         "paramValue": row.paramValue,
                     }
                     this.baselabel = row.paramName;
+                   
                 },
                 basesetsubmitForm(formName) {
                     this.$refs[formName].validate((valid) => {
@@ -1382,7 +1383,7 @@ export default {
                                         type: 'success',
                                         message: "保存成功"
                                     });
-
+                                     this.getbasesetlist()
                                 } else {
                                     this.$message({
                                         type: 'error',

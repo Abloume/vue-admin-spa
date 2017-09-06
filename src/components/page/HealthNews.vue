@@ -51,10 +51,11 @@
             </el-table-column>
             <el-table-column label="操作" width="260">
                 <template scope="scope">
-                    <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                    <el-button size="small" @click="handleEdit(scope.$index, scope.row,'look')" v-if=" scope.row.newsStatus==1">查看</el-button>
+                    <el-button size="small" @click="handleEdit(scope.$index, scope.row,'edit')" v-if="scope.row.newsStatus==0">编辑</el-button>
                     <el-button size="small" type="success" @click="publish(scope.$index, scope.row)" v-if=" scope.row.newsStatus==0">发布</el-button>
                     <el-button size="small" type="danger" @click="publish(scope.$index, scope.row)" v-if=" scope.row.newsStatus==1">取消发布</el-button>
-                    <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                    <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)" v-if=" scope.row.newsStatus==0">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -65,34 +66,34 @@
         <el-dialog :title="dialogtitle" v-model="dialogFormVisible" @close="resetForm('adinfoForm')">
             <el-form :model="formdata" :rules="formrules" ref="adinfoForm" auto-complete="off" id="adinfoForm">
                 <el-form-item label="资讯标题" :label-width="formLabelWidth" prop="title">
-                    <el-input v-model="formdata.title" ></el-input>
+                    <el-input v-model="formdata.title" :disabled="islook"></el-input>
                 </el-form-item>
                 <el-form-item label="资讯标题图片" :label-width="formLabelWidth" prop="">
-                    <el-upload class="avatar-uploader" :action="imguploadurl" :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :headers="headers" :data="imguploaddata" >
+                    <el-upload class="avatar-uploader" :action="imguploadurl" :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :headers="headers" :data="imguploaddata"  :disabled="islook">
                         <img v-if="imageUrl" :src="imageUrl" class="avatar">
                         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                     </el-upload>
                 </el-form-item>
                 <el-form-item label="资讯类别" :label-width="formLabelWidth" prop="category">
-                    <el-select v-model="formdata.category" placeholder="请选择" >
+                    <el-select v-model="formdata.category" placeholder="请选择"  :disabled="islook">
                         <el-option v-for="item in typetableData" :key="item.tagCode" :label="item.tagName" :value="item.tagCode">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="适合人群" :label-width="formLabelWidth" prop="peopleClassifyIds">
-                    <el-select v-model="formdata.peopleClassifyIds" multiple filterable allow-create placeholder="请选择标签" >
+                    <el-select v-model="formdata.peopleClassifyIds" multiple filterable allow-create placeholder="请选择标签" :disabled="islook">
                         <el-option v-for="item in dictionary.peopleClassify" :key="item.key" :label="item.text" :value="item.key">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="资讯内容" :label-width="formLabelWidth" prop="newsdesc">
+                <el-form-item label="资讯内容" :label-width="formLabelWidth" prop="newsdesc" >
                     <quill-editor ref="myTextEditor" v-model="formdata.newsdesc" :config="editorOption" @showImageUI="imageHandler" @change="onEditorChange">
                     </quill-editor>
                     <!-- 必须带上这个input 上传图片用-->
                     <input type="file" name="file" id="fileinput" @change="customimgupload($event)" style="display:none">
                 </el-form-item>
             </el-form>
-            <div class="dialog-footer center-foot">
+            <div class="dialog-footer center-foot" v-show="!islook">
                 <el-button @click="closemodal('adinfoForm')">取 消</el-button>
                 <el-button type="primary" @click="submitForm('adinfoForm')">确 定</el-button>
             </div>
@@ -163,7 +164,7 @@ export default {
                 },
                 typetableData: [],
                 fileformdata: "",
-               
+                islook:true
             }
         },
         computed: {
@@ -174,11 +175,15 @@ export default {
         methods: {
             // 列表常用的方法开始
             //点击编辑的方法
-            handleEdit(index, row) {
+            handleEdit(index, row,str) {
                     if (row) {
                         this.dialogFormVisible = true;
                         this.dialogtitle = "编辑新闻";
-                  
+                        if(str=='look'){
+                            this.islook=true
+                        }else{
+                            this.islook=false
+                        }
                         commonAjax("cas.healthNewService", "getHealthNews", `[${row.id}]`, ).then(res => {
                             if (res.code == 200) {
                                 this.formdata = {
@@ -201,7 +206,7 @@ export default {
                         });
 
                     } else {
-                       
+                        this.islook=false;
                         this.imageUrl = "";
                         this.dialogFormVisible = true;
                         this.dialogtitle = "新增广告";

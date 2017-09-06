@@ -139,6 +139,10 @@ export default new Router({
                     path: '/doctorReview', //医生审核
                     name: 'DoctorReview',
                     component: resolve => require(['../components/page/DoctorReview.vue'], resolve)
+                }, { // 签约申请
+                    path: '/signApplyList',
+                    name: 'SignApplyList',
+                    component: resolve => require(['../components/page/SignApplyList.vue'], resolve)
                 }, {
                     path: '/serviceItem',
                     component: resolve => require(['../components/zxxpage/ServiceItem.vue'], resolve),

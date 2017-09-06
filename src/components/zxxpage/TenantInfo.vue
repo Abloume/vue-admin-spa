@@ -242,8 +242,8 @@
                 <el-form-item label="租户名称" :label-width="formLabelWidth" prop="tenantName">
                     <el-input v-model="addProdFormData.tenantName"></el-input>
                 </el-form-item>
-                <el-form-item label="一级产品" :label-width="formLabelWidth" prop="pCode">
-                    <el-select placeholder="请选择" v-model="addProdFormData.pCode">
+                <el-form-item label="上级产品" :label-width="formLabelWidth" prop="pCode">
+                    <el-select placeholder="请选择" v-model="addProdFormData.pCode" @change="choosePrtPrd">
                         <el-option v-for="item in productFirstLevelData" :key="item.code" :label="item.name" :value="item.code">
                         </el-option>
                     </el-select>
@@ -582,14 +582,15 @@ export default {
                 },
                 addProdTenantName: '', // 添加租户产品模态框-租户名称
                 curProductTypeObj: '', // 当前已选产品类型
-                addProdFormData: { // 添加产品表单数据
+                isFstPrdEmpty: false,  // 一级产品是否为空
+                addProdFormData: {     // 添加产品表单数据
                     code: '',
                     description: '',
                     name: '',
-                    pCode: '', // 一级产品
-                    productType: '', // 产品类型
+                    pCode: '',         // 一级产品
+                    productType: '',   // 产品类型
                     status: 1,
-                    tenantName: '' // 租户名称
+                    tenantName: ''     // 租户名称
                 },
                 isProdEnable: false, // 产品列表启用和禁用状态
                 prodDialogFormVisible: false, // 产品列表-添加产品模态框
@@ -747,13 +748,15 @@ export default {
                 // 模态框 - 关闭和取消按钮
                 closeModal(formName) {
                     this.$refs[formName].resetFields();
-                    if (formName == 'prodAddDialogForm') { // 添加产品模态框
+                    if (formName == 'prodInfoForm') {             // 查看产品模态框
+                        this.prodCheckDialogForm = false;
+                    } else if (formName == 'prodAddDialogForm') { // 添加产品模态框
                         this.prodDialogFormVisible = false;
                         console.log('746: ' + JSON.stringify(this.addProdFormData));
                     } else if (formName == 'servAddDialogForm') { // 添加服务模态框
                         this.servAddDialogFormVisible = false;
                     } else if (formName == 'addExtFldForm') {
-                        this.addSerExtDialogFormVisible = false; // 添加扩展属性模态框
+                        this.addSerExtDialogFormVisible = false;  // 添加扩展属性模态框
                     } else if (formName == 'servCheck') {
                         this.servCheckDialogForm = false;
                     }
@@ -1231,7 +1234,7 @@ export default {
                 // 产品列表 - 查看产品
                 checkProduct(index, row) {
                     this.dialogTitle = "查看租户产品",
-                        this.isProdReadOnly = true;
+                    this.isProdReadOnly = true;
                     this.prodCheckDialogForm = true;
                     this.curProductCode = row.code;
 
@@ -1292,7 +1295,34 @@ export default {
 
                     commonAjax('cas.tenantManageService', 'productFirstLevel', params).then(res => {
                         if (res.code == 200) {
-                            this.productFirstLevelData = res.body;
+                            if (res.body.length != 0) { // 返回一级产品
+                                this.productFirstLevelData = res.body;     
+                            } else {  // 没有返回
+                                this.isFstPrdEmpty = true;
+                                this.dictionary.productType = [
+                                    {
+                                      "key": "patient",
+                                      "text": "患者版",
+                                      "leaf": true,
+                                      "index": 0,
+                                      "mcode": "hzb"
+                                    },
+                                    {
+                                      "key": "doctor",
+                                      "text": "医生版",
+                                      "leaf": true,
+                                      "index": 0,
+                                      "mcode": "ysb"
+                                    },
+                                    {
+                                      "key": "admin",
+                                      "text": "管理版",
+                                      "leaf": true,
+                                      "index": 0,
+                                      "mcode": "glb"
+                                    }
+                                ];
+                            }
                         } else {
                             this.$message({
                                 type: 'error',
@@ -1300,6 +1330,47 @@ export default {
                             });
                         }
                     });
+                },
+                // 产品列表 - 选择一级产品
+                choosePrtPrd() {
+                    let myPcode = this.addProdFormData.pCode;
+                    if ( myPcode.indexOf('admin') != -1 ) {        // 管理
+                        this.dictionary.productType = [{
+                            "key": "admin_pc",
+                            "text": "管理版_pc",
+                            "leaf": true,
+                            "index": 0,
+                            "mcode": "glb_pc"
+                        }];
+                    } else if ( myPcode.indexOf('doctor') != -1 ) { // 医生
+                        this.dictionary.productType = [{
+                            "key": "doctor_ios",
+                            "text": "医生版_ios",
+                            "leaf": true,
+                            "index": 0,
+                            "mcode": "ysb_ios"
+                        }, {
+                              "key": "doctor_android",
+                              "text": "医生版_android",
+                              "leaf": true,
+                              "index": 0,
+                              "mcode": "ysb_android"
+                        }];
+                    } else {                                        // 患者
+                        this.dictionary.productType = [{
+                            "key": "patient_ios",
+                            "text": "患者版_ios",
+                            "leaf": true,
+                            "index": 0,
+                            "mcode": "hzb_ios"
+                        }, {
+                              "key": "patient_android",
+                              "text": "患者版_android",
+                              "leaf": true,
+                              "index": 0,
+                              "mcode": "hzb_android"
+                        }];
+                    }
                 },
                 // 产品列表 - 添加产品
                 addProduct() {

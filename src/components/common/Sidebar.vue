@@ -4,9 +4,9 @@
             <el-menu-item index="readme">
                 <i class="el-icon-menu"></i>主页
             </el-menu-item>
-          <!--   <el-menu-item index="doctorsignset">
-                <i class="el-icon-menu"></i>家医签约配置
-            </el-menu-item> -->
+            <el-menu-item index="signApplyList">
+                <i class="el-icon-menu"></i>签约申请
+            </el-menu-item>
             <!--  <el-menu-item index="BaseTable">
                 <i class="el-icon-menu"></i>租户管理
             </el-menu-item> -->

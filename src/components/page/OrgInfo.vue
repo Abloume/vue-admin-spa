@@ -394,8 +394,8 @@
                 </el-form-item>
                 <el-form-item label="有效标志" prop="effectiveFlag" :label-width="formLabelWidth">
                     <el-radio-group v-model="serformdata.effectiveFlag">
-                        <el-radio label="1">是</el-radio>
-                        <el-radio label="0">否</el-radio>
+                        <el-radio label="1" disabled>是</el-radio>
+                        <el-radio label="0" disabled>否</el-radio>
                     </el-radio-group>
                 </el-form-item>
                 <div class="center-foot">
@@ -422,7 +422,7 @@
                         <p v-show="scope.row.effectiveFlag==0">否</p>
                     </template>
                 </el-table-column>
-                <el-table-column prop="lastModifyUser" label="最后修改人">
+                <el-table-column prop="lastModifyUserName" label="最后修改人">
                 </el-table-column>
                 <el-table-column prop="lastModifyDt" label="最后修改时间">
                 </el-table-column>
@@ -849,6 +849,10 @@ export default {
                 // 通用结束-----------------------------------------------------------
                 //机构基本信息开始
                 submitForm(formName) {
+                    this.orgOption.province = this.editarea.province;
+                    this.orgOption.city = this.editarea.city;
+                    this.orgOption.district = this.editarea.district;
+                    this.orgOption.street = this.editarea.street;
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
                             var reqmtd = this.orgOption.orgId ? "updateOrgInfo" : "addOrgInfo";
@@ -1444,15 +1448,15 @@ export default {
                 // 请求服务包
                 getServicePacklist() {
                     let temobj = {
-                        "pageNo": 200,
-                        "pageSize": 1,
+                        "pageNo": 1,
+                        "pageSize": 200,
                         "serviceName": "",
-                        "status": "",
+                        "status": "1",
                         "tenantId": sessionStorage.getItem('tenantId')
                     };
-                    commonAjax("cas.baseServiceService", "getBaseServiceitemsList", '['+JSON.stringify(temobj)+']' ).then(res => {
+                    commonAjax("cas.baseServiceService", "getBaseServiceitemsList", '[' + JSON.stringify(temobj) + ']').then(res => {
                         if (res.code == 200) {
-                            this.servicePacklist = res.body;
+                            this.servicePacklist = res.body.items;
                         } else {
                             this.$message({
                                 type: 'error',
