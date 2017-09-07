@@ -112,7 +112,7 @@ export default {
                         if (res.code == 200) {
                             this.$message({
                                 type: 'success',
-                                message: "删除成功"
+                                message: "操作成功"
                             });
                             this.getTableData();
                         } else {

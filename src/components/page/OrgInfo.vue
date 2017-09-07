@@ -381,9 +381,11 @@
                     <el-input v-model="serformdata.serviceDesc" disabled></el-input>
                 </el-form-item>
                 <el-form-item label="开通服务对象类别" :label-width="formLabelWidth" prop="objectType">
-                    <el-select v-model="serformdata.objectType" placeholder="请选择">
-                        <el-option v-for="item in dictionary.objectType" :key="item.key" :label="item.text" :value="item.key">
+                    <el-select v-model="serformdata.objectType" placeholder="请选择" disabled>
+                         <el-option label="机构" value="021">
                         </el-option>
+                       <!--  <el-option v-for="item in dictionary.objectType" :key="item.key" :label="item.text" :value="item.key">
+                        </el-option> -->
                     </el-select>
                 </el-form-item>
                 <el-form-item label="服务主体标志" prop="mainFlag" :label-width="formLabelWidth">
@@ -509,7 +511,7 @@ export default {
                     orgLevel: [], //机构等级base_organizationGrade
                     reportType: [],
                     medicalCombType: [],
-                    objectType: [],
+                    // objectType: [],
                     svrOpenProperty: [],
                     baseDataType: [],
                 },
@@ -663,7 +665,7 @@ export default {
                     "orgId": "",
                     "effectiveFlag": "",
                     "serviceCode": "",
-                    "objectType": "",
+                    "objectType": "021",
                     "id": 0,
                 },
                 serdialogFormVisible: false,
@@ -804,7 +806,8 @@ export default {
                 //获取字典
                 dictionaryRequest() {
                     var that = this;
-                    let arr = ["cfs.dic.base_organizationType", "cfs.dic.base_mechanismProperties", "cfs.dic.base_organizationGrade", "cfs.dic.base_reportType", "cfs.dic.base_inspectionReportType", "cfs.dic.base_objectType", "cfs.dic.base_svrOpenProperty", "cfs.dic.base_baseDataType"];
+                    // let arr = ["cfs.dic.base_organizationType", "cfs.dic.base_mechanismProperties", "cfs.dic.base_organizationGrade", "cfs.dic.base_reportType", "cfs.dic.base_inspectionReportType", "cfs.dic.base_objectType", "cfs.dic.base_svrOpenProperty", "cfs.dic.base_baseDataType"];
+                     let arr = ["cfs.dic.base_organizationType", "cfs.dic.base_mechanismProperties", "cfs.dic.base_organizationGrade", "cfs.dic.base_reportType", "cfs.dic.base_inspectionReportType", "cfs.dic.base_svrOpenProperty", "cfs.dic.base_baseDataType"];
                     commonAjax("cas.multipleDictionaryService", "findDic", '[' + JSON.stringify(arr) + ']').then(res => {
                         // 
                         if (res.code == 200) {
@@ -824,13 +827,13 @@ export default {
                                 if (ele.dicId == arr[4]) {
                                     that.dictionary.medicalCombType = ele.items;
                                 }
+                                // if (ele.dicId == arr[5]) {
+                                //     that.dictionary.objectType = ele.items;
+                                // }
                                 if (ele.dicId == arr[5]) {
-                                    that.dictionary.objectType = ele.items;
-                                }
-                                if (ele.dicId == arr[6]) {
                                     that.dictionary.svrOpenProperty = ele.items;
                                 }
-                                if (ele.dicId == arr[7]) {
+                                if (ele.dicId == arr[6]) {
                                     that.dictionary.baseDataType = ele.items;
                                 }
                             })
@@ -1303,10 +1306,11 @@ export default {
                 // 启用禁用标记
                 serhandleDelete(index, row) {
                     const h = this.$createElement;
+                     let text=row.effectiveFlag==1?"是否禁用":"是否启用"
                     this.$msgbox({
-                        title: '确认删除',
+                        title: '确认操作',
                         message: h('p', null, [
-                            h('span', null, '是否删除 '),
+                            h('span', null, text),
                             h('i', {
                                 style: 'color: teal'
                             }, row.serviceName)
@@ -1332,7 +1336,7 @@ export default {
                         if (action == 'cancel') {
                             this.$message({
                                 type: 'info',
-                                message: "取消删除"
+                                message: "取消操作"
                             });
                         } else {
 
@@ -1341,7 +1345,7 @@ export default {
                                 if (res.code == 200) {
                                     this.$message({
                                         type: 'success',
-                                        message: "删除成功"
+                                        message: "操作成功"
                                     });
                                     this.sergetTableData();
                                 } else {
@@ -1367,8 +1371,9 @@ export default {
                             "serviceName": row.serviceName ? row.serviceName : "",
                             "serviceId": row.serviceId ? row.serviceId : "",
                             "orgId": row.orgId,
+                            "objectId": this.orgOption.orgId,
                             "effectiveFlag": row.effectiveFlag,
-                            "objectType": row.objectType ? row.objectType : "",
+                            "objectType":"021",
                             "id": row.id,
                         };
 
@@ -1376,15 +1381,16 @@ export default {
                         this.dialogtitle = "添加服务";
                         this.serformdata = {
                             "serviceCode": "",
-                            serviceDesc: "",
+                            "serviceDesc": "",
                             "mainFlag": "1",
                             "tenantId": sessionStorage.getItem('tenantId'),
                             "serviceName": "",
                             "serviceId": "",
                             "orgId": this.orgOption.orgId,
+                            "objectId": this.orgOption.orgId,
                             "effectiveFlag": "1",
                             "id": 0,
-                            "objectType": "",
+                            "objectType": "021",
                         };
                     }
 
@@ -1454,7 +1460,9 @@ export default {
                     //     "status": "1",
                     //     "tenantId": sessionStorage.getItem('tenantId')
                     // };
-                    commonAjax("cas.serviceService", "queryServices", '[]').then(res => {
+                     let  tenantId= sessionStorage.getItem('tenantId')
+                     let param=`['${tenantId}']`
+                    commonAjax("cas.serviceOpenService", "queryOpenServiceByTenantId", param).then(res => {
                         if (res.code == 200) {
                             this.servicePacklist = res.body;
                         } else {

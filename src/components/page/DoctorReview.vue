@@ -20,11 +20,11 @@
                     <el-input v-model="params.phoneNo" placeholder="联系电话"></el-input>
                 </el-col>
                 <el-col :span="4">
-                    <el-date-picker v-model="params.start" type="date" placeholder="申请开始时间">
+                    <el-date-picker v-model="params.start" type="date" placeholder="申请开始时间" @change="dateformat" format="yyyy-MM-dd">
                     </el-date-picker>
                 </el-col>
                 <el-col :span="4">
-                    <el-date-picker v-model="params.end" type="date" placeholder="申请结束时间">
+                    <el-date-picker v-model="params.end" type="date" placeholder="申请结束时间" @change="dateformat2" format="yyyy-MM-dd">
                     </el-date-picker>
                 </el-col>
                 <el-col :span="4">
@@ -71,7 +71,10 @@
                     <el-input v-model="formdata.idCard" disabled></el-input>
                 </el-form-item>
                 <el-form-item label="性别" :label-width="formLabelWidth" prop="sex">
-                    <el-input v-model="formdata.sex" disabled></el-input>
+                    <el-select v-model="formdata.sex" placeholder="请选择性别" disabled>
+                        <el-option v-for="item in dictionary.gender" :key="item.key" :label="item.text" :value="item.key">
+                        </el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="机构" :label-width="formLabelWidth" prop="orgName">
                     <el-input v-model="formdata.orgName" disabled></el-input>
@@ -156,6 +159,10 @@ export default {
                     "start": "",
                     "tenantId": sessionStorage.getItem('tenantId')
                 },
+                 //字典查询数据
+                dictionary: {
+                    gender: [],
+                },
                 total: "",
                 dialogtit: "",
                 // 表单数据开始
@@ -212,7 +219,12 @@ export default {
         },
         methods: {
             // 列表常用的方法开始
-
+             dateformat(val) {
+                    this.params.start = val
+                },
+                dateformat2(val) {
+                    this.params.end = val
+                },
             // 查看
             lookorreview(index, row) {
                         this.dialogFormVisible = true;
@@ -243,7 +255,7 @@ export default {
                             "docTypeText": row.docTypeText,
                             "roleNames": row.roleNames,
                             "checkTime": row.checkTime,
-                            "checkUser":row.checkTime,
+                            "checkUser":row.checkUser,
                         }
                         if (row.certifyPics) {
                             let temarr = row.certifyPics.split(",");
@@ -281,6 +293,26 @@ export default {
                 //搜索按钮点击
                 searchClick() {
                     this.getTableData();
+                },
+                    //获取字典
+                dictionaryRequest() {
+                    let arr = ["cfs.dic.base_gender"];
+                    commonAjax("cas.multipleDictionaryService", "findDic", '[' + JSON.stringify(arr) + ']').then(res => {
+                        if (res.code == 200) {
+                            var that = this;
+                            res.body.forEach(function(ele, index) {
+                                if (ele.dicId == arr[0]) {
+                                    that.dictionary.gender = ele.items;
+                                }
+                            })
+
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: res.msg
+                            });
+                        }
+                    });
                 },
                 // 列表常用的方法结束-------------------------------------------------------------------------------
                 // 表单常用的方法开始
@@ -360,6 +392,7 @@ export default {
         },
         mounted() {
             this.getTableData();
+            this.dictionaryRequest();
         },
 
 }

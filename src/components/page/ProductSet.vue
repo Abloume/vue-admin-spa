@@ -105,7 +105,7 @@
 </template>
 <script>
 import {
-    commonAjax
+    commonAjax,qrcodeurl
 }
 from '../../api/api';
 import {
@@ -280,7 +280,7 @@ export default {
                     };
                     temobj = JSON.stringify(temobj);
                     let b = new Base64();
-                    this.qrcodevalue = "https://app.bshcn.com.cn/download/apk/appdowmload.html?data=" + b.encode(temobj);
+                    this.qrcodevalue = qrcodeurl + b.encode(temobj);
                     // this.qrcodevalue="http://wwww.baidu.com";
                     // let str = b.decode("eyJ0eXBlIjoiNCIsInBDb2RlIjoiaGNuLnRvbmd4aWFuZy5wYXRpZW50X2FuZHJvaWQifQ==");//解码
                     // alert(str);

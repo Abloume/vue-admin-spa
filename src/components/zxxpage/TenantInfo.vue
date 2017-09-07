@@ -30,7 +30,7 @@
                 <el-tab-pane label="基本信息" name="baseInfo" class="eltabpane">
                     <el-form :model="basicData" :rules="orginformrules" ref="orginfoForm" auto-complete="off">
                         <el-form-item label="租户标识" :label-width="formLabelWidth" prop="tenantId">
-                            <el-input v-model="basicData.tenantId" :disabled="tenantOption.isdisabled"></el-input>
+                            <el-input v-model="basicData.tenantId" :disabled="tenantOption.isdisabled||tntMark"></el-input>
                         </el-form-item>
                         <el-form-item label="类型" :label-width="formLabelWidth" prop="tenantType">
                             <el-select v-model="basicData.tenantType" placeholder="请选择租户类型" :disabled="tenantOption.isdisabled">
@@ -211,7 +211,7 @@
                     <el-input v-model='addedParentOrgKeyword'></el-input>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="primary" icon="search" @click="getAddedParentOrgList">搜索</el-button>
+                    <el-button type="primary" icon="search" @click="getParentOrgList">搜索</el-button>
                 </el-col>
             </el-row>
             <!-- 列表 -->
@@ -230,14 +230,15 @@
                 </el-pagination>
             </div>
         </el-dialog>
+
         <!-- 添加产品模态框 -->
         <el-dialog :title="dialogTitle" v-model="prodDialogFormVisible" @close="closeModal('prodAddDialogForm')">
             <el-form :model="addProdFormData" ref="prodAddDialogForm">
                 <el-form-item label="租户产品标识" :label-width="formLabelWidth" prop="code">
-                    <el-input v-model="addProdFormData.code"></el-input>
+                    <el-input v-model="addProdFormData.code" disabled="true"></el-input>
                 </el-form-item>
                 <el-form-item label="租户产品名称" :label-width="formLabelWidth" prop="name">
-                    <el-input v-model="addProdFormData.name"></el-input>
+                    <el-input v-model="addProdFormData.name" disabled="true"></el-input>
                 </el-form-item>
                 <el-form-item label="租户名称" :label-width="formLabelWidth" prop="tenantName">
                     <el-input v-model="addProdFormData.tenantName"></el-input>
@@ -463,7 +464,7 @@
 </template>
 <script>
 import {
-    commonAjax
+    commonAjax,qrcodeurl
 }
 from '../../api/api';
 import {
@@ -485,7 +486,7 @@ export default {
                 },
                 tenantOption: {
                     activeName: 'baseInfo', // 基础信息标签页
-                    isdisabled: true, // true表示显示信息；false表示添加信息
+                    isdisabled: false, // true表示显示信息；false表示添加信息
                     isShowTab: true // 是否显示tab标签页
                 },
                 dictionary: { // 字典查询数据
@@ -535,6 +536,7 @@ export default {
 
                 // Tab基本信息标签页
                 hasBeenEdited: false, // 表单是否被编辑过
+                tntMark: false,       // 租户标示兼容条件
                 basicData: {          // 租户基本信息表单属性
                     status: 1,
                     tenantDesc: '',
@@ -823,6 +825,7 @@ export default {
                             });
                             this.tenantOption.isShowTab = true; //显示其他标签页
                             this.tenantOption.isdisabled = true;
+                            this.tntMark = true;
                         } else {
                             this.$message({
                                 type: 'error',
@@ -916,7 +919,6 @@ export default {
                             $.each(res.body.data, function(index, el) {
                                 el.number = (index + 1) + (params[0].pageNo - 1) * (params[0].pageSize);
                             });
-                            // 
                             this.OrgTableData = res.body.data;
                             this.OrgTableDataNum = res.body.total;
                         } else {
@@ -939,7 +941,6 @@ export default {
                 },
                 // 机构列表 - 添加机构 - 单页条数
                 addOrgSizeChange(pageSize) {
-
                     this.addedOrgListPagination.pageSize = pageSize;
                     this.getHospitalList();
                 },
@@ -951,24 +952,27 @@ export default {
                 // 机构列表 - 添加上级机构 - 单页条数
                 addParentOrgSizeChange(pageSize) {
                     this.addedParentOrgListPagination.pageSize = pageSize;
-                    this.getAddedParentOrgList();
+                    this.getParentOrgList();
                 },
                 // 机构列表 - 添加上级机构 - 当前页码
                 addParentOrgCurrentChange(curPage) {
                     this.addedParentOrgListPagination.pageNo = curPage;
-                    this.getAddedParentOrgList();
+                    this.getParentOrgList();
                 },
-                // 机构列表标签页 - 搜索机构
+                // 机构列表 - 搜索机构
                 searchOrgList() {
                     let params = [{
                         tenantId: this.basicData.tenantId,
                         orgName: this.orgKeyword,
-                        pageNo: 1,
-                        pageSize: 20
+                        pageNo: this.orgListPagination.pageNo,
+                        pageSize: this.orgListPagination.pageSize
                     }]
 
                     commonAjax("cas.tenantManageService", "searchTenantOrg", params).then(res => {
                         if (res.code == 200) {
+                            $.each(res.body.data, function(index, el) {
+                                el.number = (index + 1) + (params[0].pageNo - 1) * (params[0].pageSize);
+                            });
                             this.OrgTableData = res.body.data;
                             this.OrgTableDataNum = res.body.total;
                         } else {
@@ -979,7 +983,7 @@ export default {
                         }
                     })
                 },
-                // 租户管理 - 机构列表 - 删除按钮
+                // 机构列表 - 删除按钮
                 deleteOrg(index, row) {
                     const h = this.$createElement;
                     this.$msgbox({
@@ -1047,7 +1051,6 @@ export default {
                         }]
                     }
 
-                    // 调用服务
                     commonAjax('cas.tenantManageService', 'searchOrg', params).then(res => {
                         if (res.code == 200) {
                             $.each(res.body.items, function(index, el) {
@@ -1062,7 +1065,7 @@ export default {
                         }
                     });
                 },
-                // 租户管理 - 机构列表 - 添加医院
+                // 机构列表 - 添加医院
                 getAddedOrgList() {
                     this.dialogTitle = "添加医院";
                     this.navdialogFormVisible = true;
@@ -1095,12 +1098,8 @@ export default {
                         }
                     });
                 },
-                // 租户管理 - 机构列表 - 添加上级医院
-                getAddedParentOrgList(index, row) {
-                    this.dialogTitle = '添加上级机构';
-                    this.navdialogParentFormVisible = true;
-                    this.childOrgId = row.id;
-
+                // 机构列表 - 获取上级医院列表
+                getParentOrgList() {
                     if (this.addedParentOrgKeyword) {
                         var params = [{
                             orgName: this.addedParentOrgKeyword,
@@ -1131,7 +1130,14 @@ export default {
                         }
                     });
                 },
-                // 租户管理 - 机构列表 - 删除上级医院
+                // 机构列表 - 添加上级医院
+                getAddedParentOrgList(index, row) {
+                    this.dialogTitle = '添加上级机构';
+                    this.navdialogParentFormVisible = true;
+                    this.childOrgId = row.id;
+                    this.getParentOrgList();    
+                },
+                // 机构列表 - 删除上级医院
                 delParentOrg(index, row) {
                     var params = [row.id];
 
@@ -1146,7 +1152,7 @@ export default {
                         }
                     });
                 },
-                // 添加医院到机构列表
+                // 机构列表 - 添加医院到机构列表
                 addHspt2OrgList(index, row) {
                     let params = [{
                         orderId: index,
@@ -1170,7 +1176,7 @@ export default {
                         }
                     });
                 },
-                // 添加'上级医院'到机构列表
+                // 机构列表 - 添加'上级医院'到机构列表
                 addParentHspt2OrgList(index, row) {
                     let params = [{
                         id: this.childOrgId,
@@ -1571,7 +1577,7 @@ export default {
                     };
                     temobj = JSON.stringify(temobj);
                     let b = new Base64();
-                    this.qrcodevalue = "https://app.bshcn.com.cn/download/apk/appdowmload.html?data=" + b.encode(temobj);
+                    this.qrcodevalue = qrcodeurl + b.encode(temobj);
                     let str = b.decode(b.encode(temobj));//解码
                     // alert(str);
                 },

@@ -16,6 +16,8 @@ export const imgview = "http://10.8.3.49:8020/cfs-file/upload/image/"; //图片�
 export const filedowned = "http://10.8.3.49:8020/cfs-file/download/"; //文件下载地址
 // export const area_url = `${base}/coms.dictionary.coms_region.dic/`; //省市联动请求地址
 // export const filedownload_url = "http://115.236.19.147:15981/coms-web/download/"; //文件下载地址
+export const qrcodeurl = "http://10.8.3.48:7080/cas-app/app/down.html?data="; //测试环境
+// export const qrcodeurl = "https://app.bshcn.com.cn/apk/dowm.html?data="; //正式环境
 // 登录提交获取角色列表
 export const requestrolelist = params => {
 	let loadingInstance1 = Loading.service({

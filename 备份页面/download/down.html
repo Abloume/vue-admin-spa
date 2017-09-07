@@ -46,9 +46,9 @@
             document.write("<img src='images/download_default.png' alt='健康APP下载' width='100%'/>");
             return true;
         } else {
-            console.log(res.data.body.url);
-            console.log(res.data.body.productName);
-            // window.location.href=res.url;
+            // console.log(res.data.body.url);
+            // console.log(res.data.body.productName);
+            window.location.href=res.data.body.url;
             document.title = res.data.body.productName;
         }
         })

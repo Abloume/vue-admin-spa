@@ -278,11 +278,12 @@ export default {
                 // 删除列表中的一条数据
                 handleDelete(index, row) {
                     // this.$message.error('删除第' + (index + 1) + '行');
+                    let text=row.status==1?"是否禁用":"是否启用"
                     const h = this.$createElement;
                     this.$msgbox({
-                            title: '确认删除',
+                            title: '确认操作',
                             message: h('p', null, [
-                                h('span', null, '是否删除 '),
+                                h('span', null, text),
                                 h('i', {
                                     style: 'color: teal'
                                 }, row.name)
@@ -309,7 +310,7 @@ export default {
                             if (action == 'cancel') {
                                 this.$message({
                                     type: 'info',
-                                    message: "取消删除"
+                                    message: "取消操作"
                                 });
                             } else {
                                 let params = `[${row.id}]`;
@@ -317,7 +318,7 @@ export default {
                                     if (res.code == 200) {
                                         this.$message({
                                             type: 'success',
-                                            message: "删除成功"
+                                            message: "操作成功"
                                         });
                                         this.getTableData();
                                     } else {

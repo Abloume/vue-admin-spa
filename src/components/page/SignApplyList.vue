@@ -173,10 +173,24 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="区级医院" :label-width="formLabelWidth" prop="districtOrgName" v-if="formdata.openOneFlag==1">
-                    <el-input v-model="formdata.districtOrgName" :disabled="islook"></el-input>
+                    <el-row :gutter="20">
+                        <el-col :span="16">
+                            <el-input v-model="formdata.districtOrgName" disabled></el-input>
+                        </el-col>
+                        <el-col :span="5">
+                            <el-button type="primary" @click="districtshow" :disabled="islook">请选择</el-button>
+                        </el-col>
+                    </el-row>
                 </el-form-item>
                 <el-form-item label="市级医院" :label-width="formLabelWidth" prop="cityOrgName" v-if="formdata.openOneFlag==1">
-                    <el-input v-model="formdata.cityOrgName" :disabled="islook"></el-input>
+                    <el-row :gutter="20">
+                        <el-col :span="16">
+                            <el-input v-model="formdata.cityOrgName" disabled></el-input>
+                        </el-col>
+                        <el-col :span="5">
+                            <el-button type="primary" @click="cityshow" :disabled="islook">请选择</el-button>
+                        </el-col>
+                    </el-row>
                 </el-form-item>
                 <el-form-item label="备注" :label-width="formLabelWidth" prop="operInfo">
                     <el-input v-model="formdata.operInfo" type="textarea" :autosize="{ minRows: 4, maxRows: 8}" :disabled="islook"></el-input>
@@ -378,7 +392,6 @@ export default {
                     if (row.signState == 11) {
                         this.islook = false;
                         this.dialogtitle = "签约确认";
-                        this.getsign111()
                     } else {
                         this.dialogtitle = "签约查看"
                         this.islook = true
@@ -418,7 +431,7 @@ export default {
                                 "operTime": res.body.operTime,
                                 "operInfo": res.body.operInfo,
                                 "createAt": res.body.createAt,
-                                "signState": row.signState, //直接才从列表带过来
+                                "signState": res.body.signState, 
                                 "checkWay": this.islook ? res.body.checkWay : "",
                                 "cityOrgId": this.islook ? res.body.cityOrgId : "",
                                 "cityOrgName": this.islook ? res.body.cityOrgName : "",
@@ -427,9 +440,11 @@ export default {
                                 "openOneFlag": this.islook ? res.body.openOneFlag : "",
                                 "personGroup": this.islook ? res.body.personGroup : "",
                                 "signValidDate": this.islook ? res.body.signValidDate : "",
-                                "signState2": this.islook ? row.signState : "",
+                                "signState2": this.islook ? res.body.signState : "",
                             }
-                            console.log(this.formdata.packages)
+                            if (row.signState == 11) {
+                                this.getsign111()
+                            }
                         } else {
                             this.$message({
                                 type: 'error',
@@ -477,9 +492,8 @@ export default {
                     let params = `['${this.curorgId}']`
                     commonAjax("cas.signService", "hasService", params).then(res => {
                         if (res.code == 200) {
-                            // this.formdata.openOneFlag = res.body ? "1" : 0
-                            this.formdata.openOneFlag = 1
-                            if (this.formdata.openOneFlag ==1) {
+                            this.formdata.openOneFlag = res.body ? "1" : 0
+                            if (this.formdata.openOneFlag == 1) {
                                 this.getorgbelong(2);
                                 this.getorgbelong(3);
                             }
@@ -494,7 +508,7 @@ export default {
                 },
                 // 查询市级医院或者区级医院
                 getorgbelong(nubmerstr) {
-                    let params = `['',${this.curorgId}','${nubmerstr}']`
+                    let params = `['','${this.curorgId}','${nubmerstr}']`
                     commonAjax("cas.signService", "queryOrgInfoByAreaLevel", params).then(res => {
                         if (res.code == 200) {
                             if (nubmerstr == 2) {
@@ -550,10 +564,11 @@ export default {
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
                             let temarr = [];
-                            $.each(this.formdata.packages, function(index, el) {
-                                $.each(this.packageslist, function(index2, el2) {
-                                    if (el.spPackId == el2.spPackId) {
-                                        temarr.push(el2)
+                            let that=this;
+                            $.each(this.packageslist, function(index, el) {
+                                $.each(that.formdata.packages, function(index2, el2) {
+                                    if (el.spPackId == el2) {
+                                        temarr.push(el)
                                     }
                                 });
                             });
@@ -571,7 +586,7 @@ export default {
                                 "signState": this.formdata.signState2,
                                 "signValidDate": this.formdata.signValidDate,
                             }
-                            commonAjax("cas.signService", "signApplyConfirmed", '[' + JSON.stringify(this.formdata) + ']', ).then(res => {
+                            commonAjax("cas.signService", "signApplyConfirmed", '[' + JSON.stringify(temsubmitdata) + ']', ).then(res => {
                                 if (res.code == 200) {
                                     this.dialogFormVisible = false;
                                     this.$message({
@@ -673,13 +688,23 @@ export default {
                         }
                     });
                 },
-                selectdistrictOrg(index,row){
-                    this.formdata.cityOrgId=row.orgId;
-                    this.formdata.cityOrgName=row.orgFullName
+                selectdistrictOrg(index, row) {
+                    this.formdata.districtOrgId = row.orgId;
+                    this.formdata.districtOrgName = row.orgFullName;
+                    this.districtOrglistdialog = false;
                 },
-                selectcityOrg(index,row){
-                     this.formdata.districtOrgId=row.orgId;
-                     this.formdata.districtOrgId=row.orgFullName
+                selectcityOrg(index, row) {
+                    this.formdata.cityOrgId = row.orgId;
+                    this.formdata.cityOrgName = row.orgFullName;
+                    this.cityOrglistdialog = false
+                },
+                //地区医院选择列表弹框
+                districtshow() {
+                    this.districtOrglistdialog = true;
+                },
+                //市级医院选择列表弹框
+                cityshow() {
+                    this.cityOrglistdialog = true;
                 },
                 // 表单常用的方法结束--------------------------------------------------------------------------
 

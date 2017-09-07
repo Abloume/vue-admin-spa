@@ -684,7 +684,7 @@ export default {
                             "businessType": "",
                             "content": "",
                             "notificationName": "",
-                            "status": "",
+                            "status": "1",
                             businessTypeText: ""
                         }
                     }
@@ -859,7 +859,7 @@ export default {
                     } else {
                         this.dialogtitle = "新增健康指标类型";
                         this.healthtypeformdata = {
-                            "status": "",
+                            "status": "1",
                             "typeCode": "",
                             "typeId": undefined,
                             "typeName": "",
@@ -985,7 +985,7 @@ export default {
                             "hpiCode": "",
                             "hpiId": undefined,
                             "hpiName": "",
-                            "status": "",
+                            "status": "1",
                             "typeId": this.healthtypeformdata.typeId,
                             "upperLimit": "",
                             "lowerLimit": "",
@@ -1118,12 +1118,12 @@ export default {
                     } else {
                         this.dialogtitle = "新增评价模板";
                         this.evaluationtplformdata = {
-                            "inputFlag": "", //首评是否启用输入框
+                            "inputFlag": "1", //首评是否启用输入框
                             "defineTpName": "", //评价模板名称
                             "tenantId": this.curtenantId, //租户
-                            "addEvaluationFlag": "", //追评标志
-                            "appendInputFlag": "", //追评是否启用输入框
-                            "status": "", //是否启动
+                            "addEvaluationFlag": "1", //追评标志
+                            "appendInputFlag": "1", //追评是否启用输入框
+                            "status": "1", //是否启动
                             "id": 0 //新增为0
                         }
                     }
@@ -1229,7 +1229,7 @@ export default {
                             "defineId": this.evaluationtplformdata.id, //满意度评价定义表id
                             "appendFlag": "", //追评标志：0首评 1追评
                             "content": "", //内容
-                            "status": "", //状态 0.未启用 1.已启用
+                            "status": "1", //状态 0.未启用 1.已启用
                             "itemId": 0 //新增为0
                         }
                         if (this.activeName2 == "fristevaluation") {
@@ -1346,9 +1346,9 @@ export default {
                         if (res.code == 200) {
                             $.each(res.body, function(index, el) {
                                 if (el.paramCode == "signAdditionalTimeLimit") {
-                                    el.paramName = "签约补录时间"
+                                    el.paramName = "签约补录天数"
                                 } else if (el.paramCode == "serviceRecordAdditionalTimeLimit") {
-                                    el.paramName = "服务记录补录时间"
+                                    el.paramName = "服务记录补录天数"
                                 } else if (el.paramCode == "canRemoveCount") {
                                     el.paramName = "可解约次数"
                                 } else {
@@ -1437,7 +1437,7 @@ export default {
                             "paramId": undefined,
                             "paramName": "",
                             "paramValue": "",
-                            "status": ""
+                            "status": "1"
                         }
                     }
                 },

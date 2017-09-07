@@ -156,6 +156,7 @@ export default {
                 //     }]
                 // },
                 protableData: [],
+                tableData2: [],
             }
         },
         computed: {
@@ -183,7 +184,7 @@ export default {
                              commonAjax("cas.hotObjectService", "addHotObject", temparams).then(res => {
                                 if (res.code == 200) {
                                      this.dialogFormVisible = false;
-                                    this.getTableData()
+                                     this.getTableData()
                                 } else {
                                     this.$message({
                                         type: 'error',
