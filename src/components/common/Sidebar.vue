@@ -4,9 +4,6 @@
             <el-menu-item index="readme">
                 <i class="el-icon-menu"></i>主页
             </el-menu-item>
-            <el-menu-item index="signApplyList">
-                <i class="el-icon-menu"></i>签约申请
-            </el-menu-item>
             <!--  <el-menu-item index="BaseTable">
                 <i class="el-icon-menu"></i>租户管理
             </el-menu-item> -->
@@ -32,11 +29,8 @@
                 <el-menu-item index="doctorTeam">家医团队</el-menu-item>
             </el-submenu> -->
              <template v-for="(item,index) in rolemenulists">
-                <!-- <el-menu-item :index="item.linkedUrl" v-if="item.pId=='m_-1'">
-                    <i class="el-icon-menu"></i>{{item.name}}
-                </el-menu-item> -->
                 <el-submenu :index="item.id">
-                    <template slot="title"><i class="el-icon-menu"></i>{{item.name}}</template>
+                    <template slot="title"><img :src="item.menuIconId" width="14" height="14" style="margin-right:10px" /><!-- <i class="el-icon-menu"></i>-->{{item.name}}</template>
                     <el-menu-item :index="sitem.linkedUrl" v-for="(sitem,sindex) in item.child">{{sitem.name}}</el-menu-item>
                 </el-submenu>
             </template>
@@ -66,7 +60,6 @@ export default {
              ...mapState(['rolemenulists']),
         },
         mounted() {
-            console.log(this.rolemenulists);
             //获取菜单数据
             // console.log(this.userrolelist);
             // let rolelist=JSON.stringify(this.userrolelist);

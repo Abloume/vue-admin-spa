@@ -106,13 +106,13 @@
                     <span>审核信息</span>
                 </h2>
                 <el-form-item label="审核意见" prop="checkStatus" :label-width="formLabelWidth" v-show="formdata.checkStatus==0">
-                    <el-radio-group v-model="subformdata.checkStatus" >
+                    <el-radio-group v-model="subformdata.checkStatus">
                         <el-radio label="1">通过</el-radio>
                         <el-radio label="2">未通过</el-radio>
                     </el-radio-group>
                 </el-form-item>
-                 <el-form-item label="审核意见" :label-width="formLabelWidth" prop="checkStatus" v-show="formdata.checkStatus!=0">
-                   <el-radio-group v-model="formdata.checkStatus">
+                <el-form-item label="审核意见" :label-width="formLabelWidth" prop="checkStatus" v-show="formdata.checkStatus!=0">
+                    <el-radio-group v-model="formdata.checkStatus">
                         <el-radio label="1" disabled>通过</el-radio>
                         <el-radio label="2" disabled>未通过</el-radio>
                     </el-radio-group>
@@ -120,7 +120,6 @@
                 <el-form-item label="备注" :label-width="formLabelWidth" prop="checkInfo">
                     <el-input v-model="formdata.checkInfo" type="textarea" :autosize="{ minRows: 4, maxRows: 8}" :disabled="formdata.checkStatus!=0"></el-input>
                 </el-form-item>
-
                 <el-form-item label="审核人" :label-width="formLabelWidth" prop="checkUser" v-show="formdata.checkStatus!=0">
                     <el-input v-model="formdata.checkUser" :disabled="formdata.checkStatus!=0"></el-input>
                 </el-form-item>
@@ -155,11 +154,10 @@ export default {
                     "orgName": "",
                     "pageNo": 1,
                     "pageSize": 10,
-                    "phoneNo": "",
                     "start": "",
                     "tenantId": sessionStorage.getItem('tenantId')
                 },
-                 //字典查询数据
+                //字典查询数据
                 dictionary: {
                     gender: [],
                 },
@@ -192,19 +190,19 @@ export default {
                     "docTypeText": "",
                     "roleName": "",
                     "checkTime": "",
-                    "checkUser":"",
+                    "checkUser": "",
 
                 },
                 subformdata: {
-                    "checkStatus":"",
+                    "checkStatus": "",
                 },
-                formrules: { //表单验证规则
-                    checkInfo: [{
-                        required: true,
-                        message: '请输入不通过备注',
-                        trigger: 'blur'
-                    }]
-                },
+                // formrules: { //表单验证规则
+                //     checkInfo: [{
+                //         required: true,
+                //         message: '请输入不通过备注',
+                //         trigger: 'blur'
+                //     }]
+                // },
                 dialogImageUrl: '',
                 imgshowdialog: false,
                 certifyPicsarr: [],
@@ -219,52 +217,52 @@ export default {
         },
         methods: {
             // 列表常用的方法开始
-             dateformat(val) {
+            dateformat(val) {
                     this.params.start = val
                 },
                 dateformat2(val) {
                     this.params.end = val
                 },
-            // 查看
-            lookorreview(index, row) {
-                        this.dialogFormVisible = true;
-                        this.dialogtit = row.name + "的相关信息";
-                        this.formdata = {
-                            "doctorRegId": row.doctorRegId,
-                            "tenantId": row.tenantId,
-                            "userId": row.userId,
-                            "name": row.name,
-                            "sex": row.sex,
-                            "idCard": row.idCard,
-                            "localDoctorId": row.localDoctorId,
-                            "docType": row.docType,
-                            "roleIds": row.roleIds,
-                            "orgId": row.orgId,
-                            "orgName": row.orgName,
-                            "deptId": row.deptId,
-                            "deptName": row.deptName,
-                            "teamIds": row.teamIds,
-                            "teamNames": row.teamNames,
-                            "certifyPics": row.certifyPics,
-                            "regTime": row.regTime,
-                            "checkStatus": row.checkStatus,
-                            "status": row.status,
-                            "checkStatusText": row.checkStatusText,
-                            "checkInfo": row.checkInfo ? row.checkInfo : "",
-                            "phoneNo": row.phoneNo,
-                            "docTypeText": row.docTypeText,
-                            "roleNames": row.roleNames,
-                            "checkTime": row.checkTime,
-                            "checkUser":row.checkUser,
-                        }
-                        if (row.certifyPics) {
-                            let temarr = row.certifyPics.split(",");
-                            let newtemarr = [];
-                            $.each(temarr, function(index, el) {
-                                newtemarr.push(imgview + el)
-                            });
-                            this.certifyPicsarr = newtemarr;
-                        }
+                // 查看
+                lookorreview(index, row) {
+                    this.dialogFormVisible = true;
+                    this.dialogtit = row.name + "的相关信息";
+                    this.formdata = {
+                        "doctorRegId": row.doctorRegId,
+                        "tenantId": row.tenantId,
+                        "userId": row.userId,
+                        "name": row.name,
+                        "sex": row.sex,
+                        "idCard": row.idCard,
+                        "localDoctorId": row.localDoctorId,
+                        "docType": row.docType,
+                        "roleIds": row.roleIds,
+                        "orgId": row.orgId,
+                        "orgName": row.orgName,
+                        "deptId": row.deptId,
+                        "deptName": row.deptName,
+                        "teamIds": row.teamIds,
+                        "teamNames": row.teamNames,
+                        "certifyPics": row.certifyPics,
+                        "regTime": row.regTime,
+                        "checkStatus": row.checkStatus,
+                        "status": row.status,
+                        "checkStatusText": row.checkStatusText,
+                        "checkInfo": row.checkStatus==0?"":row.checkInfo,
+                        "phoneNo": row.phoneNo,
+                        "docTypeText": row.docTypeText,
+                        "roleNames": row.roleNames,
+                        "checkTime": row.checkTime,
+                        "checkUser": row.checkUser,
+                    }
+                    if (row.certifyPics) {
+                        let temarr = row.certifyPics.split(",");
+                        let newtemarr = [];
+                        $.each(temarr, function(index, el) {
+                            newtemarr.push(imgview + el)
+                        });
+                        this.certifyPicsarr = newtemarr;
+                    }
                 },
                 //获取列表数据
                 getTableData() {
@@ -294,7 +292,7 @@ export default {
                 searchClick() {
                     this.getTableData();
                 },
-                    //获取字典
+                //获取字典
                 dictionaryRequest() {
                     let arr = ["cfs.dic.base_gender"];
                     commonAjax("cas.multipleDictionaryService", "findDic", '[' + JSON.stringify(arr) + ']').then(res => {
@@ -318,57 +316,39 @@ export default {
                 // 表单常用的方法开始
                 //保存按钮提交数据
                 submitForm(formName) {
-                    if(this.subformdata.checkStatus==1){
-                          let temobj = {
+                    if (this.subformdata.checkStatus == 2) {
+                        if (this.formdata.checkInfo == "") {
+                            this.$message({
+                                type: 'error',
+                                message: "请输入不通过备注"
+                            });
+                            return
+                        }
+                    }
+                    let temobj = {
                                 "checkStatus": this.subformdata.checkStatus,
                                 "checkInfo": this.formdata.checkInfo,
                                 "doctorRegId": this.formdata.doctorRegId,
                             }
-                            commonAjax("cas.doctorService", "verifyDoctorInfoReg", '[' + JSON.stringify(temobj) + ']', ).then(res => {
-                                if (res.code == 200) {
-                                    this.dialogFormVisible = false;
-                                    this.$message({
-                                        type: 'success',
-                                        message: "保存成功"
-                                    });
-                                    this.getTableData();
-                                } else {
-                                    this.$message({
-                                        type: 'error',
-                                        message: res.msg
-                                    });
-                                }
+                    commonAjax("cas.doctorService", "verifyDoctorInfoReg", '[' + JSON.stringify(temobj) + ']', ).then(res => {
+                        if (res.code == 200) {
+                            this.dialogFormVisible = false;
+                            this.formdata.checkInfo = "";
+                            this.formdata.checkStatus = 0;
+                            this.$message({
+                                type: 'success',
+                                message: "保存成功"
                             });
-                    }else{
-                        this.$refs[formName].validate((valid) => {
-                        if (valid) {
-                            let temobj = {
-                                "checkStatus": this.subformdata.checkStatus,
-                                "checkInfo": this.formdata.checkInfo,
-                                "doctorRegId": this.formdata.doctorRegId,
-                            }
-                            commonAjax("cas.doctorService", "verifyDoctorInfoReg", '[' + JSON.stringify(temobj) + ']', ).then(res => {
-                                if (res.code == 200) {
-                                    this.dialogFormVisible = false;
-                                    this.$message({
-                                        type: 'success',
-                                        message: "保存成功"
-                                    });
-                                    this.getTableData();
-                                } else {
-                                    this.$message({
-                                        type: 'error',
-                                        message: res.msg
-                                    });
-                                }
-                            });
+                            this.getTableData();
                         } else {
-                            console.log('error submit!!');
-                            return false;
+                            this.$message({
+                                type: 'error',
+                                message: res.msg
+                            });
                         }
                     });
-                    }
-                    
+
+
                 },
                 //点击取消的时候关闭
                 closemodal(formName) {

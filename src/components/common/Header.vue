@@ -90,6 +90,9 @@ export default {
                     commonAjax("cas.menuManageService", "getRoleMenuTree", param).then(res => {
                         if (res.code == 200) {
                             $.each(res.body,function(index, el) {
+                                if(el.menuIconId!=undefined){
+                                    el.menuIconId=imgview+el.menuIconId
+                                }
                                 el.child=[];
                                 $.each(res.body,function(index2, el2) {
                                     if(el.id==el2.pId){
@@ -100,6 +103,7 @@ export default {
                              res.body= res.body.filter(function(el) {
                                  return el.child.length>0;
                              });
+                             console.log(res.body);
                              this.$store.dispatch('rolemenulists', res.body)
                         } else {
                             this.$message({

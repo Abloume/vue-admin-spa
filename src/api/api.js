@@ -2,8 +2,8 @@ import axios from 'axios';
 import {
 	Loading
 } from 'element-ui';
-// let base = '/cas-admin'; //生成产品用
-let base = 'proxyapi'; //开发产品用
+let base = '/cas-admin'; //生成产品用
+// let base = 'proxyapi'; //开发产品用
 
 export const commonurl = `${base}/*.jsonRequest`; //通用的请求地址
 // export const loginurl = `${base}/logon/login`; //登录地址
@@ -17,7 +17,7 @@ export const filedowned = "http://10.8.3.49:8020/cfs-file/download/"; //文件�
 // export const area_url = `${base}/coms.dictionary.coms_region.dic/`; //省市联动请求地址
 // export const filedownload_url = "http://115.236.19.147:15981/coms-web/download/"; //文件下载地址
 export const qrcodeurl = "http://10.8.3.48:7080/cas-app/app/down.html?data="; //测试环境
-// export const qrcodeurl = "https://app.bshcn.com.cn/apk/dowm.html?data="; //正式环境
+// export const qrcodeurl = "https://app.bshcn.com.cn/app/dowm.html?data="; //正式环境
 // 登录提交获取角色列表
 export const requestrolelist = params => {
 	let loadingInstance1 = Loading.service({

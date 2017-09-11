@@ -150,10 +150,11 @@
                 </el-tab-pane>
             </el-tabs>
         </el-row>
+
         <!-- 服务列表扩展属性列表  -->
         <el-row v-if="isShowServExtend">
             <el-table :data="exServiceTableData" border style="width: 100%">
-                <el-table-column prop="exPropertyType" label="属性" width="100"></el-table-column>
+                <el-table-column prop="exPropertyCodeText" label="属性" width="100"></el-table-column>
                 <el-table-column prop="exPropertyData" label="属性值" width="200"></el-table-column>
                 <el-table-column prop="effectiveFlag" label="有效标识" width="100">
                     <template scope="scope">
@@ -171,7 +172,7 @@
                 </el-table-column>
             </el-table>
             <div class="pagination">
-                <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="ServiceTableDataNum" :page-sizes="[10,20,50]" @size-change="serhandleSizeChange" @current-change="serhandleCurrentChange" :page-size="serparams.pageSize">
+                <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="exServiceTableDataNum" :page-sizes="[10,20,50]" @size-change="serhandleSizeChange" @current-change="serhandleCurrentChange" :page-size="serparams.pageSize">
                 </el-pagination>
             </div>
         </el-row>
@@ -264,6 +265,7 @@
                 </div>
             </el-form>
         </el-dialog>
+
         <!-- 查看产品模态框 -->
         <el-dialog :title="dialogTitle" v-model="prodCheckDialogForm" @close="closeModal('serinfoForm')">
             <el-form :model="productCheckData" :rules="serformdata.serinforules" ref="prodInfoForm" auto-complete="off">
@@ -298,6 +300,7 @@
                 </div>
             </el-form>
         </el-dialog>
+
         <!-- 新增租户服务模态框 -->
         <el-dialog :title="dialogTitle" v-model="servAddDialogFormVisible" @close="closeModal('servAddDialogForm')">
             <el-form :model="servAddedDialogData" :rules="serformdata.serinforules" ref="servAddDialogForm" auto-complete="off">
@@ -308,10 +311,10 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="服务编码" :label-width="formLabelWidth" prop="serviceCode">
-                    <el-input v-model="servAddedDialogData.serviceCode"></el-input>
+                    <el-input v-model="servAddedDialogData.serviceCode" disabled="true"></el-input>
                 </el-form-item>
                 <el-form-item label="服务说明" :label-width="formLabelWidth" prop="serviceDesc">
-                    <el-input v-model="servAddedDialogData.serviceDesc"></el-input>
+                    <el-input v-model="servAddedDialogData.serviceDesc" disabled="true"></el-input>
                 </el-form-item>
                 <el-form-item label="开通服务对象类别" :label-width="formLabelWidth" prop="objectId">
                     <el-select v-model="servAddedDialogData.objectId" placeholder="请选择">
@@ -326,7 +329,7 @@
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item label="有效标志" prop="effectiveFlag" :label-width="formLabelWidth">
-                    <el-radio-group v-model="servAddedDialogData.effectiveFlag">
+                    <el-radio-group v-model="servAddedDialogData.effectiveFlag" disabled="true">
                         <el-radio label="1">是</el-radio>
                         <el-radio label="0">否</el-radio>
                     </el-radio-group>
@@ -337,6 +340,7 @@
                 </div>
             </el-form>
         </el-dialog>
+
         <!-- 查看服务模态框 -->
         <el-dialog :title="dialogTitle" v-model="servCheckDialogForm" @close="closeModal('servCheck')">
             <el-form :model="ServiceDetailTableData" ref="servCheck">
@@ -377,6 +381,7 @@
                 </div>
             </el-form>
         </el-dialog>
+
         <!-- 服务新增修改模态框 -->
         <el-dialog :title="dialogTitle" v-model="serdialogFormVisible" @close="closeModal('serinfoForm')">
             <el-form :model="serformdata" :rules="serformdata.serinforules" ref="serinfoForm" auto-complete="off">
@@ -423,6 +428,7 @@
                 </div>
             </el-form>
         </el-dialog>
+
         <!-- 服务扩展属性 - 新增模态框 -->
         <el-dialog :title="dialogTitle" v-model="addSerExtDialogFormVisible" @close="closeModal('addExtFldForm')">
             <el-form :model="serextformdata" ref="addExtFldForm" auto-complete="off">
@@ -464,7 +470,7 @@
 </template>
 <script>
 import {
-    commonAjax,qrcodeurl
+    commonAjax
 }
 from '../../api/api';
 import {
@@ -638,30 +644,30 @@ export default {
                     serviceCode: '',
                     serviceDesc: '',
                     objectId: '',
-                    mainFlag: '',
-                    effectiveFlag: '',
+                    mainFlag: '1',
+                    effectiveFlag: '1',
                     serviceX: ''
                 },
-                servCheckDialogForm: false, // 服务列表查看模态框
-                tenantServicUpdatedForm: {}, // 服务列表编辑保存的数据
-                isServReadOnly: true, // 查看服务是否只读
-                servAddDialogFormVisible: false, // 服务列表添加模态框
-                addSerExtDialogFormVisible: false, // 扩展属性添加模态框model
-                isShowServExtend: false, // 是否显示服务扩展列表页
-                isEditStatus: false, // 是否显示编辑按钮
-                switchTxt: "禁用", // 禁用和启用按钮
+                servCheckDialogForm: false,         // 服务列表查看模态框
+                tenantServicUpdatedForm: {},        // 服务列表编辑保存的数据
+                isServReadOnly: true,               // 查看服务是否只读
+                servAddDialogFormVisible: false,    // 服务列表添加模态框
+                addSerExtDialogFormVisible: false,  // 扩展属性添加模态框model
+                isShowServExtend: false,            // 是否显示服务扩展列表页
+                isEditStatus: false,                // 是否显示编辑按钮
+                switchTxt: "禁用",                   // 禁用和启用按钮
                 orgOption: {
                     activeName: 'baseInfo', //基础信息标签页
-                    isdisabled: true, //true表示显示信息；false表示添加信息
-                    isShowTab: false //是否显示tab标签页, true显示，false不显示
+                    isdisabled: true,       //true表示显示信息；false表示添加信息
+                    isShowTab: false        //是否显示tab标签页, true显示，false不显示
                 },
                 sertotal: '',
                 serparams: { // 服务列表分页
                     pageNo: 1,
                     pageSize: 10
                 },
-                serextformdata: { // 扩展服务属性添加
-                    id: 0, // id为0时表示新增，id有值时表示更新
+                serextformdata: {       // 扩展服务属性添加
+                    id: 0,              // id为0时表示新增，id有值时表示更新
                     openserviceId: "",
                     exPropertyCode: "", // 扩展属性代码
                     exPropertyType: "", // 属性类型
@@ -754,7 +760,6 @@ export default {
                         this.prodCheckDialogForm = false;
                     } else if (formName == 'prodAddDialogForm') { // 添加产品模态框
                         this.prodDialogFormVisible = false;
-                        console.log('746: ' + JSON.stringify(this.addProdFormData));
                     } else if (formName == 'servAddDialogForm') { // 添加服务模态框
                         this.servAddDialogFormVisible = false;
                     } else if (formName == 'addExtFldForm') {
@@ -872,6 +877,7 @@ export default {
                 editBasicInfo() {
                     this.hasBeenEdited = true; // 保留痕迹
                     this.tenantOption.isdisabled = false;
+                    this.tntMark = true;
                 },
                 // 基本信息 - 返回按钮
                 leaveBasicInfo(formName) {
@@ -1053,10 +1059,10 @@ export default {
 
                     commonAjax('cas.tenantManageService', 'searchOrg', params).then(res => {
                         if (res.code == 200) {
-                            $.each(res.body.items, function(index, el) {
+                            $.each(res.body.data, function(index, el) {
                                 el.number = (index + 1) + (params[0].pageNo - 1) * (params[0].pageSize);
                             });
-                            this.addedOrgTableData = res.body.items;
+                            this.addedOrgTableData = res.body.data;
                         } else {
                             this.$message({
                                 type: 'error',
@@ -1085,10 +1091,10 @@ export default {
 
                     commonAjax('cas.tenantManageService', 'searchOrg', params).then(res => {
                         if (res.code == 200) {
-                            $.each(res.body.items, function(index, el) {
+                            $.each(res.body.data, function(index, el) {
                                 el.number = (index + 1) + (params[0].pageNo - 1) * (params[0].pageSize);
                             });
-                            this.addedOrgTableData = res.body.items;
+                            this.addedOrgTableData = res.body.data;
                             this.addedOrgTableDataNum = res.body.total;
                         } else {
                             this.$message({
@@ -1385,7 +1391,6 @@ export default {
                     this.addProdFormData.name = '';
                     this.addProdFormData.description = '';
 
-                    console.log('*** ' + JSON.stringify(this.addProdFormData))
                     this.dialogTitle = "添加租户产品";
                     this.addProdFormData.tenantName = this.basicData.tenantName;
                     this.prodDialogFormVisible = true;
@@ -1577,7 +1582,7 @@ export default {
                     };
                     temobj = JSON.stringify(temobj);
                     let b = new Base64();
-                    this.qrcodevalue = qrcodeurl + b.encode(temobj);
+                    this.qrcodevalue = "https://app.bshcn.com.cn/download/apk/appdowmload.html?data=" + b.encode(temobj);
                     let str = b.decode(b.encode(temobj));//解码
                     // alert(str);
                 },
@@ -1651,7 +1656,9 @@ export default {
                     this.dialogTitle = '添加租户服务扩展属性';
                     this.addSerExtDialogFormVisible = true;
                     this.isEditStatus = false;
+
                     // this.serextformdata = this.exServiceTableData[index];
+                    this.serextformdata.id = this.exServiceTableData[index].id;
                     this.serextformdata.exPropertyCode = this.exServiceTableData[index].exPropertyCode;
                     this.serextformdata.exPropertyType = this.exServiceTableData[index].exPropertyType;
                     this.serextformdata.exPropertyData = this.exServiceTableData[index].exPropertyData;
@@ -1677,7 +1684,7 @@ export default {
                     }
                     $(".yishenglist").hide();
                 },
-                // 服务列表 - 點擊添加服务
+                // 服务列表 - 点击添加服务
                 addService() {
                     this.dialogTitle = '新增租户服务';
                     this.servAddDialogFormVisible = true;
@@ -1870,21 +1877,39 @@ export default {
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
                             var self = this;
-                            commonAjax("cas.tenantManageService", "servicePropertyAdded", '[' + JSON.stringify(self.serextformdata) + ']').then(res => {
-                                if (res.code == 200) {
-                                    self.$message({
-                                        type: 'success',
-                                        message: "保存成功"
-                                    });
-                                    self.addSerExtDialogFormVisible = false; //关闭模态框
-                                    self.getServListExtendFld(this.curOpenServiceId); //继续查询扩展属性
-                                } else {
-                                    self.$message({
-                                        type: 'error',
-                                        message: res.msg
-                                    });
-                                }
-                            });
+                            if (!this.isEditStatus) {
+                                commonAjax("cas.tenantManageService", "servicePropertyAdded", '[' + JSON.stringify(self.serextformdata) + ']').then(res => {
+                                    if (res.code == 200) {
+                                        self.$message({
+                                            type: 'success',
+                                            message: "保存成功"
+                                        });
+                                        self.addSerExtDialogFormVisible = false; //关闭模态框
+                                        self.getServListExtendFld(this.curOpenServiceId); //继续查询扩展属性
+                                    } else {
+                                        self.$message({
+                                            type: 'error',
+                                            message: res.msg
+                                        });
+                                    }
+                                });
+                            } else {
+                                commonAjax("cas.tenantManageService", "servicePropertyUpdated", '[' + JSON.stringify(self.serextformdata) + ']').then(res => {
+                                    if (res.code == 200) {
+                                        self.$message({
+                                            type: 'success',
+                                            message: "保存成功"
+                                        });
+                                        self.addSerExtDialogFormVisible = false;          //关闭模态框
+                                        self.getServListExtendFld(this.curOpenServiceId); //继续查询扩展属性
+                                    } else {
+                                        self.$message({
+                                            type: 'error',
+                                            message: res.msg
+                                        });
+                                    }
+                                });
+                            }
                         } else {
                             return false;
                         }
@@ -1967,7 +1992,7 @@ export default {
                     commonAjax('cas.tenantManageService', 'servicePropertyList', params).then(res => {
                         if (res.code == 200) {
                             this.exServiceTableData = res.body;
-                            // this.exServiceTableDataNum = res.
+                            this.exServiceTableDataNum = res.body.length;
                         } else {
                             this.$message({
                                 type: 'error',

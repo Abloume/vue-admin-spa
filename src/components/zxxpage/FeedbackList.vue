@@ -1,7 +1,7 @@
 <template>
     <div class="feedback">
-        <!--标题-->
         <div class="crumbs">
+            <!-- 标题栏 -->
             <el-row class="navbreadcrumb cbafter">
                 <el-col :span="12" class="zuhu">
                     <el-breadcrumb separator="/">
@@ -15,6 +15,7 @@
                     </el-select>
                 </el-col>
             </el-row>
+            <!-- 过滤条件 -->
             <el-row v-show="!isCheckPattern" class="search_line">
                 <el-col :span="22">
                     <el-form :inline="true" :model="searchContent" class="demo-form-inline">
@@ -45,13 +46,13 @@
                 </el-col>
             </el-row>
         </div>
-        <!--列表-->
+        <!-- 列表 -->
         <el-table v-show="!isCheckPattern" :data="fbTableData" border style="width: 100%">
-            <el-table-column label="用户" prop="name"></el-table-column>
-            <el-table-column label="反馈类型" prop="classifyText"></el-table-column>
-            <el-table-column label="反馈内容" prop="content"></el-table-column>
-            <el-table-column label="反馈时间" prop="createDt"></el-table-column>
-            <el-table-column label="状态">
+            <el-table-column label="用户" prop="name" width="90"></el-table-column>
+            <el-table-column label="反馈类型" prop="classifyText" width="100"></el-table-column>
+            <el-table-column label="反馈内容" prop="content" width="410"></el-table-column>
+            <el-table-column label="反馈时间" prop="createDt" width="160"></el-table-column>
+            <el-table-column label="状态" width="100">
                 <template scope="scope">
                     <span v-if='scope.row.statusType==1'>已处理</span>
                     <span v-if='scope.row.statusType==0'>未处理</span>
