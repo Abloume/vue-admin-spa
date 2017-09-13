@@ -10,24 +10,28 @@
                 </el-col>
             </el-row>
             <el-row class="search_con" :gutter="20">
-                <el-col :span="4">
+                <el-col :span="6">
                     <el-input v-model="params.name" placeholder="医生姓名"></el-input>
                 </el-col>
-                <el-col :span="4">
+                <el-col :span="6">
                     <el-input v-model="params.orgName" placeholder="机构名称"></el-input>
                 </el-col>
-                <el-col :span="4">
+                <el-col :span="6">
                     <el-input v-model="params.phoneNo" placeholder="联系电话"></el-input>
                 </el-col>
-                <el-col :span="4">
+               
+            </el-row>
+             <el-row class="search_con" :gutter="20">
+               
+                <el-col :span="6">
                     <el-date-picker v-model="params.start" type="date" placeholder="申请开始时间" @change="dateformat" format="yyyy-MM-dd">
                     </el-date-picker>
                 </el-col>
-                <el-col :span="4">
+                <el-col :span="6">
                     <el-date-picker v-model="params.end" type="date" placeholder="申请结束时间" @change="dateformat2" format="yyyy-MM-dd">
                     </el-date-picker>
                 </el-col>
-                <el-col :span="4">
+                <el-col :span="6">
                     <el-button type="primary" icon="search" @click="searchClick">搜索</el-button>
                 </el-col>
             </el-row>

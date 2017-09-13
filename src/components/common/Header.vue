@@ -103,7 +103,6 @@ export default {
                              res.body= res.body.filter(function(el) {
                                  return el.child.length>0;
                              });
-                             console.log(res.body);
                              this.$store.dispatch('rolemenulists', res.body)
                         } else {
                             this.$message({

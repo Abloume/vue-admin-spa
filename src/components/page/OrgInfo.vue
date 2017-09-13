@@ -65,7 +65,7 @@
                             <el-row>
                                 <el-col :span="12">
                                     <el-form-item label="省级" :label-width="formLabelWidth" prop="province">
-                                        <el-select v-model="editarea.province" placeholder="请选择省">
+                                        <el-select v-model="editarea.province" placeholder="请选择省" :disabled="orgOption.isdisabled">
                                             <el-option v-for="item in provincelist" :label="item.text" :value="item.key" :key="item.key">
                                             </el-option>
                                         </el-select>
@@ -73,7 +73,7 @@
                                 </el-col>
                                 <el-col :span="12">
                                     <el-form-item label="市级" :label-width="formLabelWidth" prop="city">
-                                        <el-select v-model="editarea.city" placeholder="请选择市">
+                                        <el-select v-model="editarea.city" placeholder="请选择市" :disabled="orgOption.isdisabled">
                                             <el-option v-for="item in citylist" :label="item.text" :value="item.key" :key="item.key">
                                             </el-option>
                                         </el-select>
@@ -83,7 +83,7 @@
                             <el-row>
                                 <el-col :span="12">
                                     <el-form-item label="地区" :label-width="formLabelWidth" prop="district">
-                                        <el-select v-model="editarea.district" placeholder="请选择地区">
+                                        <el-select v-model="editarea.district" placeholder="请选择地区" :disabled="orgOption.isdisabled">
                                             <el-option v-for="item in districtlist" :label="item.text" :value="item.key" :key="item.key">
                                             </el-option>
                                         </el-select>
@@ -91,7 +91,7 @@
                                 </el-col>
                                 <el-col :span="12">
                                     <el-form-item label="街道" :label-width="formLabelWidth" prop="city">
-                                        <el-select v-model="editarea.street" placeholder="请选择街道">
+                                        <el-select v-model="editarea.street" placeholder="请选择街道" :disabled="orgOption.isdisabled">
                                             <el-option v-for="item in streetlist" :label="item.text" :value="item.key" :key="item.key">
                                             </el-option>
                                         </el-select>
@@ -492,7 +492,7 @@ import {
     mapState
 }
 from 'vuex';
-import AreaText from '../common/Area.vue';
+// import AreaText from '../common/Area.vue';
 export default {
     data() {
             return {
@@ -1652,7 +1652,7 @@ export default {
                 },
         },
         components: {
-            AreaText
+            // AreaText
         },
         mounted() {
             let params = [{}];

@@ -2,8 +2,8 @@ import axios from 'axios';
 import {
 	Loading
 } from 'element-ui';
-let base = '/cas-admin'; //生成产品用
-// let base = 'proxyapi'; //开发产品用
+// let base = '/cas-admin'; //生成产品用
+let base = 'proxyapi'; //开发产品用
 
 export const commonurl = `${base}/*.jsonRequest`; //通用的请求地址
 // export const loginurl = `${base}/logon/login`; //登录地址

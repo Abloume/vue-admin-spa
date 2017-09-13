@@ -41,13 +41,13 @@
         </div>
         <!--列表-->
         <el-table :data="servItemData" border style="width: 100%">
-            <el-table-column label="编号" prop="serviceCode" width="100"></el-table-column>
+            <el-table-column label="编号" prop="serviceCode" width="80"></el-table-column>
             <el-table-column label="服务名称" prop="serviceName" width="120"></el-table-column>
-            <el-table-column label="简介" prop="serviceDesc" width="120"></el-table-column>
-            <el-table-column label="上限价格(元)" prop="upperPrice" width="100"></el-table-column>
-            <el-table-column label="下限价格(元)" prop="lowerPrice" width="100"></el-table-column>
-            <el-table-column label="价格(元)" prop="price" width="100"></el-table-column>
-            <el-table-column label="状态" width="100">
+            <el-table-column label="简介" prop="serviceDesc" width="220"></el-table-column>
+            <el-table-column label="上限价格(元)" prop="upperPrice" width="80"></el-table-column>
+            <el-table-column label="下限价格(元)" prop="lowerPrice" width="80"></el-table-column>
+            <el-table-column label="价格(元)" prop="price" width="80"></el-table-column>
+            <el-table-column label="状态" width="70">
                 <template scope="scope">
                     <span v-if='scope.row.status==1'>已启用</span>
                     <span v-if='scope.row.status==0'>已停用</span>
@@ -78,13 +78,13 @@
                     <el-input class="serv_no" disabled="true"></el-input>
                 </el-form-item>
                 <el-form-item label="价格上限(元)" class="as_inline min_width" :label-width="formLabelWidth" prop="upperPrice">
-                    <el-input class="serv_no" v-model="addServItemForm.upperPrice" placeholder="0" :disabled="isReadOnly"></el-input>
+                    <el-input class="serv_no" v-model.number="addServItemForm.upperPrice" :disabled="isReadOnly"></el-input>
                 </el-form-item>
                 <el-form-item label="价格下限(元)" class="as_inline min_width" :label-width="formLabelWidth" prop="lowerPrice">
-                    <el-input class="serv_no" v-model="addServItemForm.lowerPrice" placeholder="0" :disabled="isReadOnly"></el-input>
+                    <el-input class="serv_no" v-model.number="addServItemForm.lowerPrice" :disabled="isReadOnly"></el-input>
                 </el-form-item>
                 <el-form-item label="默认价格(元)" class="as_inline" :label-width="formLabelWidth" prop="price">
-                    <el-input class="serv_no" v-model="addServItemForm.price" placeholder="0" :disabled="isReadOnly"></el-input>
+                    <el-input class="serv_no" v-model.number="addServItemForm.price" :disabled="isReadOnly"></el-input>
                 </el-form-item>
                 <el-form-item label="关联模块" class="as_inline" :label-width="formLabelWidth" prop="correlation">
                     <el-select placeholder="无" v-model="addServItemForm.correlation" disabled="true">
@@ -93,7 +93,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="有效期(天)" class="as_inline min_width" :label-width="formLabelWidth" prop="validPeriod">
-                    <el-input placeholder="0" class="serv_no" v-model="addServItemForm.validPeriod" :disabled="isReadOnly"></el-input>
+                    <el-input placeholder="0" class="serv_no" v-model.number="addServItemForm.validPeriod" :disabled="isReadOnly"></el-input>
                 </el-form-item>
                 <el-form-item label="关联评价" class="as_inline min_width" :label-width="formLabelWidth" prop="evaluationTplId">
                     <el-select placeholder="无" v-model="addServItemForm.evaluationTplId" disabled="true">
@@ -223,19 +223,40 @@ export default {
                 upperPrice: [{
                     required: true,
                     message: '价格上限不能为空'
+                }, {
+                    type: 'number',
+                    message: '价格为数字！'
                 }],
                 lowerPrice: [{
                     required: true,
                     message: '价格下限不能为空'
+                }, {
+                    type: 'number',
+                    message: '价格为数字'
                 }],
                 price: [{
                     required: true,
                     message: '默认价格不能为空'
+                }, {
+                    type: 'number',
+                    message: '价格为数字'
                 }],
                 validPeriod: [{
                     required: true,
                     message: '有效期不能为空'
+                }, {
+                    type: 'number',
+                    message: '有效期为数字'
                 }],
+                // allowanceRatio: [{
+                //     required: false,
+                //     message: '',
+                //     trigger: 'blur'
+                // }, {
+                //     type: 'number',
+                //     message: '请输入数字',
+                //     trigger: 'blur'
+                // }],
                 serviceDesc: [{
                     required: true,
                     message: '简介不能为空'
@@ -279,12 +300,12 @@ export default {
                 serviceName: '',      // 服务项目名称
                 upperPrice: 0,       // 价格上限
                 lowerPrice: 0,       // 价格下限
-                price: '',            // 价格
+                price: 0,            // 价格
                 correlation: '',      // 关联模块
                 validPeriod: '',      // 有效期
                 evaluationTplId: 0,  // 关联评价
                 actOrgType: '',       // 执行机构分类
-                allowanceRatio: '',   // 补助系数
+                // allowanceRatio: '',   // 补助系数
                 relateFormId: 0,     // 关联表单 
                 generatePlanFlag: '', // 是否生成计划
                 generatePlanTime: 0,  // 生成计划时机
@@ -299,7 +320,7 @@ export default {
         }
     },
     activated() {
-         this.init();
+        this.init();
     },
     methods: {
         /**
@@ -412,14 +433,14 @@ export default {
         // 重置表单
         resetAddServItemForm() {
             this.addServItemForm.serviceName = ''; // 服务项目名称
-            this.addServItemForm.upperPrice = '';  // 价格上限
-            this.addServItemForm.lowerPrice = '';  // 价格下限
-            this.addServItemForm.price = '';       // 价格
+            this.addServItemForm.upperPrice = 0;  // 价格上限
+            this.addServItemForm.lowerPrice = 0;  // 价格下限
+            this.addServItemForm.price = 0;       // 价格
             this.addServItemForm.correlation = ''; // 关联模块
-            this.addServItemForm.validPeriod = ''; // 有效期
+            this.addServItemForm.validPeriod = 0; // 有效期
             
             this.addServItemForm.actOrgType = '';      // 执行机构分类
-            this.addServItemForm.allowanceRatio = '';  // 补助系数
+            // this.addServItemForm.allowanceRatio = '';  // 补助系数
             this.addServItemForm.serviceDesc = '';     // 简介
             this.addServItemForm.helpDoc = '';         // 服务指导
             this.addServItemForm.serviceName = '';
@@ -600,7 +621,9 @@ export default {
                     if (this.isAddOrEdit == 1) { // 添加数据
                         this.addServItemForm.tenantId = sessionStorage.getItem('tenantId');
                         this.addServItemForm.content = this.servExplModule; // 服务说明模板内容
-                        this.addServItemForm.allowanceRatio = parseInt(this.addServItemForm.allowanceRatio);
+                        if (this.addServItemForm.allowanceRatio) {
+                            this.addServItemForm.allowanceRatio = parseInt(this.addServItemForm.allowanceRatio);
+                        }
                         this.addServItemForm.generatePlanTime = parseFloat(this.addServItemForm.generatePlanTime);
                         this.addServItemForm.lowerPrice = parseFloat(this.addServItemForm.lowerPrice);
                         this.addServItemForm.price = parseFloat(this.addServItemForm.price);

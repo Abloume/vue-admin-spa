@@ -588,7 +588,7 @@ export default {
                     "paramValue": ""
                 }, {
                     paramCode: "familyServiceAheadTimeLimit",
-                    paramName: "家医服务提醒提前天数",
+                    paramName: "家医服务提醒系数(%)",
                     "paramValue": ""
                 }],
                 basesetdialog: false,
@@ -1352,7 +1352,7 @@ export default {
                                 } else if (el.paramCode == "canRemoveCount") {
                                     el.paramName = "可解约次数"
                                 } else {
-                                    el.paramName = "家医服务提醒提前天数"
+                                    el.paramName = "家医服务提醒系数(%)"
                                 }
                             }.bind(this));
                             this.basesetlist = res.body;

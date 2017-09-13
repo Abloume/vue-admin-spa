@@ -154,7 +154,7 @@
                 </el-row>
                 <el-table :data="addPackFormData.packAssociation" border style="width: 100%" class="serv_item_table">
                     <el-table-column label="名称" prop="serviceName" width="100"></el-table-column>
-                    <el-table-column label="编号" prop="serviceCode" width="120"></el-table-column>
+                    <!-- <el-table-column label="编号" prop="serviceCode" width="120"></el-table-column> -->
                     <el-table-column label="上限价格(元)" prop="upperPrice" width="100"></el-table-column>
                     <el-table-column label="下限价格(元)" prop="lowerPrice" width="100"></el-table-column>
                     <el-table-column label="默认价格(元)" prop="price" width="100"></el-table-column>
@@ -217,7 +217,6 @@
     
                 <!-- 服务项标签页 -->
                 <el-tab-pane label="服务项" name="servItem" class="eltabpane" v-if="tenantOption.isShowTab">
-                    <!-- 服务项列表 -->
                     <el-row>
                         <el-col :span="20">
                             <div class="dialog_title">服务项(必填)</div>
@@ -228,7 +227,7 @@
                     </el-row>
                     <el-table :data="addPackFormData.packAssociation" border style="width: 100%" class="serv_item_table">
                         <el-table-column label="名称" prop="serviceName" width="90"></el-table-column>
-                        <el-table-column label="编号" prop="serviceCode" width="110"></el-table-column>
+                        <!-- <el-table-column label="编号" prop="serviceCode" width="110"></el-table-column> -->
                         <el-table-column label="上限价格(元)" prop="upperPrice" width="90"></el-table-column>
                         <el-table-column label="下限价格(元)" prop="lowerPrice" width="90"></el-table-column>
                         <el-table-column label="默认价格(元)" prop="price" width="90"></el-table-column>
@@ -276,7 +275,7 @@
         <el-dialog :title="dialogItemTitle" v-model="addServItemFormVisible" @close="(closeDialog('addItem'))">
             <el-form :model="addServItemForm" :rules="formrules" ref="addItemForm" auto-complete="off" id="addItemForm">
                 <el-form-item label="服务项名称" class="as_inline" :label-width="formLabelWidth" prop="serviceName">
-                    <el-select placeholder="无" class="serv_name serv_no" v-model="addServItemForm.serviceId" :disabled="isReadOnly" @change="getItsFields">
+                    <el-select placeholder="无" class="serv_name serv_no" v-model="addServItemForm.serviceName" :disabled="isReadOnly" @change="getItsFields">
                         <el-option v-for="item in servItemSelect" :key="item.serviceId" :label="item.serviceName" :value="item.serviceId">
                         </el-option>
                     </el-select>
@@ -825,9 +824,9 @@ export default {
         // 获取其他字段
         getItsFields(serviceId) {
             var self = this;
+            this.addServItemForm.serviceId = serviceId;
             var val = serviceId;
             $.each(self.servItemSelect, function (index, ele) {
-                
                 if (ele.serviceId == val) {
                     self.addServItemForm.price = ele.price;
                     self.addServItemForm.lowerPrice = ele.lowerPrice;
@@ -837,7 +836,6 @@ export default {
                     console.log( '1>>> ' + ele.price )
                     console.log( '2>>> ' + JSON.stringify(self.addServItemForm) )
                 }
-
             });
         },
         // 获取服务项列表

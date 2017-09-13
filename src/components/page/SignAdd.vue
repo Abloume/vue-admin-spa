@@ -5,10 +5,13 @@
                 <el-col :span="12" class="zuhu">
                     <el-breadcrumb separator="/">
                         <el-breadcrumb-item>签约服务</el-breadcrumb-item>
-                        <el-breadcrumb-item>签约申请</el-breadcrumb-item>
+                        <el-breadcrumb-item>签约管理</el-breadcrumb-item>
                     </el-breadcrumb>
                 </el-col>
-                <el-col :span="12" class="addorg fr">
+                <el-col :span="6" class="fr">
+                    <el-button type="info" icon="plus" @click="addapply">新增</el-button>
+                </el-col>
+                <el-col :span="6" class="addorg fr">
                     <el-select v-model="params.tenantId" placeholder="请选择租户">
                         <el-option v-for="item in tenantIdtableData" :key="item.tenantId" :label="item.tenantName" :value="item.tenantId">
                         </el-option>
@@ -16,31 +19,32 @@
                 </el-col>
             </el-row>
             <el-row class="search_con" :gutter="20">
-                <el-col :span="3">
+                <el-col :span="6">
                     <el-input v-model="params.personName" placeholder="居民姓名"></el-input>
                 </el-col>
-                <el-col :span="3">
-                    <el-input v-model="params.tel" placeholder="联系电话"></el-input>
-                </el-col>
-                <el-col :span="3">
+                <el-col :span="6">
                     <el-input v-model="params.orgName" placeholder="签约机构名称"></el-input>
                 </el-col>
-                <el-col :span="3">
+                <el-col :span="6">
                     <el-input v-model="params.teamName" placeholder="签约团队"></el-input>
                 </el-col>
-                <el-col :span="3">
-                    <el-input v-model="params.teamLeaderName" placeholder="团队长"></el-input>
+            </el-row>
+            <el-row class="search_con" :gutter="20">
+                <el-col :span="6">
+                    <el-date-picker v-model="params.start" type="date" placeholder="申请开始时间" @change="dateformat2" format="yyyy-MM-dd">
+                    </el-date-picker>
                 </el-col>
-                <el-col :span="3">
-                    <el-select v-model="params.signState" placeholder="状态">
-                        <el-option label="全部" value=""></el-option>
-                        <el-option label="待确认" value="11"></el-option>
-                        <el-option label="已取消" value="12"></el-option>
-                        <el-option label="已签约" value="13"></el-option>
-                        <el-option label="未通过" value="14"></el-option>
+                <el-col :span="6">
+                    <el-date-picker v-model="params.end" type="date" placeholder="申请结束时间" @change="dateformat3" format="yyyy-MM-dd">
+                    </el-date-picker>
+                </el-col>
+                <el-col :span="6">
+                    <el-select v-model="params.initiator" placeholder="发起人">
+                        <el-option label="患者" value="patient"></el-option>
+                        <el-option label="团队成员" value="member"></el-option>
                     </el-select>
                 </el-col>
-                <el-col :span="3">
+                <el-col :span="6">
                     <el-button type="primary" icon="search" @click="searchClick">搜索</el-button>
                 </el-col>
             </el-row>
@@ -54,22 +58,17 @@
             </el-table-column>
             <el-table-column prop="teamName" label="签约团队">
             </el-table-column>
-            <el-table-column prop="teamLeaderName" label="团队长">
-            </el-table-column>
             <el-table-column prop="createAt" label="申请时间">
             </el-table-column>
-            <el-table-column prop="signState" label="状态">
+            <el-table-column prop="initiator" label="发起人">
                 <template scope="scope">
-                    <p v-show="scope.row.signState==12">已取消</p>
-                    <p v-show="scope.row.signState==13">已签约</p>
-                    <p v-show="scope.row.signState==14">未通过</p>
-                    <p v-show="scope.row.signState==11">待确认</p>
+                    <p v-show="scope.row.initiator=='member'">团队成员</p>
+                    <p v-show="scope.row.initiator=='patient'">患者</p>
                 </template>
             </el-table-column>
             <el-table-column label="操作" width="180">
                 <template scope="scope">
-                    <el-button size="small" @click="confirmapply(scope.$index, scope.row)" v-if=" scope.row.signState!=11">查看</el-button>
-                    <el-button size="small" type="success" @click="confirmapply(scope.$index, scope.row)" v-if=" scope.row.signState==11">确认</el-button>
+                    <el-button size="small" @click="lookapply(scope.$index, scope.row)">查看</el-button>
                     <el-button size="small" @click.native="print(scope.$index, scope.row)">打印</el-button>
                 </template>
             </el-table-column>
@@ -78,8 +77,9 @@
             <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="total" :page-sizes="[10,20,50]" @size-change="handleSizeChange" @current-change="handleCurrentChange" :page-size="params.pageSize">
             </el-pagination>
         </div>
-        <el-dialog :title="dialogtitle" v-model="dialogFormVisible" @close="resetForm('adinfoForm')">
-            <el-form :model="formdata" :rules="formrules" ref="adinfoForm" auto-complete="off" id="adinfoForm">
+        <!-- 查看签约 -->
+        <el-dialog title="查看签约" v-model="lookdialogFormVisible">
+            <el-form :model="lookformdata" :rules="lookformrules" ref="lookadinfoForm" auto-complete="off" id="lookadinfoForm">
                 <h2 class="account-title">
                     <span>居民信息</span>
                 </h2>
@@ -87,43 +87,166 @@
                     <img :src="imgview+formdata.personHeader" width="100" height="150">
                 </el-form-item>
                 <el-form-item label="姓名" :label-width="formLabelWidth" prop="personName">
-                    <el-input v-model="formdata.personName" disabled></el-input>
+                    <el-input v-model="lookformdata.personName" disabled></el-input>
                 </el-form-item>
                 <el-form-item label="性别" :label-width="formLabelWidth" prop="sex">
-                    <el-select v-model="formdata.sex" placeholder="请选择性别" disabled>
+                    <el-select v-model="lookformdata.sex" placeholder="请选择性别" disabled>
                         <el-option v-for="item in dictionary.gender" :key="item.key" :label="item.text" :value="item.key">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="国籍" :label-width="formLabelWidth" prop="nationality">
-                    <el-select v-model="formdata.nationality" placeholder="请选择国籍" disabled>
+                    <el-select v-model="lookformdata.nationality" placeholder="请选择国籍" disabled>
                         <el-option v-for="item in dictionary.nationality" :key="item.key" :label="item.text" :value="item.key">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="出生日期" :label-width="formLabelWidth" prop="dob">
-                    <el-input v-model="formdata.dob" disabled></el-input>
+                    <el-input v-model="lookformdata.dob" disabled></el-input>
                 </el-form-item>
                 <el-form-item label="证件类型" :label-width="formLabelWidth" prop="idCardType">
-                    <el-select v-model="formdata.idCardType" placeholder="请选择证件类型" disabled>
+                    <el-select v-model="lookformdata.idCardType" placeholder="请选择证件类型" disabled>
                         <el-option v-for="item in dictionary.certificateType" :key="item.key" :label="item.text" :value="item.key">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="证件号码" :label-width="formLabelWidth" prop="idCard">
-                    <el-input v-model="formdata.idCard" disabled></el-input>
+                    <el-input v-model="lookformdata.idCard" disabled></el-input>
                 </el-form-item>
                 <el-form-item label="电话号码" :label-width="formLabelWidth" prop="tel">
-                    <el-input v-model="formdata.tel" disabled></el-input>
+                    <el-input v-model="lookformdata.tel" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="居住地址" :label-width="formLabelWidth" prop="tel">
+                    <el-input v-model="lookformdata.address" disabled></el-input>
                 </el-form-item>
                 <h2 class="account-title">
                     <span>签约信息</span>
                 </h2>
                 <el-form-item label="签约机构" :label-width="formLabelWidth" prop="orgName">
-                    <el-input v-model="formdata.orgName" disabled></el-input>
+                    <el-input v-model="lookformdata.orgName" disabled></el-input>
                 </el-form-item>
                 <el-form-item label="签约团队" :label-width="formLabelWidth" prop="teamName">
-                    <el-input v-model="formdata.teamName" disabled></el-input>
+                    <el-input v-model="lookformdata.teamName" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="团队长" :label-width="formLabelWidth" prop="teamLeaderName">
+                    <el-input v-model="lookformdata.teamLeaderName" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="签约周期" :label-width="formLabelWidth" prop="signCycle">
+                    <el-input v-model="lookformdata.signCycle" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="服务包" :label-width="formLabelWidth" prop="packages">
+                    <el-select v-model="lookformdata.packages" multiple filterable allow-create placeholder="请选择标签" disabled>
+                        <el-option v-for="item in packageslist" :key="item.spPackId" :label="item.spPackName" :value="item.spPackId">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <h2 class="account-title">
+                    <span>签约确认</span>
+                </h2>
+                <el-form-item label="确认方式" :label-width="formLabelWidth" prop="checkWay">
+                    <el-select v-model="lookformdata.checkWay" placeholder="请选择确认方式" disabled>
+                        <el-option v-for="item in dictionary.channelType" :key="item.key" :label="item.text" :value="item.key">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="签约生效日期" :label-width="formLabelWidth" prop="signValidDate">
+                    <el-date-picker type="date" placeholder="选择日期" v-model="lookformdata.signValidDate" style="width: 100%;" format="yyyy-MM-dd" disabled></el-date-picker>
+                </el-form-item>
+                <el-form-item label="管理类型" :label-width="formLabelWidth" prop="personGroup">
+                    <el-select v-model="lookformdata.personGroup" placeholder="请选择管理类型" disabled>
+                        <el-option v-for="item in dictionary.group" :key="item.key" :label="item.text" :value="item.key">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="区级医院" :label-width="formLabelWidth" prop="districtOrgName" v-show="lookformdata.openOneFlag==1">
+                    <el-input v-model="lookformdata.districtOrgName" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="市级医院" :label-width="formLabelWidth" prop="cityOrgName" v-show="lookformdata.openOneFlag==1">
+                    <el-input v-model="lookformdata.cityOrgName" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="备注" :label-width="formLabelWidth" prop="operInfo">
+                    <el-input v-model="lookformdata.operInfo" type="textarea" :autosize="{ minRows: 4, maxRows: 8}" disabled></el-input>
+                </el-form-item>
+            </el-form>
+            <div class="dialog-footer center-foot">
+                <el-button @click="closelookmodal('lookadinfoForm')">取 消</el-button>
+                <el-button type="info" @click="lookprotoco">查看协议</el-button>
+            </div>
+        </el-dialog>
+        <!-- 新增签约 -->
+        <el-dialog title="新增签约" v-model="dialogFormVisible" @close="resetForm('adinfoForm')">
+            <el-form :model="formdata" :rules="formrules" ref="adinfoForm" auto-complete="off" id="adinfoForm">
+                <h2 class="account-title">
+                    <span>居民信息</span>
+                </h2>
+                <el-form-item label="姓名" :label-width="formLabelWidth" prop="personName">
+                    <el-input v-model="formdata.personName"></el-input>
+                </el-form-item>
+                <el-form-item label="国籍" :label-width="formLabelWidth" prop="nationality">
+                    <el-select v-model="formdata.nationality" placeholder="请选择国籍">
+                        <el-option v-for="item in dictionary.nationality" :key="item.key" :label="item.text" :value="item.key">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="证件类型" :label-width="formLabelWidth" prop="idCardType" v-if="formdata.nationality=='01'">
+                    <!--    <el-select v-model="formdata.idCardType" placeholder="请选择证件类型">
+                        <el-option v-for="item in dictionary.certificateType" :key="item.key" :label="item.text" :value="item.key">
+                        </el-option>
+                    </el-select> -->
+                    <el-select v-model="formdata.idCardType" placeholder="请选择证件类型">
+                        <el-option label="居民身份证" value="01"></el-option>
+                        <!--  <el-option  label="居民户口簿" value="02"></el-option>
+                        <el-option  label="护照" value="03"></el-option> -->
+                        <el-option label="军官证" value="04"></el-option>
+                        <!--  <el-option  label="驾驶证" value="05"></el-option>
+                        <el-option  label="港澳居民来往内地通行证" value="06"></el-option>
+                        <el-option  label="台湾居民来往内地通行证" value="07"></el-option> -->
+                        <el-option label="出生证明" value="11"></el-option>
+                        <!-- <el-option  label="其他法定有效证件" value="99"></el-option> -->
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="证件类型" :label-width="formLabelWidth" prop="idCardType" v-if="formdata.nationality=='02'">
+                    <el-select v-model="formdata.idCardType" placeholder="请选择证件类型">
+                        <el-option label="港澳居民来往内地通行证" value="06"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="证件类型" :label-width="formLabelWidth" prop="idCardType" v-if="formdata.nationality=='03'">
+                    <el-select v-model="formdata.idCardType" placeholder="请选择证件类型">
+                        <el-option label="台湾居民来往内地通行证" value="07"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="证件类型" :label-width="formLabelWidth" prop="idCardType" v-if="formdata.nationality=='04'">
+                    <el-select v-model="formdata.idCardType" placeholder="请选择证件类型">
+                        <el-option label="护照" value="03"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="证件号码" :label-width="formLabelWidth" prop="idCard">
+                    <el-input v-model="formdata.idCard"></el-input>
+                </el-form-item>
+                <el-form-item label="出生日期" :label-width="formLabelWidth" prop="dob">
+                    <el-input v-model="formdata.dob"></el-input>
+                </el-form-item>
+                <el-form-item label="性别" :label-width="formLabelWidth" prop="sex">
+                    <el-select v-model="formdata.sex" placeholder="请选择性别">
+                        <el-option v-for="item in dictionary.gender" :key="item.key" :label="item.text" :value="item.key">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="电话号码" :label-width="formLabelWidth" prop="tel">
+                    <el-input v-model="formdata.tel"></el-input>
+                </el-form-item>
+                <h2 class="account-title">
+                    <span>签约信息</span>
+                </h2>
+                <el-form-item label="签约团队" :label-width="formLabelWidth" prop="teamName">
+                    <!--  <el-input v-model="formdata.teamName" ></el-input> -->
+                    <el-select v-model="teamobj" filterable placeholder="请选择签约团队">
+                        <el-option v-for="item in teamlist" :key="item.teamId" :label="item.teamName" :value="item">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="签约机构" :label-width="formLabelWidth" prop="orgName">
+                    <el-input v-model="formdata.orgName" disabled></el-input>
                 </el-form-item>
                 <el-form-item label="团队长" :label-width="formLabelWidth" prop="teamLeaderName">
                     <el-input v-model="formdata.teamLeaderName" disabled></el-input>
@@ -132,42 +255,25 @@
                     <el-input v-model="formdata.signCycle" disabled></el-input>
                 </el-form-item>
                 <el-form-item label="服务包" :label-width="formLabelWidth" prop="packages">
-                    <el-select v-model="formdata.packages" multiple filterable allow-create placeholder="请选择标签" :disabled="islook">
+                    <el-select v-model="formdata.packages" multiple filterable allow-create placeholder="请选择服务包">
                         <el-option v-for="item in packageslist" :key="item.spPackId" :label="item.spPackName" :value="item.spPackId">
                         </el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="申请时间" :label-width="formLabelWidth" prop="createAt">
-                    <el-input v-model="formdata.createAt" disabled></el-input>
-                </el-form-item>
-                <el-form-item label="状态" :label-width="formLabelWidth" prop="teamNames">
-                    <el-select v-model="formdata.signState" placeholder="" disabled>
-                        <el-option label="待确认" value="11"></el-option>
-                        <el-option label="已取消" value="12"></el-option>
-                        <el-option label="已签约" value="13"></el-option>
-                        <el-option label="未通过" value="14"></el-option>
                     </el-select>
                 </el-form-item>
                 <h2 class="account-title">
                     <span>签约确认</span>
                 </h2>
-                <el-form-item label="确认意见" prop="signState2" :label-width="formLabelWidth">
-                    <el-select v-model="formdata.signState2" placeholder="请选择产品" :disabled="islook">
-                        <el-option label="同意" value="13"></el-option>
-                        <el-option label="不同意" value="14"></el-option>
-                    </el-select>
-                </el-form-item>
                 <el-form-item label="确认方式" :label-width="formLabelWidth" prop="checkWay">
-                    <el-select v-model="formdata.checkWay" placeholder="请选择确认方式" :disabled="islook">
+                    <el-select v-model="formdata.checkWay" placeholder="请选择确认方式">
                         <el-option v-for="item in dictionary.channelType" :key="item.key" :label="item.text" :value="item.key">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="签约生效日期" :label-width="formLabelWidth" prop="signValidDate">
-                    <el-date-picker type="date" placeholder="选择日期" v-model="formdata.signValidDate" style="width: 100%;" @change="dateformat" format="yyyy-MM-dd" :disabled="islook"></el-date-picker>
+                    <el-date-picker type="date" placeholder="选择日期" v-model="formdata.signValidDate" style="width: 100%;" @change="dateformat" format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
                 <el-form-item label="管理类型" :label-width="formLabelWidth" prop="personGroup">
-                    <el-select v-model="formdata.personGroup" placeholder="请选择管理类型" :disabled="islook">
+                    <el-select v-model="formdata.personGroup" placeholder="请选择管理类型">
                         <el-option v-for="item in dictionary.group" :key="item.key" :label="item.text" :value="item.key">
                         </el-option>
                     </el-select>
@@ -175,30 +281,30 @@
                 <el-form-item label="区级医院" :label-width="formLabelWidth" prop="districtOrgName" v-if="formdata.openOneFlag==1">
                     <el-row :gutter="20">
                         <el-col :span="16">
-                            <el-input v-model="formdata.districtOrgName" disabled></el-input>
+                            <el-input v-model="formdata.districtOrgName"></el-input>
                         </el-col>
                         <el-col :span="5">
-                            <el-button type="primary" @click="districtshow" :disabled="islook">请选择</el-button>
+                            <el-button type="primary" @click="districtshow">请选择</el-button>
                         </el-col>
                     </el-row>
                 </el-form-item>
                 <el-form-item label="市级医院" :label-width="formLabelWidth" prop="cityOrgName" v-if="formdata.openOneFlag==1">
                     <el-row :gutter="20">
                         <el-col :span="16">
-                            <el-input v-model="formdata.cityOrgName" disabled></el-input>
+                            <el-input v-model="formdata.cityOrgName"></el-input>
                         </el-col>
                         <el-col :span="5">
-                            <el-button type="primary" @click="cityshow" :disabled="islook">请选择</el-button>
+                            <el-button type="primary" @click="cityshow">请选择</el-button>
                         </el-col>
                     </el-row>
                 </el-form-item>
                 <el-form-item label="备注" :label-width="formLabelWidth" prop="operInfo">
-                    <el-input v-model="formdata.operInfo" type="textarea" :autosize="{ minRows: 4, maxRows: 8}" :disabled="islook"></el-input>
+                    <el-input v-model="formdata.operInfo" type="textarea" :autosize="{ minRows: 4, maxRows: 8}"></el-input>
                 </el-form-item>
             </el-form>
             <div class="dialog-footer center-foot">
-                <el-button @click="closemodal('adinfoForm')" v-show="!islook">取 消</el-button>
-                <el-button type="primary" @click="submitForm('adinfoForm')" v-show="!islook">确 定</el-button>
+                <el-button @click="closemodal('adinfoForm')">取 消</el-button>
+                <el-button type="primary" @click="submitForm('adinfoForm')">确 定</el-button>
                 <el-button type="info" @click="lookprotoco">查看协议</el-button>
             </div>
         </el-dialog>
@@ -256,16 +362,15 @@ export default {
                     "pageNo": 1,
                     "pageSize": 10,
                     "personName": "",
-                    "signState": "",
-                    "teamLeaderName": "",
                     "teamName": "",
-                    "tel": "",
-                    "tenantId": ""
+                    "start": "", //开始时间
+                    "end": "", //结束时间
+                    "tenantId": "",
+                    "initiator": "" //发起人 患者 patient 团队成员 member
                 },
                 total: 1,
                 // 表单数据开始
-                dialogFormVisible: false, //模态框显示隐藏用
-                formdata: { //表单绑定数据用
+                lookformdata: { //表单绑定数据用
                     "packages": [],
                     "teamLeaderName": "",
                     "address": "",
@@ -300,8 +405,45 @@ export default {
                     "personGroup": "",
                     "signState": "",
                     "signValidDate": "",
-                    "signState2": "", //确认方式绑定
-                    "nationality":""
+                    "nationality": ""
+                },
+                lookdialogFormVisible: false, //模态框显示隐藏用
+                dialogFormVisible: false, //模态框显示隐藏用
+                formdata: { //表单绑定数据用
+                    "packages": [],
+                    "teamLeaderName": "",
+                    "teamLeaderId": "",
+                    "address": "",
+                    "teamId": "",
+                    "teamName": "",
+                    "orgId": "",
+                    "orgName": "",
+                    "signCycle": 1,
+                    "contactName": "",
+                    "contactPhone": "",
+                    "protocolId": 0,
+                    "idCardType": "",
+                    "idCard": "",
+                    "personHeader": 0,
+                    "personName": "",
+                    "sex": "",
+                    "dob": "",
+                    "tel": "",
+                    "operPersonType": "",
+                    "operPersonName": "",
+                    "operTime": "",
+                    "operInfo": "",
+                    "createAt": "",
+                    "checkWay": "",
+                    "cityOrgId": "",
+                    "cityOrgName": "",
+                    "districtOrgId": "",
+                    "districtOrgName": "",
+                    "openOneFlag": "",
+                    "personGroup": "",
+
+                    "signValidDate": "",
+                    "nationality": ""
                 },
                 dialogtitle: "", //模态框动态标题
                 formrules: { //表单验证规则
@@ -334,10 +476,7 @@ export default {
                         message: '请选择管理类型',
 
                     }],
-                    signState2: [{
-                        required: true,
-                        message: '请选择确认意见',
-                    }]
+
                 },
                 imageUrl: "", //文件或者图片上传预览图片的src地址
                 //字典查询数据
@@ -351,23 +490,65 @@ export default {
                 tenantIdtableData: [],
                 islook: false,
                 packageslist: [],
-                curteamId: "",
                 cursignId: "",
-                curorgId: "",
                 curprotocolcontent: "",
                 curprotocoldialog: false,
                 "cityOrglist": [],
                 "districtOrglist": [],
                 cityOrglistdialog: false,
                 districtOrglistdialog: false,
+                teamlist: [],
+                teamobj: null,
+                aCity: {
+                    11: "北京",
+                    12: "天津",
+                    13: "河北",
+                    14: "山西",
+                    15: "内蒙古",
+                    21: "辽宁",
+                    22: "吉林",
+                    23: "黑龙江",
+                    31: "上海",
+                    32: "江苏",
+                    33: "浙江",
+                    34: "安徽",
+                    35: "福建",
+                    36: "江西",
+                    37: "山东",
+                    41: "河南",
+                    42: "湖北",
+                    43: "湖南",
+                    44: "广东",
+                    45: "广西",
+                    46: "海南",
+                    50: "重庆",
+                    51: "四川",
+                    52: "贵州",
+                    53: "云南",
+                    54: "西藏",
+                    61: "陕西",
+                    62: "甘肃",
+                    63: "青海",
+                    64: "宁夏",
+                    65: "新疆",
+                    71: "台湾",
+                    81: "香港",
+                    82: "澳门",
+                    91: "国外"
+                },
             }
         },
         computed: {
 
         },
         methods: {
-
-            dateformat(val) {
+            dateformat2(val) {
+                    this.params.start = val
+                },
+                dateformat3(val) {
+                    this.params.end = val
+                },
+                dateformat(val) {
                     this.formdata.signValidDate = val
                 },
                 print(index, row) {
@@ -385,29 +566,62 @@ export default {
                     });
 
                 },
-                confirmapply(index, row) {
-                    this.cursignId = row.signId;
-                    this.curorgId = row.orgId;
-                    this.curteamId = row.teamId;
-                    this.getpackageslist()
-                    if (row.signState == 11) {
-                        this.islook = false;
-                        this.dialogtitle = "签约确认";
-                    } else {
-                        this.dialogtitle = "签约查看"
-                        this.islook = true
+                addapply() {
+                    this.dialogFormVisible = true;
+                    this.formdata = { //表单绑定数据用
+                        "packages": [],
+                        "teamLeaderName": this.formdata.teamLeaderName,
+                        "teamLeaderId": this.formdata.teamLeaderId,
+                        "address": "",
+                        "teamId": this.formdata.teamId,
+                        "teamName": this.formdata.teamName,
+                        "orgId": this.formdata.orgId,
+                        "orgName": this.formdata.orgName,
+                        "signCycle": 1,
+                        "contactName": "",
+                        "contactPhone": "",
+                        "protocolId": 0,
+                        "idCardType": "",
+                        "idCard": "",
+                        "personHeader": 0,
+                        "personName": "",
+                        "sex": "",
+                        "dob": "",
+                        "tel": "",
+                        "operPersonType": "",
+                        "operPersonName": "",
+                        "operTime": "",
+                        "operInfo": "",
+                        "createAt": "",
+                        "checkWay": "2",
+                        "cityOrgId": "",
+                        "cityOrgName": "",
+                        "districtOrgId": "",
+                        "districtOrgName": "",
+                        "openOneFlag": "",
+                        "personGroup": "",
+                        "signValidDate": "",
+                        "nationality": "01"
                     }
+                    var d = new Date();
+                    var year = d.getFullYear();
+                    var month = d.getMonth() + 1;
+                    var date = d.getDate();
+                    this.formdata.signValidDate = year + "-" + (month < 10 ? '0' + month : month) + "-" + (date < 10 ? '0' + date : date);
+
+                },
+                lookapply(index, row) {
+                    this.cursignId = row.signId;
+                    this.getpackageslist(row.teamId)
                     let param = `[${row.signId}]`;
                     commonAjax("cas.signService", "signDetail", param).then(res => {
                         if (res.code == 200) {
-                            this.dialogFormVisible = true;
-
+                            this.lookdialogFormVisible = true;
                             let temarr = [];
                             $.each(res.body.packages, function(index, el) {
                                 temarr.push(el.spPackId);
                             });
-                            this.formdata = { //表单绑定数据用
-                                 "nationality":res.body.nationality,
+                            this.lookformdata = { //表单绑定数据用
                                 "packages": temarr,
                                 "address": res.body.address,
                                 "teamId": res.body.teamId,
@@ -433,21 +647,18 @@ export default {
                                 "operTime": res.body.operTime,
                                 "operInfo": res.body.operInfo,
                                 "createAt": res.body.createAt,
-                                "signState": res.body.signState, 
-                                "checkWay": this.islook ? res.body.checkWay : "",
-                                "cityOrgId": this.islook ? res.body.cityOrgId : "",
-                                "cityOrgName": this.islook ? res.body.cityOrgName : "",
-                                "districtOrgId": this.islook ? res.body.districtOrgId : "",
-                                "districtOrgName": this.islook ? res.body.districtOrgName : "",
-                                "openOneFlag": this.islook ? res.body.openOneFlag : "",
-                                "personGroup": this.islook ? res.body.personGroup : "",
-                                "signValidDate": this.islook ? res.body.signValidDate : "",
-                                "signState2": this.islook ? res.body.signState : "",
-                               
+                                "signState": res.body.signState,
+                                "checkWay": res.body.checkWay,
+                                "cityOrgId": res.body.cityOrgId,
+                                "cityOrgName": res.body.cityOrgName,
+                                "districtOrgId": res.body.districtOrgId,
+                                "districtOrgName": res.body.districtOrgName,
+                                "openOneFlag": res.body.openOneFlag,
+                                "personGroup": res.body.personGroup,
+                                "signValidDate": res.body.signValidDate,
+                                "nationality": res.body.nationality
                             }
-                            if (row.signState == 11) {
-                                this.getsign111()
-                            }
+
                         } else {
                             this.$message({
                                 type: 'error',
@@ -477,9 +688,8 @@ export default {
                     });
                 },
                 //获取服务包下拉框
-                getpackageslist() {
-                    let params = `[${this.curteamId},${this.cursignId}]`
-                    commonAjax("cas.signService", "spPackApplyChecked", params).then(res => {
+                getpackageslist(teamId) {
+                    commonAjax("cas.signService", "querySpPack", `[${teamId}]`).then(res => {
                         if (res.code == 200) {
                             this.packageslist = res.body;
                         } else {
@@ -490,10 +700,9 @@ export default {
                         }
                     });
                 },
-                //获取是否有1+1+1签约
+                //新增签约的时候用获取是否有1+1+1签约
                 getsign111() {
-                    let params = `['${this.curorgId}']`
-                    commonAjax("cas.signService", "hasService", params).then(res => {
+                    commonAjax("cas.signService", "hasService", `['${this.formdata.orgId}']`).then(res => {
                         if (res.code == 200) {
                             this.formdata.openOneFlag = res.body ? "1" : 0
                             if (this.formdata.openOneFlag == 1) {
@@ -509,10 +718,9 @@ export default {
                         }
                     });
                 },
-                // 查询市级医院或者区级医院
+                // 新增签约的时候用查询市级医院或者区级医院
                 getorgbelong(nubmerstr) {
-                    let params = `['','${this.curorgId}','${nubmerstr}']`
-                    commonAjax("cas.signService", "queryOrgInfoByAreaLevel", params).then(res => {
+                    commonAjax("cas.signService", "queryOrgInfoByAreaLevel", `['','${this.formdata.orgId}','${nubmerstr}']`).then(res => {
                         if (res.code == 200) {
                             if (nubmerstr == 2) {
                                 this.districtOrglist = res.body
@@ -567,7 +775,7 @@ export default {
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
                             let temarr = [];
-                            let that=this;
+                            let that = this;
                             $.each(this.packageslist, function(index, el) {
                                 $.each(that.formdata.packages, function(index2, el2) {
                                     if (el.spPackId == el2) {
@@ -586,7 +794,7 @@ export default {
                                 "packages": temarr,
                                 "personGroup": this.formdata.personGroup,
                                 "signId": this.formdata.signId,
-                                "signState": this.formdata.signState2,
+
                                 "signValidDate": this.formdata.signValidDate,
                             }
                             commonAjax("cas.signService", "signApplyConfirmed", '[' + JSON.stringify(temsubmitdata) + ']', ).then(res => {
@@ -610,6 +818,10 @@ export default {
                         }
                     });
                 },
+                closelookmodal(formName) {
+                    this.$refs[formName].resetFields();
+                    this.lookdialogFormVisible = false;
+                },
                 //点击取消的时候关闭
                 closemodal(formName) {
                     this.$refs[formName].resetFields();
@@ -620,27 +832,7 @@ export default {
                     this.$refs[formName].resetFields();
 
                 },
-                // //上传文件或者图片成功后
-                // handleAvatarSuccess(res, file) {
-                //     this.imageUrl = imgview + res.body;
-                //     this.formdata.picture = res.body;
-                //     this.$message.success('上传成功');
-                // },
-                // //上传上传文件或者图片之前
-                // beforeAvatarUpload(file) {
 
-                //     // const isJPG = file.type === 'image/jpeg';
-                //     // const isLt2M = file.size / 1024 / 1024 < 2;
-
-                //     // if (!isJPG) {
-                //     //     this.$message.error('上传头像图片只能是 JPG 格式!');
-                //     // }
-                //     // if (!isLt2M) {
-                //     //     this.$message.error('上传头像图片大小不能超过 2MB!');
-                //     // }
-                //     // return isJPG && isLt2M;
-
-                // },
                 //获取字典
                 dictionaryRequest() {
                     let arr = ["cfs.dic.base_channelType", "cfs.dic.base_nationality", "cfs.dic.base_certificateType", "cfs.dic.base_gender", "cfs.dic.base_group"];
@@ -709,20 +901,111 @@ export default {
                 cityshow() {
                     this.cityOrglistdialog = true;
                 },
-                // 表单常用的方法结束--------------------------------------------------------------------------
+                //根据doctorId获取团队列表
+                getteamlistbydoctorId() {
+                    commonAjax("cas.signService", "queryTeamInfoByDoctorId", "['01a950a3-b681-4197-afa0-672844643a1d']").then(res => {
+                        if (res.code == 200) {
+                            this.teamlist = res.body;
+                            this.teamobj = res.body[0];
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: res.msg
+                            });
+                        }
+                    });
+                    // this.getcurdocId().then(doctorId => {
+                    //    commonAjax("cas.signService", "queryTeamInfoByDoctorId", `['${doctorId}']`).then(res => {
+                    //         if (res.code == 200) {
+                    //             this.teamlist = res.body;
+                    //             this.formdata.teamId = res.body[0].teamId;
+                    //             this.formdata.teamName = res.body[0].teamName;
+                    //             this.formdata.orgName = res.body[0].orgFullName;
+                    //             this.formdata.orgId = res.body[0].orgId;
+                    //             this.formdata.teamLeaderId = res.body[0].teamLeaderId;
+                    //             this.formdata.teamLeaderName = res.body[0].teamLeaderName;
 
+                    //         } else {
+                    //             this.$message({
+                    //                 type: 'error',
+                    //                 message: res.msg
+                    //             });
+                    //         }
+                    //     });
+                    // });
+                },
+                //先请求 获取当前登录人的医生id
+                getcurdocId() {
+                    var p = new Promise((resolve, reject) => {
+                        commonAjax("cas.doctorService", "getCurrentDoctorId", '[]').then(res => {
+                            if (res.code == 200) {
+                                resolve(res.body);
+                            } else {
+                                this.$message({
+                                    type: 'error',
+                                    message: res.msg
+                                });
+                            }
+                        });
+                    })
+                    return p;
+                },
+
+            // 表单常用的方法结束--------------------------------------------------------------------------
+            // 身份证验证
+            isCardID(sId) {
+                var iSum = 0;
+                var info = "";
+                if (!/^\d{17}(\d|x)$/i.test(sId)) return "你输入的身份证长度或格式错误";
+                sId = sId.replace(/x$/i, "a");
+                if (this.aCity[parseInt(sId.substr(0, 2))] == null) return "你的身份证地区非法";
+                sBirthday = sId.substr(6, 4) + "-" + Number(sId.substr(10, 2)) + "-" + Number(sId.substr(12, 2));
+                var d = new Date(sBirthday.replace(/-/g, "/"));
+                if (sBirthday != (d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate())) return "身份证上的出生日期非法";
+                for (var i = 17; i >= 0; i--) iSum += (Math.pow(2, i) % 11) * parseInt(sId.charAt(17 - i), 11);
+                if (iSum % 11 != 1) return "你输入的身份证号非法";
+                //aCity[parseInt(sId.substr(0,2))]+","+sBirthday+","+(sId.substr(16,1)%2?"男":"女");//此次还可以判断出输入的身份证号的人性别
+                return true;
+            },
         },
         components: {
 
         },
         mounted() {
-
+            this.getteamlistbydoctorId()
             this.gettenantIdlist();
             this.dictionaryRequest();
         },
         watch: {
             'params.tenantId' (val, oldval) {
                 this.getTableData();
+            },
+            // 'formdata.orgId' (val, oldval) {
+            //     if (val != '') {
+            //         alert(111)
+            //         this.getsign111();
+            //     }
+            // },
+            'teamobj' (val, oldval) {
+                if (val != null) {
+                    this.formdata.teamId = val.teamId;
+                    this.formdata.teamName = val.teamName;
+                    this.formdata.orgName = val.orgFullName;
+                    this.formdata.orgId = val.orgId;
+                    this.formdata.teamLeaderId = val.teamLeaderId;
+                    this.formdata.teamLeaderName = val.teamLeaderName;
+                    this.getpackageslist(val.teamId)
+                    this.getsign111();
+                }
+
+            },
+            'formdata.nationality' (val, oldval) {
+                if (val == '01') {
+                    this.formdata.idCardType = "01"
+                } else {
+                    this.formdata.idCardType = ""
+                }
+
             }
         }
 

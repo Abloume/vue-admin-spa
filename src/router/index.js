@@ -143,6 +143,10 @@ export default new Router({
                     path: '/signApplyList',
                     name: 'SignApplyList',
                     component: resolve => require(['../components/page/SignApplyList.vue'], resolve)
+                }, { // 签约新增
+                    path: '/signAdd',
+                    name: 'SignAdd.vue',
+                    component: resolve => require(['../components/page/SignAdd.vue'], resolve)
                 }, {
                     path: '/serviceItem',
                     component: resolve => require(['../components/zxxpage/ServiceItem.vue'], resolve),
