@@ -96,7 +96,7 @@
 </template>
 <script>
 import {
-    commonAjax, imguploadurl, imgview, adAjaxAdd
+    commonAjax, adAjaxAdd
 }
 from '../../api/api';
 export default {

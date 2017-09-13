@@ -304,8 +304,14 @@
         <!-- 新增租户服务模态框 -->
         <el-dialog :title="dialogTitle" v-model="servAddDialogFormVisible" @close="closeModal('servAddDialogForm')">
             <el-form :model="servAddedDialogData" :rules="serformdata.serinforules" ref="servAddDialogForm" auto-complete="off">
-                <el-form-item label="服务项目" :label-width="formLabelWidth" prop="serviceX">
+                <!-- <el-form-item label="服务项目" :label-width="formLabelWidth" prop="serviceX">
                     <el-select v-model="servAddedDialogData.serviceX" placeholder="请选择" @change='chooseServItem'>
+                        <el-option v-for="item in dictionary.svrItemCode" :key="item.key" :label="item.text" :value="item.key">
+                        </el-option>
+                    </el-select>
+                </el-form-item> -->
+                <el-form-item label="服务项目" :label-width="formLabelWidth" prop="serviceId">
+                    <el-select v-model="servAddedDialogData.serviceId" placeholder="请选择" @change='chooseServItem'>
                         <el-option v-for="item in dictionary.svrItemCode" :key="item.key" :label="item.text" :value="item.key">
                         </el-option>
                     </el-select>
@@ -317,7 +323,7 @@
                     <el-input v-model="servAddedDialogData.serviceDesc" disabled="true"></el-input>
                 </el-form-item>
                 <el-form-item label="开通服务对象类别" :label-width="formLabelWidth" prop="objectId">
-                    <el-select v-model="servAddedDialogData.objectId" placeholder="请选择">
+                    <el-select v-model="servAddedDialogData.objectType" placeholder="请选择">
                         <el-option v-for="item in dictionary.svrItemType" :key="item.key" :label="item.text" :value="item.key">
                         </el-option>
                     </el-select>
@@ -644,6 +650,7 @@ export default {
                     serviceCode: '',
                     serviceDesc: '',
                     objectId: '',
+                    objectType: '',
                     mainFlag: '1',
                     effectiveFlag: '1',
                     serviceX: ''
@@ -712,7 +719,7 @@ export default {
                         "cfs.dic.base_baseDataType", // 属性类型字典
                         "cfs.dic.base_productType", // 一级产品类型
                         "cfs.dic.base_svrItemCode", // 服务项目
-                        "cfs.dic.base_svrItemType" // 开通服务对象类别
+                        "cfs.dic.base_objectType" // 开通服务对象类别
                     ];
 
                     commonAjax("cas.multipleDictionaryService", "findDic", '[' + JSON.stringify(arr) + ']').then(res => {
@@ -734,7 +741,8 @@ export default {
                                     that.dictionary.svrItemCode = ele.items;
                                 }
                                 if (ele.dicId == arr[5]) {
-                                    that.dictionary.svrItemType = ele.items;
+                                    let fst = ele.items[0];
+                                    that.dictionary.svrItemType = [fst];
                                 }
                             })
                         } else {
@@ -1691,6 +1699,7 @@ export default {
                 },
                 // 服务列表 - 添加服务 - 服务项目选择
                 chooseServItem(val) {
+                    debugger
                     if (this.servAddDialogFormVisible == false) {
                         return;
                     }
@@ -1699,7 +1708,7 @@ export default {
 
                     commonAjax('cas.tenantManageService', 'getAvailableServiceByCode', params).then(res => {
                         if (res.code == 200) {
-                            this.servAddedDialogData.serviceId = res.body.serviceId;
+                            // this.servAddedDialogData.serviceId = res.body.serviceId;
                             this.servAddedDialogData.serviceCode = res.body.serviceCode;
                             this.servAddedDialogData.serviceDesc = res.body.serviceDesc;
                         } else {
@@ -1712,16 +1721,17 @@ export default {
                 },
                 // 服务列表 - 保存新增租户服务
                 saveAddedService(formName) {
-                    var self = this;
-                    $.each(self.dictionary.svrItemType, function(index, ele) {
-                        if (ele.key == self.servAddedDialogData.objectId) {
-                            self.servAddedDialogData.objectType = ele.text;
-                        }
-                    });
+                    // var self = this;
+                    // $.each(self.dictionary.svrItemType, function(index, ele) {
+                    //     if (ele.key == self.servAddedDialogData.objectId) {
+                    //         self.servAddedDialogData.objectType = ele.text;
+                    //     }
+                    // });
 
                     delete this.servAddedDialogData.serviceX;
                     delete this.servAddedDialogData.serviceCode;
                     delete this.servAddedDialogData.serviceDesc;
+                    this.servAddedDialogData.objectId = this.basicData.tenantId;
                     this.servAddedDialogData.tenantId = this.basicData.tenantId;
                     let params = [this.servAddedDialogData];
 

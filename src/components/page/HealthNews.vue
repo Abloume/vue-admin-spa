@@ -137,7 +137,7 @@ export default {
                     "peopleClassifyNames": [] //人群分类
                 },
                 imguploaddata: {
-                    catalog: "banner"
+                    catalog: "consult"
                 },
                 dialogtitle: "", //模态框动态标题
                 formrules: { //表单验证规则

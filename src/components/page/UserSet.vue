@@ -218,7 +218,7 @@
 </template>
 <script>
 import {
-    commonAjax, imguploadurl, imgview
+    commonAjax
 }
 from '../../api/api';
 import md5 from 'md5';
@@ -781,7 +781,7 @@ export default {
                     let {
                         content, pageNo, pageSize
                     } = this.orgparams;
-                    let params = `['${content}',${pageNo},${pageSize}]`;
+                    let params = `['${content}','',${pageNo},${pageSize}]`;
                     commonAjax("cas.orgService", "orgInfoList", params).then(res => {
                         if (res.code == 200) {
                             this.orglist = res.body.items;

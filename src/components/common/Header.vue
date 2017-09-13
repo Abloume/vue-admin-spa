@@ -58,6 +58,7 @@ export default {
                         sessionStorage.removeItem('accessToken')
                         sessionStorage.removeItem('userName')
                        var urlopt=sessionStorage.getItem('loginurl')
+                       this.$store.dispatch('rolemenulists', [])
                         this.$router.push('/login'+urlopt);
                     }
                 },

@@ -100,7 +100,7 @@
             </el-form>
         </el-dialog>
     
-        <!-- 新增服务包对话框 -->
+        <!-- 添加服务包对话框 -->
         <el-dialog :title="dialogPackTitle" v-model="dialogFormVisible" @close="closeDialog('addPack')">
             <el-form :model="addPackFormData" :rules="addPackRules" ref="addPackInfoForm" auto-complete="off" id="addPackInfoForm">
                 <!-- 基础信息 -->
@@ -152,7 +152,7 @@
                         <div v-show="!isReadOnly" class="dialog_title_mini" @click='addServItem'>+新增服务项</div>
                     </el-col>
                 </el-row>
-                <el-table :data="addPackFormData.packAssociation" border style="width: 100%" class="serv_item_table">
+                <el-table :data="addPackFormData.association" border style="width: 100%" class="serv_item_table">
                     <el-table-column label="名称" prop="serviceName" width="100"></el-table-column>
                     <!-- <el-table-column label="编号" prop="serviceCode" width="120"></el-table-column> -->
                     <el-table-column label="上限价格(元)" prop="upperPrice" width="100"></el-table-column>
@@ -225,7 +225,7 @@
                             <div v-show="!isReadOnly" class="dialog_title_mini" @click='addServItem'>+新增服务项</div>
                         </el-col>
                     </el-row>
-                    <el-table :data="addPackFormData.packAssociation" border style="width: 100%" class="serv_item_table">
+                    <el-table :data="addPackFormData.association" border style="width: 100%" class="serv_item_table">
                         <el-table-column label="名称" prop="serviceName" width="90"></el-table-column>
                         <!-- <el-table-column label="编号" prop="serviceCode" width="110"></el-table-column> -->
                         <el-table-column label="上限价格(元)" prop="upperPrice" width="90"></el-table-column>
@@ -385,6 +385,18 @@ export default {
                     leaf: "",
                     index: "",
                     mcode: ""
+                }, {
+                    key: "",
+                    text: "",
+                    leaf: "",
+                    index: "",
+                    mcode: ""
+                }, {
+                    key: "",
+                    text: "",
+                    leaf: "",
+                    index: "",
+                    mcode: ""
                 }]
             },
             page: {
@@ -489,7 +501,7 @@ export default {
                 },{
                     discountType: 3
                 }],           
-                packAssociation: [] 
+                association: [] 
             },
             
             // 查看服务包
@@ -528,6 +540,7 @@ export default {
             
             // 添加服务项
             servItemSelect: [],     // 服务项列表选项
+            srvItemArr: [],         // 服务包下服务项
             addServItemForm: {      // 添加服务项详情表单
                 duration: '',       // 服务时长(分钟)
                 frequency: '',      // 服务频率计数
@@ -568,6 +581,7 @@ export default {
         closeDialog(one) {
             if (one == 'addPack') {
                 this.dialogFormVisible = false;
+                // this.addPackFormData = {};
             } else if (one == 'addItem') {
                 this.addServItemFormVisible = false;
             } else if (one == 'checkPack') {
@@ -581,7 +595,7 @@ export default {
         // 获取字典
         dictionaryRequest() {
             // 参数
-            var that = this;
+            var self = this;
             let arr = [
                 "cfs.dic.base_suitableObject",  // 适合人群
                 "cfs.dic.base_frequencyType",   // 服务频率单位
@@ -590,16 +604,15 @@ export default {
             // 调用服务
             commonAjax("cas.multipleDictionaryService", "findDic", '[' + JSON.stringify(arr) + ']').then(res => {
                 if (res.code == 200) {
-                    console.table( res.body )
                     res.body.forEach(function (ele, index) {
                         if (ele.dicId == arr[0]) {
-                            that.dictionary.base_suitableObject = ele.items;
+                            self.dictionary.base_suitableObject = ele.items;
                         }
                         if (ele.dicId == arr[1]) {
-                            that.dictionary.base_frequencyType = ele.items;
+                            self.dictionary.base_frequencyType = ele.items;
                         }
                         if (ele.dicId == arr[2]) {
-                            that.dictionary.base_discountType = ele.items;
+                            self.dictionary.base_discountType = ele.items;
                         }
                     })
                 } else {
@@ -652,7 +665,7 @@ export default {
             delete this.copyPackFormData.prePackName;
             this.copyPackFormData.startDt = this.curPickDate;
 
-            this.copyPackFormData.packAssociation = [{
+            this.copyPackFormData.association = [{
                 "duration": "33",
                 "frequency": "33",
                 "frequencyType": "03",
@@ -698,7 +711,7 @@ export default {
 
             commonAjax('cas.baseServiceService', 'deleteServiceitemTmpl', params).then(res => {
                 if (res.code == 200) {
-                    this.addPackFormData.packAssociation.splice(index, 1);
+                    this.addPackFormData.association.splice(index, 1);
                 } else {
                     this.$message({
                         type: 'error',
@@ -709,7 +722,7 @@ export default {
         },
         // 删除服务包添加的服务项
         delAddedServItem(index, row) {
-            this.addPackFormData.packAssociation.splice(index, 1);
+            this.addPackFormData.association.splice(index, 1);
         },
         // 优惠信息保存
         saveEditDiscInfoForm() {
@@ -777,7 +790,14 @@ export default {
         },
         // 保存添加的服务项
         saveServItemForm() {
-            if (this.isAddedPackStatus) { // 添加
+            var sServiceId = this.addServItemForm.serviceId;
+            var self = this;
+            $.each(self.servItemSelect, function(idx, ele) {
+                if (ele.serviceId == sServiceId) {
+                    self.addServItemForm.serviceName = ele.serviceName;
+                }
+            });
+            if (this.isAddedPackStatus) { // 添加包服务项
                 let tmpObj = {
                     duration: this.addServItemForm.duration,
                     frequency: this.addServItemForm.frequency,
@@ -791,17 +811,18 @@ export default {
                     validPeriod: this.addServItemForm.validPeriod
                 };
 
-                this.addPackFormData.packAssociation.push(tmpObj);
+                this.addPackFormData.association.push(tmpObj);
                 this.addServItemFormVisible = false;
-            } else {  // 编辑
+            } else {  // 编辑包服务项
                 let tmpObj = {
                     duration: this.addServItemForm.duration,
                     frequency: this.addServItemForm.frequency,
                     frequencyType: this.addServItemForm.frequencyType,
                     lowerPrice: parseInt(this.addServItemForm.lowerPrice),
                     price: parseInt(this.addServItemForm.price),
-                    serviceName: this.addServItemForm.serviceName,
                     serviceId: this.addServItemForm.serviceId,
+                    serviceName: this.addServItemForm.serviceName,
+                    servicePackId: this.curEditPackId,
                     times: this.addServItemForm.times,
                     upperPrice: parseInt(this.addServItemForm.upperPrice),
                     validPeriod: this.addServItemForm.validPeriod
@@ -810,7 +831,7 @@ export default {
 
                 commonAjax('cas.baseServiceService', 'savePackAssociation', params).then(res => {
                     if (res.code == 200) {
-                        this.addPackFormData.packAssociation.push(tmpObj);
+                        this.addPackFormData.association.push(tmpObj);
                         this.addServItemFormVisible = false;
                     } else {
                         this.$message({
@@ -832,9 +853,6 @@ export default {
                     self.addServItemForm.lowerPrice = ele.lowerPrice;
                     self.addServItemForm.upperPrice = ele.upperPrice;
                     self.addServItemForm.validPeriod = ele.validPeriod;
-
-                    console.log( '1>>> ' + ele.price )
-                    console.log( '2>>> ' + JSON.stringify(self.addServItemForm) )
                 }
             });
         },
@@ -863,14 +881,30 @@ export default {
             this.addServItemFormVisible = true;
             this.getServItemList();
         },
+        // 获取包下的服务项
+        getSrvItem() {
+            let params = [this.curEditPackId];
+
+            commonAjax('cas.baseServiceService', 'queryServiceItemInfo', params).then(res => {
+                if (res.code == 200) {
+                    // this.srvItemArr = res.body;
+                    this.addPackFormData.association = res.body;
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
         // 编辑
         editServPack(index, row) {
-            // debugger
             this.basicInfoData = row;
             this.curEditPackId = row.packId;
             this.isAddedPackStatus = false; // 当前为编辑状态
             this.dialogTitle = '编辑服务包';
             this.editPackFormVisible = true;
+            this.getSrvItem();  // 获取包下的服务项
         },
         // 复制
         copyServPack(index, row) {
@@ -1089,7 +1123,7 @@ export default {
         savePackFormData(formName) {
             this.$refs[formName].validate((valid) => {
                 if (valid) {
-                    if (this.addPackFormData.packAssociation.length == 0) {
+                    if (this.addPackFormData.association.length == 0) {
                         this.$message({
                             type: 'error',
                             message: '服务项不能为空'
@@ -1121,7 +1155,6 @@ export default {
         },
 
         init() {
-            var self = this;
             this.dictionaryRequest();
             this.getServPackList(); // 获取列表数据
         }

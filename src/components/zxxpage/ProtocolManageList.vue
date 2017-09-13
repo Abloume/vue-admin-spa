@@ -36,10 +36,10 @@
             </el-row>
         </div>
         <!--列表-->
-        <el-table :data="protOrgListData2" border style="width: 100%">
-            <el-table-column label="机构" prop="name"></el-table-column>
-            <el-table-column label="分类" prop="type"></el-table-column>
-            <el-table-column label="使用协议" prop="protName"></el-table-column>
+        <el-table :data="protOrgListData" border style="width: 100%">
+            <el-table-column label="机构" prop="name" width="200"></el-table-column>
+            <el-table-column label="分类" prop="type" width="200"></el-table-column>
+            <el-table-column label="使用协议" prop="protName" width="200"></el-table-column>
             <el-table-column label="操作">
                 <template scope="scope">
                     <el-button size="small" @click="editProtocol(scope.$index, scope.row)">编辑</el-button>
@@ -132,6 +132,7 @@
 </template>
 <script>
 import { commonAjax } from '../../api/api';
+import quillEditor from '../common/editor.vue';
 export default {
     data() {
         return {
@@ -156,27 +157,27 @@ export default {
                 orgType: ''
             },
             protOrgListData: [],  // 本页列表数据源
-            protOrgListData2: [{  // 本页列表模拟数据源
-                name: '新1',
-                type: '社区1',
-                protName: '医联体协议'
-            }, {
-                name: '新2',
-                type: '社区2',
-                protName: '医联体协议'
-            }, {
-                name: '新3',
-                type: '社区3',
-                protName: '医联体协议'
-            }, {
-                name: '新4',
-                type: '社区4',
-                protName: '医联体协议'
-            }, {
-                name: '新5',
-                type: '社区5',
-                protName: '医联体协议'
-            }],
+            // protOrgListData2: [{  // 本页列表模拟数据源
+            //     name: '新1',
+            //     type: '社区1',
+            //     protName: '医联体协议'
+            // }, {
+            //     name: '新2',
+            //     type: '社区2',
+            //     protName: '医联体协议'
+            // }, {
+            //     name: '新3',
+            //     type: '社区3',
+            //     protName: '医联体协议'
+            // }, {
+            //     name: '新4',
+            //     type: '社区4',
+            //     protName: '医联体协议'
+            // }, {
+            //     name: '新5',
+            //     type: '社区5',
+            //     protName: '医联体协议'
+            // }],
             dialogTitle: '',
             editUnionFormVisible: false,
             editOrgFormVisible: false,
@@ -190,29 +191,20 @@ export default {
             },
             // 医联体协议内容
             unionFormData: {
-                protocalName: '新增医院协议', // 协议名称
-                protocalObjName: '医联体云平台',   // 租户名称
                 protocalText: "",           // 协议内容
-                protocalObjType: 1,         // 协议主体类型：1 医联体
-                protocalObjId: '',          // 租户ID
-                status: 1,
-                createUser: '',             // 当前登录用户ID
-                lastModifyUser: '',         // 当前登录用户ID
-                protocalTypeCurrentUse: 1   // 当前使用的协议类型：1 医联体协议
+                protocalObjType: 1,         // 协议主体类型
+                protocalTypeCurrentUse: 1   // 当前使用的协议类型
             },
             // 机构协议内容
             orgFormData: {
-                protocalName: '本机构协议',  // 协议名称
-                protocalObjName: '机构云平台',  // 租户名称
                 protocalText: "",           // 协议内容
-                protocalObjType: 2,         // 协议主体类型：2 机构
-                protocalObjId: '',          // 租户ID
-                status: 1,
-                createUser: '',             // 当前登录用户ID
-                lastModifyUser: '',         // 当前登录用户ID
-                protocalTypeCurrentUse: 2   // 当前使用的协议类型：2 机构协议
+                protocalObjType: 2,         // 协议主体类型
+                protocalTypeCurrentUse: 2   // 当前使用的协议类型
             }
         }
+    },
+    components: {
+        quillEditor
     },
     activated() {
         this.init();
@@ -236,7 +228,9 @@ export default {
                 if (res.code == 200) {
                     res.body.forEach(function(ele, index) {
                         if (ele.dicId == arr[0]) {
-                            that.dictionary.organizationType = ele.items;
+                            // that.dictionary.organizationType = ele.items;
+                            that.dictionary.organizationType.push(ele.items[1]);
+                            that.dictionary.organizationType.push(ele.items[10]);
                         }
                     })
                 } else {
@@ -269,35 +263,31 @@ export default {
         // 获取协议列表
         getProtocalList() {
             if (this.searchContent.name == "" && this.searchContent.orgType == "") {
-                var params = [{
-                    tenantId: 'hcn',
-                    pageNo: this.page.pageNo,
-                    pageSize: this.page.pageSize
-                }];
+                var params = [
+                    '',
+                    '',
+                    this.page.pageNo,
+                    this.page.pageSize
+                ];
             } else {
-                var params = [{
-                    tenantId: 'hcn',
-                    pageNo: this.page.pageNo,
-                    pageSize: this.page.pageSize,
-                    serviceName: this.searchContent.name,
-                    orgType: this.searchContent.orgType
-                }];
+                var params = [
+                    this.page.pageNo,
+                    this.page.pageSize,
+                    this.searchContent.name,
+                    this.searchContent.orgType
+                ];
             }
 
-            // commonAjax('cas.baseServiceService', 'getBaseServiceitemsList', params).then(res => {
-            //     if (res.code == 200) {
-            //         this.protOrgListData = res.body;
-            //     } else {
-            //         this.$message({
-            //             type: 'error',
-            //             message: res.msg
-            //         });
-            //     }
-            // });
-
-            // Tmp
-            this.protOrgListData = this.protOrgListData2;
-            this.total = this.protOrgListData2.length;
+            commonAjax('cas.protocalParamService', 'getProtocalList', params).then(res => {
+                if (res.code == 200) {
+                    this.protOrgListData = res.body.items;
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
         },
 
 
@@ -306,9 +296,6 @@ export default {
          */
         // 保存医联体协议
         saveUnionProtocol() {
-            // this.unionFormData.protocalObjName = this.basicData.tenantName;
-            // this.unionFormData.protocalObjId = this.basicData.tenantId;
-            
             let params = [this.unionFormData];
 
             commonAjax('cas.protocalParamService', 'addprotocal', params).then(res => {
@@ -385,9 +372,6 @@ export default {
          */
         // 机构协议 - 保存协议
         saveOrgProtocol() {
-            // this.orgFormData.protocalObjName = this.basicData.tenantName;
-            // this.orgFormData.protocalObjId = this.basicData.tenantId;
-
             let params = [this.orgFormData];
 
             commonAjax('cas.protocalParamService', 'updateprotocal', params).then(res => {
@@ -474,5 +458,9 @@ export default {
 
 .PMList .org_prot .quill-editor {
     height: 840px;
+}
+
+.PMList .ql-container {
+    height: 600px;
 }
 </style>

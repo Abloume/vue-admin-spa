@@ -179,9 +179,7 @@
                 <h2 class="account-title">
                     <span>居民信息</span>
                 </h2>
-                <el-form-item label="姓名" :label-width="formLabelWidth" prop="personName">
-                    <el-input v-model="formdata.personName"></el-input>
-                </el-form-item>
+              
                 <el-form-item label="国籍" :label-width="formLabelWidth" prop="nationality">
                     <el-select v-model="formdata.nationality" placeholder="请选择国籍">
                         <el-option v-for="item in dictionary.nationality" :key="item.key" :label="item.text" :value="item.key">
@@ -224,7 +222,8 @@
                     <el-input v-model="formdata.idCard"></el-input>
                 </el-form-item>
                 <el-form-item label="出生日期" :label-width="formLabelWidth" prop="dob">
-                    <el-input v-model="formdata.dob"></el-input>
+                    <el-date-picker v-model="formdata.dob" type="date" placeholder="出生日期" @change="dateformat4" format="yyyy-MM-dd">
+                    </el-date-picker>
                 </el-form-item>
                 <el-form-item label="性别" :label-width="formLabelWidth" prop="sex">
                     <el-select v-model="formdata.sex" placeholder="请选择性别">
@@ -232,8 +231,52 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
+                  <el-form-item label="姓名" :label-width="formLabelWidth" prop="personName">
+                    <el-input v-model="formdata.personName"></el-input>
+                </el-form-item>
                 <el-form-item label="电话号码" :label-width="formLabelWidth" prop="tel">
                     <el-input v-model="formdata.tel"></el-input>
+                </el-form-item>
+                <div id="areatext">
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="省级" :label-width="formLabelWidth" prop="province">
+                                <el-select v-model="formdata.province" placeholder="请选择省">
+                                    <el-option v-for="item in provincelist" :label="item.text" :value="item.key" :key="item.key">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="市级" :label-width="formLabelWidth" prop="city">
+                                <el-select v-model="formdata.city" placeholder="请选择市">
+                                    <el-option v-for="item in citylist" :label="item.text" :value="item.key" :key="item.key">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="地区" :label-width="formLabelWidth" prop="district">
+                                <el-select v-model="formdata.district" placeholder="请选择地区">
+                                    <el-option v-for="item in districtlist" :label="item.text" :value="item.key" :key="item.key">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="街道" :label-width="formLabelWidth" prop="city">
+                                <el-select v-model="formdata.street" placeholder="请选择街道">
+                                    <el-option v-for="item in streetlist" :label="item.text" :value="item.key" :key="item.key">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                </div>
+                <el-form-item label="详细地址" :label-width="formLabelWidth" prop="address">
+                    <el-input v-model="formdata.address"></el-input>
                 </el-form-item>
                 <h2 class="account-title">
                     <span>签约信息</span>
@@ -305,7 +348,7 @@
             <div class="dialog-footer center-foot">
                 <el-button @click="closemodal('adinfoForm')">取 消</el-button>
                 <el-button type="primary" @click="submitForm('adinfoForm')">确 定</el-button>
-                <el-button type="info" @click="lookprotoco">查看协议</el-button>
+                <el-button type="info" @click="lookaddprotoco">查看协议</el-button>
             </div>
         </el-dialog>
         <el-dialog title="查看协议" v-model="curprotocoldialog">
@@ -343,7 +386,7 @@
 </template>
 <script>
 import {
-    commonAjax, imgview
+    commonAjax, imgview,areaAjax
 }
 from '../../api/api';
 import 'assets/lib/print/jquery.jqprint-0.3.js';
@@ -351,6 +394,68 @@ import 'assets/lib/print/jquery-migrate-1.2.1.min.js';
 
 export default {
     data() {
+            var checkidCard = (rule, value, callback) => {
+                if (this.formdata.idCardType == "01") {
+                    var iSum = 0,
+                        info = "",
+                        sId = value,
+                        sBirthday;
+                    if (!/^\d{17}(\d|x)$/i.test(sId)) {
+                        callback(new Error('你输入的身份证长度或格式错误'))
+                    }
+                    sId = sId.replace(/x$/i, "a");
+                    if (this.aCity[parseInt(sId.substr(0, 2))] == null) {
+                        callback(new Error('你的身份证地区非法'))
+                    }
+                    sBirthday = sId.substr(6, 4) + "-" + sId.substr(10, 2) + "-" + sId.substr(12, 2);
+
+                    var d = new Date(sBirthday.replace(/-/g, "/"));
+                    var year = d.getFullYear(),
+                        month = d.getMonth() + 1,
+                        date = d.getDate();
+                    if (sBirthday != (year + "-" + (month < 10 ? '0' + month : month) + "-" + (date < 10 ? '0' + date : date))) {
+                        callback(new Error('身份证上的出生日期非法'))
+                    }
+                    for (var i = 17; i >= 0; i--) iSum += (Math.pow(2, i) % 11) * parseInt(sId.charAt(17 - i), 11);
+                    if (iSum % 11 != 1) {
+                        callback(new Error('你输入的身份证号非法'))
+                    }
+                    var str = sId.substr(16, 1) % 2 ? "1" : "2"; //此次还可以判断出输入的身份证号的人性别 男1女2
+                    callback();
+                } else {
+                    callback();
+
+                }
+
+                commonAjax("cas.signService", "hasCert", `['${this.formdata.idCard}','${this.formdata.idCardType}','${this.formdata.nationality}']`).then(res => {
+                        if (res.code == 200) {
+                            if(res.body){
+                                this.formdata.sex=res.body.sex;
+                                this.formdata.dob=res.body.dob.substring(0,10);
+                                this.formdata.personName=res.body.personName;
+                                this.formdata.tel=res.body.phoneNo;
+                                this.formdata.province=res.body.province;
+                                this.formdata.city=res.body.city;
+                                this.formdata.district=res.body.district;
+                                this.formdata.street=res.body.street;
+                                this.formdata.address=res.body.address;
+                                this.formdata.mpiId=res.body.mpiId;
+                            }else{
+                                if(this.formdata.idCardType=="01"){
+                                     this.formdata.dob=sBirthday
+                                     this.formdata.sex=str;
+                                }
+                            }
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: res.msg
+                            });
+                        }
+                    });
+
+
+            };
             return {
                 // 通用
                 formLabelWidth: '120px',
@@ -441,9 +546,14 @@ export default {
                     "districtOrgName": "",
                     "openOneFlag": "",
                     "personGroup": "",
-
                     "signValidDate": "",
-                    "nationality": ""
+                    "nationality": "",
+                    province: "",
+                    city: "",
+                    district: "",
+                    street: "",
+                    mpiId:""
+
                 },
                 dialogtitle: "", //模态框动态标题
                 formrules: { //表单验证规则
@@ -474,6 +584,44 @@ export default {
                     personGroup: [{
                         required: true,
                         message: '请选择管理类型',
+
+                    }],
+                    teamName: [{
+                        required: true,
+                        message: '请选择团队',
+
+                    }],
+                    personName: [{
+                        required: true,
+                        message: '请输入姓名',
+
+                    }],
+                    nationality: [{
+                        required: true,
+                        message: '请选择国籍',
+
+                    }],
+                    idCardType: [{
+                        required: true,
+                        message: '请选择证件类型',
+
+                    }],
+                    idCard: [{
+                        required: true,
+                        message: '请输入证件号码',
+
+                    }, {
+                        validator: checkidCard,
+                        trigger: 'blur'
+                    }],
+                    sex: [{
+                        required: true,
+                        message: '请选择性别',
+
+                    }],
+                    tel: [{
+                        required: true,
+                        message: '请输入电话号码',
 
                     }],
 
@@ -536,6 +684,11 @@ export default {
                     82: "澳门",
                     91: "国外"
                 },
+                provincelist: [],
+                citylist: [],
+                districtlist: [],
+                streetlist: [],
+
             }
         },
         computed: {
@@ -547,6 +700,10 @@ export default {
                 },
                 dateformat3(val) {
                     this.params.end = val
+                },
+                //出生日期
+                dateformat4(val) {
+                    this.formdata.dob = val
                 },
                 dateformat(val) {
                     this.formdata.signValidDate = val
@@ -598,10 +755,15 @@ export default {
                         "cityOrgName": "",
                         "districtOrgId": "",
                         "districtOrgName": "",
-                        "openOneFlag": "",
+                        "openOneFlag": this.formdata.openOneFlag,
                         "personGroup": "",
                         "signValidDate": "",
-                        "nationality": "01"
+                        "nationality": "01",
+                        province: "",
+                        city: "",
+                        district: "",
+                        street: "",
+                        mpiId:"",
                     }
                     var d = new Date();
                     var year = d.getFullYear();
@@ -783,21 +945,35 @@ export default {
                                     }
                                 });
                             });
-                            let temsubmitdata = {
-                                "checkWay": this.formdata.checkWay,
-                                "cityOrgId": this.formdata.cityOrgId,
-                                "cityOrgName": this.formdata.cityOrgName,
-                                "districtOrgId": this.formdata.districtOrgId,
-                                "districtOrgName": this.formdata.districtOrgName,
-                                "openOneFlag": this.formdata.openOneFlag,
-                                "operInfo": this.formdata.operInfo,
-                                "packages": temarr,
-                                "personGroup": this.formdata.personGroup,
-                                "signId": this.formdata.signId,
 
-                                "signValidDate": this.formdata.signValidDate,
-                            }
-                            commonAjax("cas.signService", "signApplyConfirmed", '[' + JSON.stringify(temsubmitdata) + ']', ).then(res => {
+                            this.formdata.packages=temarr;
+                            this.formdata.residents=[{
+                                    "idCard": this.formdata.idCard,
+                                    "idCardType": this.formdata.idCardType,
+                                    "nation": this.formdata.nation,
+                                    "nationality": this.formdata.nationality,
+                                    "personName":this.formdata.personName,
+                                    "dob":this.formdata.dob,
+                                    "sex": this.formdata.sex,
+                                    "tel": this.formdata.tel,
+                                    mpiId:this.formdata.mpiId,
+
+                                }]
+                            // let temsubmitdata = {
+                            //     "checkWay": this.formdata.checkWay,
+                            //     "cityOrgId": this.formdata.cityOrgId,
+                            //     "cityOrgName": this.formdata.cityOrgName,
+                            //     "districtOrgId": this.formdata.districtOrgId,
+                            //     "districtOrgName": this.formdata.districtOrgName,
+                            //     "openOneFlag": this.formdata.openOneFlag,
+                            //     "operInfo": this.formdata.operInfo,
+                            //     "packages": temarr,
+                            //     "personGroup": this.formdata.personGroup,
+                            //     "signId": this.formdata.signId,
+
+                            //     "signValidDate": this.formdata.signValidDate,
+                            // }
+                            commonAjax("cas.signService", "signApplySaved", '[' + JSON.stringify(this.formdata) + ']', ).then(res => {
                                 if (res.code == 200) {
                                     this.dialogFormVisible = false;
                                     this.$message({
@@ -871,8 +1047,34 @@ export default {
                     this.getprotococont();
                 },
                 getprotococont() {
+                    this.curprotocolcontent = "";
                     var params = `[${this.cursignId}]`
                     commonAjax("cas.signService", "signedProtocolContent", params).then(res => {
+                        if (res.code == 200) {
+                            this.curprotocolcontent = res.body;
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: res.msg
+                            });
+                        }
+                    });
+                },
+                lookaddprotoco() {
+                    this.curprotocoldialog = true;
+                    this.getaddprotococont();
+                },
+                getaddprotococont() {
+                    this.curprotocolcontent = "";
+                    let temaddprodata = {
+                        "orgId": this.formdata.orgId,
+                        "peopleAddress": this.formdata.peopleAddress,
+                        "peopleCardNum": this.formdata.idCard,
+                        "peopleCardType": this.formdata.idCardType,
+                        "peoplePhone": this.formdata.tel,
+                        "signHospitalName": this.formdata.orgName,
+                    };
+                    commonAjax("cas.signProtocolService", "getSignContentText", '[' + JSON.stringify(temaddprodata) + ']').then(res => {
                         if (res.code == 200) {
                             this.curprotocolcontent = res.body;
                         } else {
@@ -950,23 +1152,28 @@ export default {
                     })
                     return p;
                 },
+                getchilddata(val, sign) {
+                    var params = {
+                        limit: 50,
+                        parentKey: val,
+                    };
+                    areaAjax(params).then(res => {
+                        if (sign == "city") {
+                            this.citylist = res.items;
+                        } else if (sign == "district") {
+                            this.districtlist = res.items;
+                        } else if (sign == "street") {
+                            this.streetlist = res.items;
+                        } else {
+                            this.provincelist = res.items;
+                        }
 
-            // 表单常用的方法结束--------------------------------------------------------------------------
-            // 身份证验证
-            isCardID(sId) {
-                var iSum = 0;
-                var info = "";
-                if (!/^\d{17}(\d|x)$/i.test(sId)) return "你输入的身份证长度或格式错误";
-                sId = sId.replace(/x$/i, "a");
-                if (this.aCity[parseInt(sId.substr(0, 2))] == null) return "你的身份证地区非法";
-                sBirthday = sId.substr(6, 4) + "-" + Number(sId.substr(10, 2)) + "-" + Number(sId.substr(12, 2));
-                var d = new Date(sBirthday.replace(/-/g, "/"));
-                if (sBirthday != (d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate())) return "身份证上的出生日期非法";
-                for (var i = 17; i >= 0; i--) iSum += (Math.pow(2, i) % 11) * parseInt(sId.charAt(17 - i), 11);
-                if (iSum % 11 != 1) return "你输入的身份证号非法";
-                //aCity[parseInt(sId.substr(0,2))]+","+sBirthday+","+(sId.substr(16,1)%2?"男":"女");//此次还可以判断出输入的身份证号的人性别
-                return true;
-            },
+                    });
+
+                },
+
+                // 表单常用的方法结束--------------------------------------------------------------------------
+
         },
         components: {
 
@@ -975,6 +1182,7 @@ export default {
             this.getteamlistbydoctorId()
             this.gettenantIdlist();
             this.dictionaryRequest();
+            this.getchilddata(null, 'province');
         },
         watch: {
             'params.tenantId' (val, oldval) {
@@ -988,6 +1196,7 @@ export default {
             // },
             'teamobj' (val, oldval) {
                 if (val != null) {
+                    this.formdata.packages=[];
                     this.formdata.teamId = val.teamId;
                     this.formdata.teamName = val.teamName;
                     this.formdata.orgName = val.orgFullName;
@@ -1006,7 +1215,35 @@ export default {
                     this.formdata.idCardType = ""
                 }
 
-            }
+            },
+            'formdata.province' (val, oldval) {
+                if (val != "") {
+                    console.log(val);
+                     console.log(oldval);
+                    this.getchilddata(val, "city");
+                }
+
+            },
+            'formdata.city' (val, oldval) {
+                // //通过市区县
+                if (val != "") {
+                    this.getchilddata(val, "district");
+                }
+
+            },
+            'formdata.district' (val, oldval) {
+
+                if (val != "") {
+                    this.getchilddata(val, "street");
+                }
+
+            },
+            'formdata.street' (val, oldval) {
+                if (val != "") {
+
+                }
+
+            },
         }
 
 }

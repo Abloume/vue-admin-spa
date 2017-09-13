@@ -53,7 +53,7 @@
 </template>
 <script>
 import {
-    commonAjax, imguploadurl, imgview
+    commonAjax
 }
 from '../../api/api';
 export default {

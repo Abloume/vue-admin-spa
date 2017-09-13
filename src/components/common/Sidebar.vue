@@ -31,7 +31,7 @@
              <template v-for="(item,index) in rolemenulists">
                 <el-submenu :index="item.id">
                     <template slot="title"><img :src="item.menuIconId" width="14" height="14" style="margin-right:10px" /><!-- <i class="el-icon-menu"></i>-->{{item.name}}</template>
-                    <el-menu-item :index="sitem.linkedUrl" v-for="(sitem,sindex) in item.child">{{sitem.name}}</el-menu-item>
+                    <el-menu-item :index="sitem.linkedUrl" v-for="(sitem,sindex) in item.child"><img :src="sitem.menuIconId" width="14" height="14" style="margin-right:10px" />{{sitem.name}}</el-menu-item>
                 </el-submenu>
             </template>
         </el-menu>

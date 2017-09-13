@@ -12,7 +12,27 @@
                     <router-link to="/"> <span class="return"><img src="../../assets/img/return.png"></span>返回上一级</router-link>
                 </el-col> -->
             </el-row>
-            <el-row class="search_con">
+            <el-row class="search_con" :gutter="20">
+                <el-col :span="6">
+                    <el-select v-model="params.organizationType" placeholder="请选择机构类型">
+                        <el-option label="全部" value="">
+                        </el-option>
+                        <el-option v-for="item in dictionary.organizationType" :key="item.key" :label="item.text" :value="item.key">
+                        </el-option>
+                    </el-select>
+                </el-col>
+                <el-col :span="6">
+                    <el-input placeholder="请输入医院名称" v-model="params.content">
+                    </el-input>
+                </el-col>
+                <el-col :span="6">
+                    <el-button type="primary" icon="search" @click="searchClick">搜索</el-button>
+                </el-col>
+                <el-col :span="6" class="addorg">
+                    <el-button type="primary" icon="plus" @click="handleEdit('','','baseInfo')">新建机构</el-button>
+                </el-col>
+            </el-row>
+            <!--  <el-row class="search_con">
                 <el-col :span="12">
                     <el-input placeholder="请输入医院名称" icon="search" v-model="params.content" :on-icon-click="searchClick">
                     </el-input>
@@ -20,7 +40,7 @@
                 <el-col :span="12" class="addorg">
                     <el-button type="primary" icon="plus" @click="handleEdit('','','baseInfo')">新建机构</el-button>
                 </el-col>
-            </el-row>
+            </el-row> -->
         </div>
         <el-table :data="tableData" border style="width: 100%">
             <el-table-column prop="number" label="序号" width="120">
@@ -62,17 +82,22 @@ export default {
                 tableData: [],
                 params: {
                     content: "",
+                    "organizationType": "",
                     pageNo: 1,
                     pageSize: 10,
                 },
                 total: "",
+                dictionary: {
+                    organizationType: [], //广告位置
+
+                },
             }
         },
         computed: {
 
         },
         mounted() {
-            // this.getTableData();
+            this.dictionaryRequest();
         },
         methods: {
             handleEdit(index, row, activeName) { //第三个参数是为了到orgInfo组件的tab传参
@@ -177,9 +202,9 @@ export default {
                 //获取机构列表数据
                 getTableData() {
                     let {
-                        content, pageNo, pageSize
+                        content, pageNo, pageSize, organizationType
                     } = this.params;
-                    let params = `['${content}',${pageNo},${pageSize}]`;
+                    let params = `['${content}','${organizationType}',${pageNo},${pageSize}]`;
                     commonAjax("cas.orgService", "orgInfoList", params).then(res => {
                         if (res.code == 200) {
                             $.each(res.body.items, function(index, el) {
@@ -209,6 +234,27 @@ export default {
                 searchClick() {
                     this.getTableData();
                 },
+                //获取字典
+                dictionaryRequest() {
+                    let arr = ["cfs.dic.base_organizationType"];
+                    commonAjax("cas.multipleDictionaryService", "findDic", '[' + JSON.stringify(arr) + ']').then(res => {
+                        if (res.code == 200) {
+                            var that = this;
+                            res.body.forEach(function(ele, index) {
+                                if (ele.dicId == arr[0]) {
+                                    that.dictionary.organizationType = ele.items;
+                                }
+                            })
+
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: res.msg
+                            });
+                        }
+                    })
+                }
+
         },
         components: {},
         beforeRouteEnter(to, from, next) {
