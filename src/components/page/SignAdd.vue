@@ -1105,36 +1105,37 @@ export default {
                 },
                 //根据doctorId获取团队列表
                 getteamlistbydoctorId() {
-                    commonAjax("cas.signService", "queryTeamInfoByDoctorId", "['01a950a3-b681-4197-afa0-672844643a1d']").then(res => {
-                        if (res.code == 200) {
-                            this.teamlist = res.body;
-                            this.teamobj = res.body[0];
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            });
-                        }
-                    });
-                    // this.getcurdocId().then(doctorId => {
-                    //    commonAjax("cas.signService", "queryTeamInfoByDoctorId", `['${doctorId}']`).then(res => {
-                    //         if (res.code == 200) {
-                    //             this.teamlist = res.body;
-                    //             this.formdata.teamId = res.body[0].teamId;
-                    //             this.formdata.teamName = res.body[0].teamName;
-                    //             this.formdata.orgName = res.body[0].orgFullName;
-                    //             this.formdata.orgId = res.body[0].orgId;
-                    //             this.formdata.teamLeaderId = res.body[0].teamLeaderId;
-                    //             this.formdata.teamLeaderName = res.body[0].teamLeaderName;
-
-                    //         } else {
-                    //             this.$message({
-                    //                 type: 'error',
-                    //                 message: res.msg
-                    //             });
-                    //         }
-                    //     });
+                    // commonAjax("cas.signService", "queryTeamInfoByDoctorId", "['01a950a3-b681-4197-afa0-672844643a1d']").then(res => {
+                    //     if (res.code == 200) {
+                    //         this.teamlist = res.body;
+                    //         this.teamobj = res.body[0];
+                    //     } else {
+                    //         this.$message({
+                    //             type: 'error',
+                    //             message: res.msg
+                    //         });
+                    //     }
                     // });
+                    this.getcurdocId().then(doctorId => {
+                       commonAjax("cas.signService", "queryTeamInfoByDoctorId", `['${doctorId}']`).then(res => {
+                            if (res.code == 200) {
+                                this.teamlist = res.body;
+                                this.teamobj = res.body[0];
+                                // this.formdata.teamId = res.body[0].teamId;
+                                // this.formdata.teamName = res.body[0].teamName;
+                                // this.formdata.orgName = res.body[0].orgFullName;
+                                // this.formdata.orgId = res.body[0].orgId;
+                                // this.formdata.teamLeaderId = res.body[0].teamLeaderId;
+                                // this.formdata.teamLeaderName = res.body[0].teamLeaderName;
+
+                            } else {
+                                this.$message({
+                                    type: 'error',
+                                    message: res.msg
+                                });
+                            }
+                        });
+                    });
                 },
                 //先请求 获取当前登录人的医生id
                 getcurdocId() {

@@ -234,8 +234,12 @@
                     </el-table-column>
                     <el-table-column prop="appointmentFlag" label="是否可预约">
                         <template scope="scope">
-                            <p v-if="scope.row.appointmentFlag==='1'">是</p>
-                            <p v-if="scope.row.appointmentFlag==='0'">否</p>
+                             <el-select v-model="scope.row.appointmentFlag" placeholder="">
+                                <el-option label="是" value="1"></el-option>
+                                <el-option label="否" value="0"></el-option>
+                            </el-select>
+                          <!--   <p v-if="scope.row.appointmentFlag==='1'">是</p>
+                            <p v-if="scope.row.appointmentFlag==='0'">否</p> -->
                         </template>
                     </el-table-column>
                     <el-table-column label="操作">

@@ -49,7 +49,7 @@
                     <p v-show="scope.row.defaultFlag==0">否</p>
                 </template>
             </el-table-column>
-            <el-table-column prop="hitCount" label="点击统计" >
+            <el-table-column prop="hitCount" label="点击统计">
             </el-table-column>
             <el-table-column label="操作" width="180">
                 <template scope="scope">
@@ -66,7 +66,7 @@
         <el-dialog :title="dialogtitle" v-model="dialogFormVisible" @close="resetForm('adinfoForm')">
             <el-form :model="formdata" :rules="formrules" ref="adinfoForm" auto-complete="off" id="adinfoForm">
                 <el-form-item label="app名称" :label-width="formLabelWidth" prop="productCode">
-                    <el-select v-model="formdata.productCode" placeholder="请选择" >
+                    <el-select v-model="formdata.productCode" placeholder="请选择">
                         <el-option v-for="item in protableData" :key="item.code" :label="item.name" :value="item.code">
                         </el-option>
                     </el-select>
@@ -159,7 +159,7 @@ export default {
                     "orderNo": 0, //排序
                     "description": "", //备注
                     id: 0,
-                    "picture":0,
+                    "picture": 0,
                 },
                 imguploaddata: {
                     catalog: "banner"
@@ -169,7 +169,7 @@ export default {
                     productCode: [{
                         required: true,
                         message: '请选择产品名称',
-                       
+
                     }],
                     name: [{
                         required: true,
@@ -179,32 +179,32 @@ export default {
                     position: [{
                         required: true,
                         message: '请选择广告位置',
-                       
+
                     }],
                     linkType: [{
                         required: true,
                         message: '请选择链接类型',
-                       
+
                     }],
                     linkAddress: [{
                         required: true,
                         message: '请输入链接地址',
-                       
+
                     }],
                     picture: [{
                         required: true,
                         message: '请上传图片',
-                       
+
                     }],
                     valid_startDate: [{
                         required: true,
                         message: '请选择开始日期',
-                       
+
                     }],
                     valid_endDate: [{
                         required: true,
                         message: '请选择结束日期',
-                       
+
                     }],
                 },
                 imguploadurl: imguploadurl, //文件或者图片上传的url
@@ -252,7 +252,7 @@ export default {
                             "description": row.description ? row.description : "", //备注
                             "picture": row.picture ? row.picture : 0,
                         }
-                         this.imageUrl = imgview + this.formdata.picture;
+                        this.imageUrl = imgview + this.formdata.picture;
 
                     } else {
                         this.dialogtitle = "新增广告";
@@ -271,14 +271,14 @@ export default {
                             "id": 0,
                             "picture": "",
                         }
-                         this.imageUrl = ""
+                        this.imageUrl = ""
                     }
-                   
+
                 },
                 // 删除列表中的一条数据
                 handleDelete(index, row) {
                     // this.$message.error('删除第' + (index + 1) + '行');
-                    let text=row.status==1?"是否禁用":"是否启用"
+                    let text = row.status == 1 ? "是否禁用" : "是否启用"
                     const h = this.$createElement;
                     this.$msgbox({
                             title: '确认操作',
@@ -350,9 +350,9 @@ export default {
                     var temparams = `['${this.params.bannerPostion}','${this.params.proCode}','${this.params.isEnable}',${this.params.pageNo},${this.params.pageSize}]`;
                     commonAjax("cas.productbannerService", "searchProductBannerList", temparams).then(res => {
                         if (res.code == 200) {
-                            $.each(res.body.list,function(index, el) {
-                                el.valid_startDate=el.valid_startDate.substring(0,10)
-                                el.valid_endDate=el.valid_endDate.substring(0,10)
+                            $.each(res.body.list, function(index, el) {
+                                el.valid_startDate = el.valid_startDate.substring(0, 10)
+                                el.valid_endDate = el.valid_endDate.substring(0, 10)
                             }.bind(this));
                             this.tableData = res.body.list;
                             this.total = res.body.count;
@@ -382,11 +382,11 @@ export default {
                 // 表单常用的方法开始
                 //保存按钮提交数据
                 submitForm(formName) {
-                    if(!this.formdata.picture){
-                          this.$message({
-                                        type: 'error',
-                                        message:"请上传图片"
-                                    });
+                    if (!this.formdata.picture) {
+                        this.$message({
+                            type: 'error',
+                            message: "请上传图片"
+                        });
                     }
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
@@ -425,7 +425,7 @@ export default {
                 handleAvatarSuccess(res, file) {
                     this.imageUrl = imgview + res.body;
                     this.formdata.picture = res.body;
-                     this.$message.success('上传成功');
+                    this.$message.success('上传成功');
                 },
                 //上传上传文件或者图片之前
                 beforeAvatarUpload(file) {
@@ -521,6 +521,9 @@ export default {
     background: url(../../assets/img/zuhu.png) no-repeat left center;
     padding-left: 30px
 }
-.el-table td, .el-table th{padding: 5px;}
 
+.el-table td,
+.el-table th {
+    padding: 5px;
+}
 </style>

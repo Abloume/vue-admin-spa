@@ -115,7 +115,12 @@ export default {
                     });
                 },
             selectchange(val) {
-                this.getmenu();
+                if(val.length==0){
+                    this.$store.dispatch('rolemenulists', [])
+                }else{
+                      this.getmenu();
+                }
+              
             }
         },
         mounted() {

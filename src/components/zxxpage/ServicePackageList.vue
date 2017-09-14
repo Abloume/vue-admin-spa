@@ -542,15 +542,15 @@ export default {
             servItemSelect: [],     // 服务项列表选项
             srvItemArr: [],         // 服务包下服务项
             addServItemForm: {      // 添加服务项详情表单
-                duration: '',       // 服务时长(分钟)
-                frequency: '',      // 服务频率计数
+                duration: 0,       // 服务时长(分钟)
+                frequency: 0,      // 服务频率计数
                 frequencyType: '',  // 服务频率类型
                 lowerPrice: '',     // 价格下限
                 price: '',          // 价格
                 serviceName: '',    // 服务项目名称
-                serviceId: '',      // 服务项目id
-                servicePackId: '',  // 服务包id ?
-                times: '',          // 年服务次数
+                serviceId: 0,      // 服务项目id
+                servicePackId: 0,  // 服务包id ?
+                times: 0,          // 年服务次数
                 upperPrice: '',     // 价格上限
                 validPeriod: ''     // 有效期
             },
@@ -799,14 +799,14 @@ export default {
             });
             if (this.isAddedPackStatus) { // 添加包服务项
                 let tmpObj = {
-                    duration: this.addServItemForm.duration,
-                    frequency: this.addServItemForm.frequency,
+                    duration: parseFloat(this.addServItemForm.duration),
+                    frequency: parseFloat(this.addServItemForm.frequency),
                     frequencyType: this.addServItemForm.frequencyType,
                     lowerPrice: parseInt(this.addServItemForm.lowerPrice),
                     price: parseInt(this.addServItemForm.price),
                     serviceName: this.addServItemForm.serviceName,
                     serviceId: this.addServItemForm.serviceId,
-                    times: this.addServItemForm.times,
+                    times: parseInt(this.addServItemForm.times),
                     upperPrice: parseInt(this.addServItemForm.upperPrice),
                     validPeriod: this.addServItemForm.validPeriod
                 };
@@ -815,15 +815,15 @@ export default {
                 this.addServItemFormVisible = false;
             } else {  // 编辑包服务项
                 let tmpObj = {
-                    duration: this.addServItemForm.duration,
-                    frequency: this.addServItemForm.frequency,
+                    duration: parseFloat(this.addServItemForm.duration),
+                    frequency: parseFloat(this.addServItemForm.frequency),
                     frequencyType: this.addServItemForm.frequencyType,
                     lowerPrice: parseInt(this.addServItemForm.lowerPrice),
                     price: parseInt(this.addServItemForm.price),
                     serviceId: this.addServItemForm.serviceId,
                     serviceName: this.addServItemForm.serviceName,
                     servicePackId: this.curEditPackId,
-                    times: this.addServItemForm.times,
+                    times: parseInt(this.addServItemForm.times),
                     upperPrice: parseInt(this.addServItemForm.upperPrice),
                     validPeriod: this.addServItemForm.validPeriod
                 };
@@ -881,6 +881,21 @@ export default {
             this.addServItemFormVisible = true;
             this.getServItemList();
         },
+        // 获取优惠信息数据
+        getDiscData() {
+            let params = [this.curEditPackId];
+
+            commonAjax('cas.baseServiceService', 'getDiscountList', params).then(res => {
+                if (res.code == 200) {
+                    this.addPackFormData.association = res.body;
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
         // 获取包下的服务项
         getSrvItem() {
             let params = [this.curEditPackId];
@@ -889,6 +904,8 @@ export default {
                 if (res.code == 200) {
                     // this.srvItemArr = res.body;
                     this.addPackFormData.association = res.body;
+                    // 获取优惠信息数据
+                    // this.getDiscData();
                 } else {
                     this.$message({
                         type: 'error',

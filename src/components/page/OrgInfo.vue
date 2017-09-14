@@ -355,25 +355,13 @@
         <!-- 服务新增修改模态框 -->
         <el-dialog :title="dialogtitle" v-model="serdialogFormVisible" @close="resetForm('serinfoForm')">
             <el-form :model="serformdata" :rules="serformdata.serinforules" ref="serinfoForm" auto-complete="off">
-                <!-- <el-form-item label="服务项目" prop="serviceId" :label-width="formLabelWidth">
+                <el-form-item label="服务项目" prop="serviceId" :label-width="formLabelWidth">
                     <el-select v-model="serformdata.serviceId" placeholder="请选择">
                         <el-option v-for="item in servicePacklist" :key="item.serviceId" :label="item.serviceName" :value="item.serviceId">
                         </el-option>
                     </el-select>
-                </el-form-item> -->
-                <el-row>
-                    <el-col>
-                        <div id="zhuguanyis">
-                            <el-form-item label="服务项目" :label-width="formLabelWidth" prop="serviceName" @click.native="showlist">
-                                <el-input v-model="serformdata.serviceName" id="serviceName"></el-input>
-                            </el-form-item>
-                            <div class="yishenglist">
-                                <p @click="mayclick()">清空搜索内容</p>
-                                <p @click="mayclick(item,$event)" v-for="item in servicePacklist" :key="item.serviceId">{{item.serviceName}}</p>
-                            </div>
-                        </div>
-                    </el-col>
-                </el-row>
+                </el-form-item>
+       
                 <el-form-item label="模块编码" :label-width="formLabelWidth" prop="serviceCode">
                     <el-input v-model="serformdata.serviceCode" disabled></el-input>
                 </el-form-item>
@@ -382,9 +370,9 @@
                 </el-form-item>
                 <el-form-item label="开通服务对象类别" :label-width="formLabelWidth" prop="objectType">
                     <el-select v-model="serformdata.objectType" placeholder="请选择" disabled>
-                         <el-option label="机构" value="021">
+                        <el-option label="机构" value="021">
                         </el-option>
-                       <!--  <el-option v-for="item in dictionary.objectType" :key="item.key" :label="item.text" :value="item.key">
+                        <!--  <el-option v-for="item in dictionary.objectType" :key="item.key" :label="item.text" :value="item.key">
                         </el-option> -->
                     </el-select>
                 </el-form-item>
@@ -807,7 +795,7 @@ export default {
                 dictionaryRequest() {
                     var that = this;
                     // let arr = ["cfs.dic.base_organizationType", "cfs.dic.base_mechanismProperties", "cfs.dic.base_organizationGrade", "cfs.dic.base_reportType", "cfs.dic.base_inspectionReportType", "cfs.dic.base_objectType", "cfs.dic.base_svrOpenProperty", "cfs.dic.base_baseDataType"];
-                     let arr = ["cfs.dic.base_organizationType", "cfs.dic.base_mechanismProperties", "cfs.dic.base_organizationGrade", "cfs.dic.base_reportType", "cfs.dic.base_inspectionReportType", "cfs.dic.base_svrOpenProperty", "cfs.dic.base_baseDataType"];
+                    let arr = ["cfs.dic.base_organizationType", "cfs.dic.base_mechanismProperties", "cfs.dic.base_organizationGrade", "cfs.dic.base_reportType", "cfs.dic.base_inspectionReportType", "cfs.dic.base_svrOpenProperty", "cfs.dic.base_baseDataType"];
                     commonAjax("cas.multipleDictionaryService", "findDic", '[' + JSON.stringify(arr) + ']').then(res => {
                         // 
                         if (res.code == 200) {
@@ -1306,7 +1294,7 @@ export default {
                 // 启用禁用标记
                 serhandleDelete(index, row) {
                     const h = this.$createElement;
-                     let text=row.effectiveFlag==1?"是否禁用":"是否启用"
+                    let text = row.effectiveFlag == 1 ? "是否禁用" : "是否启用"
                     this.$msgbox({
                         title: '确认操作',
                         message: h('p', null, [
@@ -1373,7 +1361,7 @@ export default {
                             "orgId": row.orgId,
                             "objectId": this.orgOption.orgId,
                             "effectiveFlag": row.effectiveFlag,
-                            "objectType":"021",
+                            "objectType": "021",
                             "id": row.id,
                         };
 
@@ -1423,9 +1411,7 @@ export default {
                     this.$refs[formName].resetFields();
                     this.serdialogFormVisible = false;
                 },
-                showlist() {
-                    $(".yishenglist").show();
-                },
+
                 // serhandleSizeChange(val) {
                 //     // this.serparams.pageSize = val;
                 //     // this.sergetTableData()
@@ -1435,22 +1421,7 @@ export default {
                 //     // this.sergetTableData()
                 // },
                 //服务新增和编辑时候选择服务项目时候的联动
-                mayclick(item, event) {
-                    if (item == undefined && event == undefined) {
-                        this.serformdata.serviceDesc = "";
-                        this.serformdata.serviceCode = "";
-                        this.serformdata.serviceId = "";
-                        this.serformdata.serviceName = "";
-                    } else {
-                        this.serformdata.serviceDesc = item.serviceDesc;
-                        this.serformdata.serviceCode = item.serviceCode;
-                        this.serformdata.serviceId = item.serviceId;
-                        this.serformdata.serviceName = item.serviceName;
 
-                    }
-                    $(".yishenglist").hide();
-
-                },
                 // 请求服务包
                 getServicePacklist() {
                     // let temobj = {
@@ -1460,8 +1431,8 @@ export default {
                     //     "status": "1",
                     //     "tenantId": sessionStorage.getItem('tenantId')
                     // };
-                     let  tenantId= sessionStorage.getItem('tenantId')
-                     let param=`['${tenantId}']`
+                    let tenantId = sessionStorage.getItem('tenantId')
+                    let param = `['${tenantId}']`
                     commonAjax("cas.serviceOpenService", "queryOpenServiceByTenantId", param).then(res => {
                         if (res.code == 200) {
                             this.servicePacklist = res.body;
@@ -1722,6 +1693,15 @@ export default {
                 }
 
             },
+            'serformdata.serviceId' (val, oldval) {
+                $.each(this.servicePacklist, function(index, el) {
+                    if (val == el.serviceId) {
+                        this.serformdata.serviceDesc = el.serviceDesc;
+                        this.serformdata.serviceCode = el.serviceCode;
+                        this.serformdata.serviceName = el.serviceName;
+                    }
+                }.bind(this));
+            }
 
         },
 }
@@ -1823,7 +1803,8 @@ h2.account-title {
     height: 200px
 }
 
-#zhuguanyis {
+
+/*#zhuguanyis {
     position: relative;
     display: inline-block;
 }
@@ -1856,5 +1837,5 @@ h2.account-title {
 #zhuguanyis .yishenglist p:nth-child(1) {
     background: #1dc499;
     color: #fff
-}
+}*/
 </style>

@@ -109,7 +109,7 @@
                                 <el-button size="small" type="success" @click="checkProduct(scope.$index, scope.row)">查看</el-button>
                                 <el-button size="small" type="success" @click="handleForbidden(scope.$index, scope.row)" v-show="scope.row.status==0">启用</el-button>
                                 <el-button size="small" type="danger" @click="handleForbidden(scope.$index, scope.row)" v-show="scope.row.status==1">禁用</el-button>
-                                
+
                             </template>
                         </el-table-column>
                     </el-table>
@@ -154,16 +154,16 @@
         <!-- 服务列表扩展属性列表  -->
         <el-row v-if="isShowServExtend">
             <el-table :data="exServiceTableData" border style="width: 100%">
-                <el-table-column prop="exPropertyCodeText" label="属性" width="100"></el-table-column>
-                <el-table-column prop="exPropertyData" label="属性值" width="200"></el-table-column>
-                <el-table-column prop="effectiveFlag" label="有效标识" width="100">
+                <el-table-column prop="exPropertyCodeText" label="属性"></el-table-column>
+                <el-table-column prop="exPropertyData" label="属性值"></el-table-column>
+                <el-table-column prop="effectiveFlag" label="有效标识">
                     <template scope="scope">
                         <p v-show="scope.row.effectiveFlag==1">是</p>
                         <p v-show="scope.row.effectiveFlag==0">否</p>
                     </template>
                 </el-table-column>
-                <el-table-column prop="lastModifyUser" label="最后修改人" width="100"></el-table-column>
-                <el-table-column prop="lastModifyDt" label="最后修改时间" width="200"></el-table-column>
+                <el-table-column prop="lastModifyUser" label="最后修改人"></el-table-column>
+                <el-table-column prop="lastModifyDt" label="最后修改时间"></el-table-column>
                 <el-table-column label="操作">
                     <template scope="scope">
                         <el-button size="small" @click="editServExtFld(scope.$index, scope.row)">编辑</el-button>
@@ -232,7 +232,7 @@
             </div>
         </el-dialog>
 
-        <!-- 添加产品模态框 -->
+        <!-- 添加租户产品对话框 -->
         <el-dialog :title="dialogTitle" v-model="prodDialogFormVisible" @close="closeModal('prodAddDialogForm')">
             <el-form :model="addProdFormData" ref="prodAddDialogForm">
                 <el-form-item label="租户产品标识" :label-width="formLabelWidth" prop="code">
@@ -242,7 +242,7 @@
                     <el-input v-model="addProdFormData.name" disabled="true"></el-input>
                 </el-form-item>
                 <el-form-item label="租户名称" :label-width="formLabelWidth" prop="tenantName">
-                    <el-input v-model="addProdFormData.tenantName"></el-input>
+                    <el-input v-model="addProdFormData.tenantName" disabled="true"></el-input>
                 </el-form-item>
                 <el-form-item label="上级产品" :label-width="formLabelWidth" prop="pCode">
                     <el-select placeholder="请选择" v-model="addProdFormData.pCode" @change="choosePrtPrd">
@@ -251,7 +251,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="产品类型" :label-width="formLabelWidth" prop="productType">
-                    <el-select placeholder="请选择" v-model="addProdFormData.productType" @change="setProductType">
+                    <el-select placeholder="请选择" v-model="addProdFormData.productType" @change="setProductType" >
                         <el-option v-for="item in dictionary.productType" :key="item.key" :label="item.text" :value="item.key">
                         </el-option>
                     </el-select>
@@ -305,11 +305,11 @@
         <el-dialog :title="dialogTitle" v-model="servAddDialogFormVisible" @close="closeModal('servAddDialogForm')">
             <el-form :model="servAddedDialogData" :rules="serformdata.serinforules" ref="servAddDialogForm" auto-complete="off">
                 <!-- <el-form-item label="服务项目" :label-width="formLabelWidth" prop="serviceX">
-                    <el-select v-model="servAddedDialogData.serviceX" placeholder="请选择" @change='chooseServItem'>
-                        <el-option v-for="item in dictionary.svrItemCode" :key="item.key" :label="item.text" :value="item.key">
-                        </el-option>
-                    </el-select>
-                </el-form-item> -->
+                        <el-select v-model="servAddedDialogData.serviceX" placeholder="请选择" @change='chooseServItem'>
+                            <el-option v-for="item in dictionary.svrItemCode" :key="item.key" :label="item.text" :value="item.key">
+                            </el-option>
+                        </el-select>
+                    </el-form-item> -->
                 <el-form-item label="服务项目" :label-width="formLabelWidth" prop="serviceId">
                     <el-select v-model="servAddedDialogData.serviceId" placeholder="请选择" @change='chooseServItem'>
                         <el-option v-for="item in dictionary.svrItemCode" :key="item.key" :label="item.text" :value="item.key">
@@ -439,30 +439,30 @@
         <el-dialog :title="dialogTitle" v-model="addSerExtDialogFormVisible" @close="closeModal('addExtFldForm')">
             <el-form :model="serextformdata" ref="addExtFldForm" auto-complete="off">
                 <el-form-item label="属性代码" :label-width="formLabelWidth" prop="exPropertyCode">
-                    <el-select v-model="serextformdata.exPropertyCode" placeholder="请选择" :disabled='!isEditStatus'>
+                    <el-select v-model="serextformdata.exPropertyCode" placeholder="请选择" :disabled='!isEditStatusMark'>
                         <el-option v-for="item in dictionary.svrOpenProperty" :key="item.key" :label="item.text" :value="item.key">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="属性类型" :label-width="formLabelWidth" prop="exPropertyType">
-                    <el-select v-model="serextformdata.exPropertyType" placeholder="请选择" :disabled='!isEditStatus'>
+                    <el-select v-model="serextformdata.exPropertyType" placeholder="请选择" :disabled='!isEditStatusMark'>
                         <el-option v-for="item in dictionary.baseDataType" :key="item.key" :label="item.text" :value="item.key">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="属性值" :label-width="formLabelWidth" prop="exPropertyData">
-                    <el-input v-model="serextformdata.exPropertyData" :disabled='!isEditStatus'></el-input>
+                    <el-input v-model="serextformdata.exPropertyData" :disabled='!isEditStatusMark'></el-input>
                 </el-form-item>
                 <el-form-item label="有效标志" :label-width="formLabelWidth" prop="effectiveFlag">
-                    <el-radio-group v-model="serextformdata.effectiveFlag" :disabled='!isEditStatus'>
+                    <el-radio-group v-model="serextformdata.effectiveFlag" :disabled='!isEditStatusMark'>
                         <el-radio label="1">是</el-radio>
                         <el-radio label="0">否</el-radio>
                     </el-radio-group>
                 </el-form-item>
                 <div class="dialog-footer center-foot">
                     <el-button @click="closeModal('addExtFldForm')">返 回</el-button>
-                    <el-button v-show='isEditStatus' type="primary" @click="saveServExtFld('addExtFldForm')">保 存</el-button>
-                    <el-button v-show='!isEditStatus' type="primary" @click="goEditServExtFld('addExtFldForm')">我要编辑</el-button>
+                    <el-button v-show='isEditStatusMark' type="primary" @click="saveServExtFld('addExtFldForm')">保 存</el-button>
+                    <el-button v-show='!isEditStatusMark' type="primary" @click="goEditServExtFld('addExtFldForm')">我要编辑</el-button>
                 </div>
             </el-form>
         </el-dialog>
@@ -478,1284 +478,1370 @@
 import {
     commonAjax
 }
-from '../../api/api';
+    from '../../api/api';
 import {
     Base64
 }
-from 'assets/lib/qrcode/Base64';
+    from 'assets/lib/qrcode/Base64';
 import vueQrcodeComponent from 'vue-qrcode-component'
 export default {
     data() {
-            return {
-                /**
-                 *  通用
-                 */
-                dialogTitle: "",
-                formLabelWidth: '150px',
-                isShowTabList: true, // 是否显示标签页
-                headers: {
-                    "X-Access-Token": sessionStorage.getItem("accessToken")
-                },
-                tenantOption: {
-                    activeName: 'baseInfo', // 基础信息标签页
-                    isdisabled: false, // true表示显示信息；false表示添加信息
-                    isShowTab: true // 是否显示tab标签页
-                },
-                dictionary: { // 字典查询数据
-                    medicalCombType: [{ // 租户维护-基本信息-类型
-                        key: "",
-                        text: "",
-                        leaf: "",
-                        index: "",
-                        mcode: ""
-                    }],
-                    svrOpenProperty: [{ // 属性代码
-                        key: "",
-                        text: "",
-                        leaf: "",
-                        index: "",
-                        mcode: ""
-                    }],
-                    baseDataType: [{ // 属性类型
-                        key: "",
-                        text: "",
-                        leaf: "",
-                        index: "",
-                        mcode: ""
-                    }],
-                    productType: [{ // 产品类型
-                        key: "",
-                        text: "",
-                        leaf: "",
-                        index: "",
-                        mcode: ""
-                    }],
-                    svrItemCode: [{ // 添加服务 - 服务项目
-                        key: "",
-                        text: "",
-                        leaf: "",
-                        index: "",
-                        mcode: ""
-                    }],
-                    svrItemType: [{ // 开通服务对象类别
-                        key: "",
-                        text: "",
-                        leaf: "",
-                        index: "",
-                        mcode: ""
-                    }]
-                },
-
-                // Tab基本信息标签页
-                hasBeenEdited: false, // 表单是否被编辑过
-                tntMark: false,       // 租户标示兼容条件
-                basicData: {          // 租户基本信息表单属性
-                    status: 1,
-                    tenantDesc: '',
-                    tenantId: '',
-                    tenantName: '',
-                    tenantPhone: '',
-                    tenantType: ''
-                },
-
-                // Tab机构列表标签页
-                orgKeyword: '',                     // 机构列表搜索关键字
-                addedOrgKeyword: '',                // 添加机构搜索关键字
-                addedParentOrgKeyword: '',          // 添加上级机构搜索关键字
-                OrgTableData: [],                   // 机构列表返回数据
-                OrgTableDataNum: '',                // 条数
-                addedOrgTableData: [],              // 添加机构列表
-                addedOrgTableDataNum: '',           // 添加机构条数
-                addedParentOrgTableData: [],        // 添加上级机构列表
-                addedParentOrgTableDataNum: '',     // 添加上级机构条数
-                isHasParentOrg: false,              // 是否有上级机构名称，无：添加；有：显示名称
-                childOrgId: '',                     // 具有上级机构的机构ID
-                parentOrgLabel: '',                 // 上级机构名称
-                navdialogFormVisible: false,        // 添加机构模态框
-                navdialogParentFormVisible: false,  // 添加上级机构模态框
-                orgListPagination: {                // 机构列表分页
-                    pageNo: 1,
-                    pageSize: 10,
-                },
-                addedOrgListPagination: {           // 添加医院列表分页
-                    pageNo: 1,
-                    pageSize: 10,
-                },
-                addedParentOrgListPagination: {     // 添加上级医院列表分页
-                    pageNo: 1,
-                    pageSize: 10,
-                },
-
-                // Tab产品列表标签页
-                test: '',
-                ProductTableData: [], // 产品列表返回数据
-                ProductTableDataNum: '', // 条数
-                curProductCode: '', // 当前产品编码
-                productCheckData: { // 查看产品返回数据
-                    productType: ''
-                },
-                addProdTenantName: '', // 添加租户产品模态框-租户名称
-                curProductTypeObj: '', // 当前已选产品类型
-                isFstPrdEmpty: false,  // 一级产品是否为空
-                addProdFormData: {     // 添加产品表单数据
-                    code: '',
-                    description: '',
-                    name: '',
-                    pCode: '',         // 一级产品
-                    productType: '',   // 产品类型
-                    status: 1,
-                    tenantName: ''     // 租户名称
-                },
-                isProdEnable: false, // 产品列表启用和禁用状态
-                prodDialogFormVisible: false, // 产品列表-添加产品模态框
-                prodCheckDialogForm: false, // 产品列表-查看产品模态框
-                isProdReadOnly: true, // 查看或编辑
-                prodListPagination: { // 分页
-                    pageNo: 1,
-                    pageSize: 10,
-                },
-                productFirstLevelData: [{ // 一级产品返回数据
-                    code: "",
-                    tenantId: "",
-                    name: "",
-                    pCode: "",
-                    status: "",
-                    createDt: "",
-                    creater: ""
+        return {
+            /**
+             *  通用
+             */
+            dialogTitle: "",
+            formLabelWidth: '150px',
+            isShowTabList: true, // 是否显示标签页
+            headers: {
+                "X-Access-Token": sessionStorage.getItem("accessToken")
+            },
+            tenantOption: {
+                activeName: 'baseInfo', // 基础信息标签页
+                isdisabled: false, // true表示显示信息；false表示添加信息
+                isShowTab: true // 是否显示tab标签页
+            },
+            dictionary: { // 字典查询数据
+                medicalCombType: [{ // 租户维护-基本信息-类型
+                    key: "",
+                    text: "",
+                    leaf: "",
+                    index: "",
+                    mcode: ""
                 }],
+                svrOpenProperty: [{ // 属性代码
+                    key: "",
+                    text: "",
+                    leaf: "",
+                    index: "",
+                    mcode: ""
+                }],
+                baseDataType: [{ // 属性类型
+                    key: "",
+                    text: "",
+                    leaf: "",
+                    index: "",
+                    mcode: ""
+                }],
+                productType: [{ // 产品类型
+                    key: "",
+                    text: "",
+                    leaf: "",
+                    index: "",
+                    mcode: ""
+                }],
+                svrItemCode: [{ // 添加服务 - 服务项目
+                    key: "",
+                    text: "",
+                    leaf: "",
+                    index: "",
+                    mcode: ""
+                }],
+                svrItemType: [{ // 开通服务对象类别
+                    key: "",
+                    text: "",
+                    leaf: "",
+                    index: "",
+                    mcode: ""
+                }]
+            },
 
-                // Tab服务列表标签页
-                dialogTitle2: "", //服务属性扩展的标题
-                curopenserviceId: 0,
-                curOpenServiceId: '',
-                ServiceTableData: [], // 服务列表返回数据
-                ServiceTableDataNum: '', // 条数
-                servListPagination: { // 分页
-                    pageNo: 1,
-                    pageSize: 10,
-                },
-                exServiceTableData: [], // 服务列表-扩展属性返回数据
-                exServiceTableDataNum: '', // 条数
-                ServiceDetailTableData: { // 服务列表查看返回数据
-                    serviceName: '',
-                    serviceId: '',
-                    serviceNo: '',
-                    serviceDesc: '',
-                    objectType: '',
-                    mainFlag: '',
-                    effectiveFlag: ''
-                },
-                servAddedDialogData: { // 服务列表-添加服务数据源
-                    serviceId: '',
-                    serviceCode: '',
-                    serviceDesc: '',
-                    objectId: '',
-                    objectType: '',
-                    mainFlag: '1',
-                    effectiveFlag: '1',
-                    serviceX: ''
-                },
-                servCheckDialogForm: false,         // 服务列表查看模态框
-                tenantServicUpdatedForm: {},        // 服务列表编辑保存的数据
-                isServReadOnly: true,               // 查看服务是否只读
-                servAddDialogFormVisible: false,    // 服务列表添加模态框
-                addSerExtDialogFormVisible: false,  // 扩展属性添加模态框model
-                isShowServExtend: false,            // 是否显示服务扩展列表页
-                isEditStatus: false,                // 是否显示编辑按钮
-                switchTxt: "禁用",                   // 禁用和启用按钮
-                orgOption: {
-                    activeName: 'baseInfo', //基础信息标签页
-                    isdisabled: true,       //true表示显示信息；false表示添加信息
-                    isShowTab: false        //是否显示tab标签页, true显示，false不显示
-                },
-                sertotal: '',
-                serparams: { // 服务列表分页
-                    pageNo: 1,
-                    pageSize: 10
-                },
-                serextformdata: {       // 扩展服务属性添加
-                    id: 0,              // id为0时表示新增，id有值时表示更新
-                    openserviceId: "",
-                    exPropertyCode: "", // 扩展属性代码
-                    exPropertyType: "", // 属性类型
-                    exPropertyData: "",
-                    effectiveFlag: ""
-                },
-                serparams: {
-                    content: "",
-                    pageNo: 1,
-                    pageSize: 10,
-                },
-                serformdata: {
-                    id: 0,
-                    orgId: "",
-                    tenantId: "",
-                    serviceId: "",
-                    serviceCode: "",
-                    serviceName: "",
-                    mainFlag: "",
-                    effectiveFlag: "",
-                    objectType: ""
-                },
-                qrcodeVisible: false,
-                qrcodevalue: "",
-                qrcodetit: "",
+            // Tab基本信息标签页
+            hasBeenEdited: false, // 表单是否被编辑过
+            tntMark: false,       // 租户标示兼容条件
+            basicData: {          // 租户基本信息表单属性
+                status: 1,
+                tenantDesc: '',
+                tenantId: '',
+                tenantName: '',
+                tenantPhone: '',
+                tenantType: ''
+            },
+
+            // Tab机构列表标签页
+            orgKeyword: '',                     // 机构列表搜索关键字
+            addedOrgKeyword: '',                // 添加机构搜索关键字
+            addedParentOrgKeyword: '',          // 添加上级机构搜索关键字
+            OrgTableData: [],                   // 机构列表返回数据
+            OrgTableDataNum: '',                // 条数
+            addedOrgTableData: [],              // 添加机构列表
+            addedOrgTableDataNum: '',           // 添加机构条数
+            addedParentOrgTableData: [],        // 添加上级机构列表
+            addedParentOrgTableDataNum: '',     // 添加上级机构条数
+            isHasParentOrg: false,              // 是否有上级机构名称，无：添加；有：显示名称
+            childOrgId: '',                     // 具有上级机构的机构ID
+            parentOrgLabel: '',                 // 上级机构名称
+            navdialogFormVisible: false,        // 添加机构模态框
+            navdialogParentFormVisible: false,  // 添加上级机构模态框
+            orgListPagination: {                // 机构列表分页
+                pageNo: 1,
+                pageSize: 10,
+            },
+            addedOrgListPagination: {           // 添加医院列表分页
+                pageNo: 1,
+                pageSize: 10,
+            },
+            addedParentOrgListPagination: {     // 添加上级医院列表分页
+                pageNo: 1,
+                pageSize: 10,
+            },
+
+            // Tab产品列表标签页
+            ProductTableData: [], // 产品列表返回数据
+            ProductTableDataNum: '', // 条数
+            curProductCode: '', // 当前产品编码
+            productCheckData: { // 查看产品返回数据
+                productType: ''
+            },
+            addProdTenantName: '', // 添加租户产品模态框-租户名称
+            curProductTypeObj: '', // 当前已选产品类型
+            isFstPrdEmpty: false,  // 一级产品是否为空
+            addProdFormData: {     // 添加产品表单数据
+                code: '',
+                description: '',
+                name: '',
+                pCode: '',         // 一级产品
+                productType: '',   // 产品类型
+                status: 1,
+                tenantName: ''     // 租户名称
+            },
+            isProdEnable: false, // 产品列表启用和禁用状态
+            prodDialogFormVisible: false, // 产品列表-添加产品模态框
+            prodCheckDialogForm: false, // 产品列表-查看产品模态框
+            isProdReadOnly: true, // 查看或编辑
+            prodListPagination: { // 分页
+                pageNo: 1,
+                pageSize: 10,
+            },
+            productFirstLevelData: [{ // 一级产品返回数据
+                code: "",
+                tenantId: "",
+                name: "",
+                pCode: "",
+                status: "",
+                createDt: "",
+                creater: ""
+            }],
+
+            // Tab服务列表标签页
+            dialogTitle2: "", //服务属性扩展的标题
+            curopenserviceId: 0,
+            curOpenServiceId: '',
+            ServiceTableData: [], // 服务列表返回数据
+            ServiceTableDataNum: '', // 条数
+            servListPagination: { // 分页
+                pageNo: 1,
+                pageSize: 10,
+            },
+            exServiceTableData: [], // 服务列表-扩展属性返回数据
+            exServiceTableDataNum: '', // 条数
+            ServiceDetailTableData: { // 服务列表查看返回数据
+                serviceName: '',
+                serviceId: '',
+                serviceNo: '',
+                serviceDesc: '',
+                objectType: '',
+                mainFlag: '',
+                effectiveFlag: ''
+            },
+            servAddedDialogData: { // 服务列表-添加服务数据源
+                serviceId: '',
+                serviceCode: '',
+                serviceDesc: '',
+                objectId: '',
+                objectType: '',
+                mainFlag: '1',
+                effectiveFlag: '1',
+                serviceX: ''
+            },
+            servCheckDialogForm: false,         // 服务列表查看模态框
+            tenantServicUpdatedForm: {},        // 服务列表编辑保存的数据
+            isServReadOnly: true,               // 查看服务是否只读
+            servAddDialogFormVisible: false,    // 服务列表添加模态框
+            addSerExtDialogFormVisible: false,  // 扩展属性添加模态框model
+            isShowServExtend: false,            // 是否显示服务扩展列表页
+            isEditStatus: false,                // 是否显示编辑按钮
+            isEditStatusMark: true,            // 是否禁用
+            switchTxt: "禁用",                   // 禁用和启用按钮
+            orgOption: {
+                activeName: 'baseInfo', //基础信息标签页
+                isdisabled: true,       //true表示显示信息；false表示添加信息
+                isShowTab: false        //是否显示tab标签页, true显示，false不显示
+            },
+            sertotal: '',
+            serparams: { // 服务列表分页
+                pageNo: 1,
+                pageSize: 10
+            },
+            serextformdata: {       // 扩展服务属性添加
+                id: 0,              // id为0时表示新增，id有值时表示更新
+                openserviceId: "",
+                exPropertyCode: "", // 扩展属性代码
+                exPropertyType: "", // 属性类型
+                exPropertyData: "",
+                effectiveFlag: ""
+            },
+            serparams: {
+                content: "",
+                pageNo: 1,
+                pageSize: 10,
+            },
+            serformdata: {
+                id: 0,
+                orgId: "",
+                tenantId: "",
+                serviceId: "",
+                serviceCode: "",
+                serviceName: "",
+                mainFlag: "",
+                effectiveFlag: "",
+                objectType: ""
+            },
+            qrcodeVisible: false,
+            qrcodevalue: "",
+            qrcodetit: "",
+        }
+    },
+    activated() {
+        this.tenantOption.activeName = 'baseInfo';
+        this.init() //页面初始化
+    },
+    methods: {
+        /**
+         *  通用 
+         */
+        // 获取字典
+        dictionaryRequest() {
+            var that = this;
+            let arr = [
+                "cfs.dic.base_medicalCombType", // 租户维护-基本信息-类型
+                "cfs.dic.base_svrOpenProperty", // 属性代码字典
+                "cfs.dic.base_baseDataType",    // 属性类型字典
+                "cfs.dic.base_productType",     // 一级产品类型
+                "cfs.dic.base_svrItemCode",     // 服务项目
+                "cfs.dic.base_objectType"       // 开通服务对象类别
+            ];
+
+            commonAjax("cas.multipleDictionaryService", "findDic", '[' + JSON.stringify(arr) + ']').then(res => {
+                if (res.code == 200) {
+                    res.body.forEach(function(ele, index) {
+                        if (ele.dicId == arr[0]) {
+                            that.dictionary.medicalCombType = ele.items;
+                        }
+                        if (ele.dicId == arr[1]) {
+                            that.dictionary.svrOpenProperty = ele.items;
+                        }
+                        if (ele.dicId == arr[2]) {
+                            that.dictionary.baseDataType = ele.items;
+                        }
+                        if (ele.dicId == arr[3]) {
+                            that.dictionary.productType = ele.items;
+                        }
+                        if (ele.dicId == arr[4]) {
+                            that.dictionary.svrItemCode = ele.items;
+                        }
+                        if (ele.dicId == arr[5]) {
+                            let fst = ele.items[0];
+                            that.dictionary.svrItemType = [fst];
+                        }
+                    })
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
+        // 关闭添加医院模态框
+        closeAddHsptDialog() {
+            this.navdialogFormVisible = false;
+        },
+        // 关闭添加上级机构模态框 
+        closeAddParentOrg() {
+            this.navdialogParentFormVisible = false;
+        },
+        // 模态框 - 关闭和取消按钮
+        closeModal(formName) {
+            this.$refs[formName].resetFields();
+        },
+        showlist() {
+            $(".yishenglist").show();
+        },
+        // 点击选项卡
+        tabHandleClick(tab, event) {
+            if (tab.name == 'baseInfo') {
+                return;
+            }
+            let activeTab = event.target.innerHTML;
+            this.tenantOption.activeName = tab.name;
+            this.tenantOption.isShowTab = true;
+            if (activeTab == "机构列表") {
+                if (this.OrgTableData.length == 0) {
+                    this.getOrgList();
+                }
+            } else if (activeTab == "产品列表") {
+                if (this.ProductTableData.length == 0) {
+                    this.getProdList();
+                }
+            } else if (activeTab == "服务列表") {
+                if (this.ServiceTableData.length == 0) {
+                    this.getServList();
+                }
             }
         },
-        activated() {
-            this.tenantOption.activeName = 'baseInfo';
-            this.init() //页面初始化
+        // 判断是新增还是查看
+        checkPrevBtn() {
+            if (this.$route.params.type) {
+                if (this.$route.params.type == 1) { // 新增租户传1
+                    this.basicData = { // 重置
+                        tenantId: '',
+                        tenantType: '',
+                        tenantName: '',
+                        tenantPhone: '',
+                        tenantDesc: ''
+                    }
+                    this.tenantOption.isShowTab = false; // 不显示其他标签页
+                    this.tenantOption.isdisabled = false; // 表单可以修改
+                } else { // 查看租户传2
+                    this.tenantOption.isShowTab = true; //显示标签页
+                    this.tenantOption.isdisabled = true; //表单不可以修改
+                    this.getTenantData()
+                }
+            }
         },
-        methods: {
-            /**
-             *  通用 
-             */
-            // 获取字典
-            dictionaryRequest() {
-                    var that = this;
-                    let arr = [
-                        "cfs.dic.base_medicalCombType", // 租户维护-基本信息-类型
-                        "cfs.dic.base_svrOpenProperty", // 属性代码字典
-                        "cfs.dic.base_baseDataType", // 属性类型字典
-                        "cfs.dic.base_productType", // 一级产品类型
-                        "cfs.dic.base_svrItemCode", // 服务项目
-                        "cfs.dic.base_objectType" // 开通服务对象类别
-                    ];
 
-                    commonAjax("cas.multipleDictionaryService", "findDic", '[' + JSON.stringify(arr) + ']').then(res => {
-                        if (res.code == 200) {
-                            res.body.forEach(function(ele, index) {
-                                if (ele.dicId == arr[0]) {
-                                    that.dictionary.medicalCombType = ele.items;
-                                }
-                                if (ele.dicId == arr[1]) {
-                                    that.dictionary.svrOpenProperty = ele.items;
-                                }
-                                if (ele.dicId == arr[2]) {
-                                    that.dictionary.baseDataType = ele.items;
-                                }
-                                if (ele.dicId == arr[3]) {
-                                    that.dictionary.productType = ele.items;
-                                }
-                                if (ele.dicId == arr[4]) {
-                                    that.dictionary.svrItemCode = ele.items;
-                                }
-                                if (ele.dicId == arr[5]) {
-                                    let fst = ele.items[0];
-                                    that.dictionary.svrItemType = [fst];
-                                }
-                            })
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            });
-                        }
+
+        /**
+         *  基本信息 
+         */
+        // 基本信息 - 租户添加保存按钮
+        saveBasicInfo() {
+            let params = [this.basicData];
+
+            commonAjax('cas.tenantManageService', 'tenantAdded', params).then(res => {
+                if (res.code == 200) {
+                    this.$message({
+                        type: 'success',
+                        message: "保存成功"
                     });
-                },
-                // 关闭添加医院模态框
-                closeAddHsptDialog() {
-                    this.navdialogFormVisible = false;
-                },
-                // 关闭添加上级机构模态框 
-                closeAddParentOrg() {
-                    this.navdialogParentFormVisible = false;
-                },
-                // 模态框 - 关闭和取消按钮
-                closeModal(formName) {
-                    this.$refs[formName].resetFields();
-                    if (formName == 'prodInfoForm') {             // 查看产品模态框
-                        this.prodCheckDialogForm = false;
-                    } else if (formName == 'prodAddDialogForm') { // 添加产品模态框
-                        this.prodDialogFormVisible = false;
-                    } else if (formName == 'servAddDialogForm') { // 添加服务模态框
-                        this.servAddDialogFormVisible = false;
-                    } else if (formName == 'addExtFldForm') {
-                        this.addSerExtDialogFormVisible = false;  // 添加扩展属性模态框
-                    } else if (formName == 'servCheck') {
-                        this.servCheckDialogForm = false;
-                    }
-                },
-                showlist() {
-                    $(".yishenglist").show();
-                },
-                // 点击选项卡
-                tabHandleClick(tab, event) {
-                    if (tab.name == 'baseInfo') {
-                        return;
-                    }
-                    let activeTab = event.target.innerHTML;
-                    this.tenantOption.activeName = tab.name;
-                    this.tenantOption.isShowTab = true;
-                    if (activeTab == "机构列表") {
-                        if (this.OrgTableData.length == 0) {
-                            this.getOrgList();
-                        }
-                    } else if (activeTab == "产品列表") {
-                        if (this.ProductTableData.length == 0) {
-                            this.getProdList();
-                        }
-                    } else if (activeTab == "服务列表") {
-                        if (this.ServiceTableData.length == 0) {
-                            this.getServList();
-                        }
-                    }
-                },
-                // 判断是新增还是查看
-                checkPrevBtn() {
-                    if (this.$route.params.type) {
-                        if (this.$route.params.type == 1) { // 新增租户传1
-                            this.basicData = { // 重置
-                                tenantId: '',
-                                tenantType: '',
-                                tenantName: '',
-                                tenantPhone: '',
-                                tenantDesc: ''
-                            }
-                            this.tenantOption.isShowTab = false; // 不显示其他标签页
-                            this.tenantOption.isdisabled = false; // 表单可以修改
-                        } else { // 查看租户传2
-                            this.tenantOption.isShowTab = true; //显示标签页
-                            this.tenantOption.isdisabled = true; //表单不可以修改
-                            this.getTenantData()
-                        }
-                    }
-                },
-
-
-                /**
-                 *  基本信息 
-                 */
-                // 基本信息 - 租户添加保存按钮
-                saveBasicInfo() {
-                    let params = [this.basicData];
-
-                    commonAjax('cas.tenantManageService', 'tenantAdded', params).then(res => {
-                        if (res.code == 200) {
-                            this.$message({
-                                type: 'success',
-                                message: "保存成功"
-                            });
-                            this.tenantOption.isShowTab = true; //显示其他标签页
-                            this.tenantOption.isdisabled = true;
-                            this.tntMark = true;
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            });
-                        }
-                    });
-                },
-                // 基本信息 - 编辑后再保存
-                saveEditedBasicInfo() {
-                    let params = [this.basicData];
-
-                    commonAjax('cas.tenantManageService', 'tenantUpdated', params).then(res => {
-                        if (res.code == 200) {
-                            this.$message({
-                                type: 'success',
-                                message: "保存成功"
-                            });
-                            this.tenantOption.isShowTab = true; //显示其他标签页
-                            this.tenantOption.isdisabled = true;
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            });
-                        }
-                    });
-                },
-                // 基本信息 - 保存新增或者保存修改后的内容
-                submitForm(formName) {
-                    this.$refs[formName].validate((valid) => {
-                        if (valid) {
-                            if (!this.hasBeenEdited) {
-                                this.saveBasicInfo();
-                            } else {
-                                this.saveEditedBasicInfo();
-                            }
-                        } else { //数据不合法
-                            return false;
-                        }
-                    });
-                },
-                // 基本信息 - 编辑按钮
-                editBasicInfo() {
-                    this.hasBeenEdited = true; // 保留痕迹
-                    this.tenantOption.isdisabled = false;
+                    this.tenantOption.isShowTab = true; //显示其他标签页
+                    this.tenantOption.isdisabled = true;
                     this.tntMark = true;
-                },
-                // 基本信息 - 返回按钮
-                leaveBasicInfo(formName) {
-                    this.$refs[formName].resetFields();
-                    this.$router.push('tenantManage');
-                },
-                // 如果是查询，获取租户基本查询信息
-                getTenantData() {
-                    if (this.$route.params.id) { // 获取租户ID
-                        var tenantId = this.$route.params.id;
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
+        // 基本信息 - 编辑后再保存
+        saveEditedBasicInfo() {
+            let params = [this.basicData];
+
+            commonAjax('cas.tenantManageService', 'tenantUpdated', params).then(res => {
+                if (res.code == 200) {
+                    this.$message({
+                        type: 'success',
+                        message: "保存成功"
+                    });
+                    this.tenantOption.isShowTab = true; //显示其他标签页
+                    this.tenantOption.isdisabled = true;
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
+        // 基本信息 - 保存新增或者保存修改后的内容
+        submitForm(formName) {
+            this.$refs[formName].validate((valid) => {
+                if (valid) {
+                    if (!this.hasBeenEdited) {
+                        this.saveBasicInfo();
+                    } else {
+                        this.saveEditedBasicInfo();
                     }
+                } else { //数据不合法
+                    return false;
+                }
+            });
+        },
+        // 基本信息 - 编辑按钮
+        editBasicInfo() {
+            this.hasBeenEdited = true; // 保留痕迹
+            this.tenantOption.isdisabled = false;
+            this.tntMark = true;
+        },
+        // 基本信息 - 返回按钮
+        leaveBasicInfo(formName) {
+            this.$refs[formName].resetFields();
+            this.$router.push('tenantManage');
+        },
+        // 如果是查询，获取租户基本查询信息
+        getTenantData() {
+            if (this.$route.params.id) { // 获取租户ID
+                var tenantId = this.$route.params.id;
+            }
 
-                    let params = [tenantId]
+            let params = [tenantId]
 
-                    commonAjax('cas.tenantManageService', 'tenantDetail', params).then(res => {
-                        if (res.code == 200) {
-                            this.basicData.tenantId = res.body.tenantId
-                            this.basicData.tenantType = res.body.tenantType
-                            this.basicData.tenantName = res.body.tenantName
-                            this.basicData.tenantPhone = res.body.tenantPhone
-                            this.basicData.tenantDesc = res.body.tenantDesc
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            })
-                        }
+            commonAjax('cas.tenantManageService', 'tenantDetail', params).then(res => {
+                if (res.code == 200) {
+                    this.basicData.tenantId = res.body.tenantId
+                    this.basicData.tenantType = res.body.tenantType
+                    this.basicData.tenantName = res.body.tenantName
+                    this.basicData.tenantPhone = res.body.tenantPhone
+                    this.basicData.tenantDesc = res.body.tenantDesc
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
                     })
-                },
+                }
+            })
+        },
 
 
-                /**
-                 *  机构信息 
-                 */
-                // 获取机构列表
-                getOrgList() {
-                    let params = [{
-                        tenantId: this.basicData.tenantId,
-                        pageNo: this.orgListPagination.pageNo,
-                        pageSize: this.orgListPagination.pageSize
-                    }]
+        /**
+         *  机构信息 
+         */
+        // 获取机构列表
+        getOrgList() {
+            let params = [{
+                tenantId: this.basicData.tenantId,
+                pageNo: this.orgListPagination.pageNo,
+                pageSize: this.orgListPagination.pageSize
+            }]
 
-                    commonAjax("cas.tenantManageService", "searchTenantOrg", params).then(res => {
+            commonAjax("cas.tenantManageService", "searchTenantOrg", params).then(res => {
+                if (res.code == 200) {
+                    $.each(res.body.data, function(index, el) {
+                        el.number = (index + 1) + (params[0].pageNo - 1) * (params[0].pageSize);
+                    });
+                    this.OrgTableData = res.body.data;
+                    this.OrgTableDataNum = res.body.total;
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    })
+                }
+            })
+        },
+        // 机构列表 - 单页条数
+        updateOrgListPageSize(pageSize) {
+            this.orgListPagination.pageSize = pageSize;
+            this.getOrgList();
+        },
+        // 机构列表 - 当前页码
+        updateOrgListCurPage(curPage) {
+            this.orgListPagination.pageNo = curPage;
+            this.getOrgList();
+        },
+        // 机构列表 - 添加机构 - 单页条数
+        addOrgSizeChange(pageSize) {
+            this.addedOrgListPagination.pageSize = pageSize;
+            this.getHospitalList();
+        },
+        // 机构列表 - 添加机构 - 当前页码
+        addOrgCurrentChange(curPage) {
+            this.addedOrgListPagination.pageNo = curPage;
+            this.getHospitalList();
+        },
+        // 机构列表 - 添加上级机构 - 单页条数
+        addParentOrgSizeChange(pageSize) {
+            this.addedParentOrgListPagination.pageSize = pageSize;
+            this.getParentOrgList();
+        },
+        // 机构列表 - 添加上级机构 - 当前页码
+        addParentOrgCurrentChange(curPage) {
+            this.addedParentOrgListPagination.pageNo = curPage;
+            this.getParentOrgList();
+        },
+        // 机构列表 - 搜索机构
+        searchOrgList() {
+            let params = [{
+                tenantId: this.basicData.tenantId,
+                orgName: this.orgKeyword,
+                pageNo: this.orgListPagination.pageNo,
+                pageSize: this.orgListPagination.pageSize
+            }]
+
+            commonAjax("cas.tenantManageService", "searchTenantOrg", params).then(res => {
+                if (res.code == 200) {
+                    $.each(res.body.data, function(index, el) {
+                        el.number = (index + 1) + (params[0].pageNo - 1) * (params[0].pageSize);
+                    });
+                    this.OrgTableData = res.body.data;
+                    this.OrgTableDataNum = res.body.total;
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    })
+                }
+            })
+        },
+        // 机构列表 - 删除按钮
+        deleteOrg(index, row) {
+            const h = this.$createElement;
+            this.$msgbox({
+                title: '确认删除',
+                message: h('p', null, [
+                    h('span', null, ''),
+                    h('i', {
+                        style: 'color: teal'
+                    }, row.shortName)
+                ]),
+                showCancelButton: true,
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                beforeClose: (action, instance, done) => {
+                    if (action === 'confirm') {
+                        instance.confirmButtonLoading = true;
+                        instance.confirmButtonText = '执行中...';
+                        setTimeout(() => {
+                            done();
+                            setTimeout(() => {
+                                instance.confirmButtonLoading = false;
+                            }, 300);
+                        }, 1000);
+                    } else {
+                        done();
+                    }
+                }
+            }).then(action => {
+                if (action == 'cancel') {
+                    this.$message({
+                        type: 'info',
+                        message: "取消删除"
+                    });
+                } else {
+                    let params = [row.id];
+                    commonAjax("cas.tenantManageService", "tenantOrgDeleted", params).then(res => {
                         if (res.code == 200) {
-                            $.each(res.body.data, function(index, el) {
-                                el.number = (index + 1) + (params[0].pageNo - 1) * (params[0].pageSize);
+                            this.$message({
+                                type: 'success',
+                                message: "删除成功"
                             });
-                            this.OrgTableData = res.body.data;
-                            this.OrgTableDataNum = res.body.total;
+                            this.getOrgList();
                         } else {
                             this.$message({
                                 type: 'error',
                                 message: res.msg
-                            })
-                        }
-                    })
-                },
-                // 机构列表 - 单页条数
-                updateOrgListPageSize(pageSize) {
-                    this.orgListPagination.pageSize = pageSize;
-                    this.getOrgList();
-                },
-                // 机构列表 - 当前页码
-                updateOrgListCurPage(curPage) {
-                    this.orgListPagination.pageNo = curPage;
-                    this.getOrgList();
-                },
-                // 机构列表 - 添加机构 - 单页条数
-                addOrgSizeChange(pageSize) {
-                    this.addedOrgListPagination.pageSize = pageSize;
-                    this.getHospitalList();
-                },
-                // 机构列表 - 添加机构 - 当前页码
-                addOrgCurrentChange(curPage) {
-                    this.addedOrgListPagination.pageNo = curPage;
-                    this.getHospitalList();
-                },
-                // 机构列表 - 添加上级机构 - 单页条数
-                addParentOrgSizeChange(pageSize) {
-                    this.addedParentOrgListPagination.pageSize = pageSize;
-                    this.getParentOrgList();
-                },
-                // 机构列表 - 添加上级机构 - 当前页码
-                addParentOrgCurrentChange(curPage) {
-                    this.addedParentOrgListPagination.pageNo = curPage;
-                    this.getParentOrgList();
-                },
-                // 机构列表 - 搜索机构
-                searchOrgList() {
-                    let params = [{
-                        tenantId: this.basicData.tenantId,
-                        orgName: this.orgKeyword,
-                        pageNo: this.orgListPagination.pageNo,
-                        pageSize: this.orgListPagination.pageSize
-                    }]
-
-                    commonAjax("cas.tenantManageService", "searchTenantOrg", params).then(res => {
-                        if (res.code == 200) {
-                            $.each(res.body.data, function(index, el) {
-                                el.number = (index + 1) + (params[0].pageNo - 1) * (params[0].pageSize);
                             });
-                            this.OrgTableData = res.body.data;
-                            this.OrgTableDataNum = res.body.total;
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            })
                         }
+                    });
+                }
+            })
+        },
+        // 机构添加 - 机构搜索（初始化列表视作搜索为空）
+        getHospitalList() {
+            if (this.orgKeyword) {
+                var params = [{
+                    'pageNo': this.addedOrgListPagination.pageNo,
+                    'pageSize': this.addedOrgListPagination.pageSize,
+                    'orgFullName': paramO.content
+                }]
+            } else {
+                var params = [{
+                    'pageNo': this.addedOrgListPagination.pageNo,
+                    'pageSize': this.addedOrgListPagination.pageSize
+                }]
+            }
+
+            commonAjax('cas.tenantManageService', 'searchOrg', params).then(res => {
+                if (res.code == 200) {
+                    $.each(res.body.data, function(index, el) {
+                        el.number = (index + 1) + (params[0].pageNo - 1) * (params[0].pageSize);
+                    });
+                    this.addedOrgTableData = res.body.data;
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
                     })
-                },
-                // 机构列表 - 删除按钮
-                deleteOrg(index, row) {
-                    const h = this.$createElement;
-                    this.$msgbox({
-                        title: '确认删除',
-                        message: h('p', null, [
-                            h('span', null, ''),
-                            h('i', {
-                                style: 'color: teal'
-                            }, row.shortName)
-                        ]),
-                        showCancelButton: true,
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        beforeClose: (action, instance, done) => {
-                            if (action === 'confirm') {
-                                instance.confirmButtonLoading = true;
-                                instance.confirmButtonText = '执行中...';
+                }
+            });
+        },
+        // 机构列表 - 添加医院
+        getAddedOrgList() {
+            this.dialogTitle = "添加医院";
+            this.navdialogFormVisible = true;
+
+            if (this.addedOrgKeyword) {
+                var params = [{
+                    orgFullName: this.addedOrgKeyword,
+                    pageNo: this.addedOrgListPagination.pageNo,
+                    pageSize: this.addedOrgListPagination.pageSize
+                }];
+            } else {
+                var params = [{
+                    pageNo: this.addedOrgListPagination.pageNo,
+                    pageSize: this.addedOrgListPagination.pageSize
+                }];
+            }
+
+            commonAjax('cas.tenantManageService', 'searchOrg', params).then(res => {
+                if (res.code == 200) {
+                    $.each(res.body.data, function(index, el) {
+                        el.number = (index + 1) + (params[0].pageNo - 1) * (params[0].pageSize);
+                    });
+                    this.addedOrgTableData = res.body.data;
+                    this.addedOrgTableDataNum = res.body.total;
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
+        // 机构列表 - 获取上级医院列表
+        getParentOrgList() {
+            if (this.addedParentOrgKeyword) {
+                var params = [{
+                    orgFullName: this.addedParentOrgKeyword,
+                    // tenantId: this.basicData.tenantId,
+                    pageNo: this.addedParentOrgListPagination.pageNo,
+                    pageSize: this.addedParentOrgListPagination.pageSize
+                }];
+            } else {
+                var params = [{
+                    // tenantId: this.basicData.tenantId,
+                    pageNo: this.addedParentOrgListPagination.pageNo,
+                    pageSize: this.addedParentOrgListPagination.pageSize
+                }];
+            }
+
+            // commonAjax('cas.tenantManageService', 'searchTenantOrg', params).then(res => {
+            commonAjax('cas.tenantManageService', 'searchOrg', params).then(res => {
+                if (res.code == 200) {
+                    $.each(res.body.data, function(index, el) {
+                        el.number = (index + 1) + (params[0].pageNo - 1) * (params[0].pageSize);
+                    });
+                    this.addedParentOrgTableData = res.body.data;
+                    this.addedParentOrgTableDataNum = res.body.total;
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
+        // 添加上级机构列表
+        // getPrtOrg() {
+        //     commonAjax('cas.orgService', 'findOrgs', []).then(res => {
+        //         if (res.code == 200) {
+        //             $.each(res.body, function(index, el) {
+        //                 el.number = (index + 1) + (params[0].pageNo - 1) * (params[0].pageSize);
+        //             });
+        //             this.addedParentOrgTableData = res.body;
+        //             this.addedParentOrgTableDataNum = res.body.length;
+        //         } else {
+        //             this.$message({
+        //                 type: 'error',
+        //                 message: res.msg
+        //             });
+        //         }
+        //     });
+        // },
+        // 机构列表 - 添加上级医院
+        getAddedParentOrgList(index, row) {
+            this.dialogTitle = '添加上级机构';
+            this.navdialogParentFormVisible = true;
+            this.childOrgId = row.id;
+            this.getParentOrgList(); // 原来的
+            // this.getPrtOrg();    
+        },
+        // 机构列表 - 删除上级医院
+        delParentOrg(index, row) {
+            var params = [row.id];
+
+            commonAjax('cas.tenantManageService', 'tenantOrgParentDeleted', params).then(res => {
+                if (res.code == 200) {
+                    this.getOrgList();
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
+        // 机构列表 - 添加医院到机构列表
+        addHspt2OrgList(index, row) {
+            let params = [{
+                orderId: index,
+                orgId: row.orgId,
+                tenantId: this.basicData.tenantId
+            }];
+
+            commonAjax('cas.tenantManageService', 'tenantOrgAdded', params).then(res => {
+                if (res.code == 200) {
+                    this.navdialogFormVisible = false; // 关闭模态框
+                    this.$message({
+                        type: 'success',
+                        message: '添加成功！'
+                    });
+                    this.getOrgList(); // 刷新机构列表
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
+        // 机构列表 - 添加'上级医院'到机构列表
+        addParentHspt2OrgList(index, row) {
+            let params = [{
+                id: this.childOrgId,
+                orgPid: row.orgId
+            }];
+
+            commonAjax('cas.tenantManageService', 'tenantOrgParentUpdated', params).then(res => {
+                if (res.code == 200) {
+                    this.navdialogParentFormVisible = false;
+                    this.$message({
+                        type: 'success',
+                        message: '添加成功！'
+                    });
+                    this.getOrgList();
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
+
+
+        /**
+         *  产品信息 
+         */
+        // 产品列表 - 获取产品列表
+        getProdList() {
+            let params = [{
+                tenantId: this.basicData.tenantId,
+                pageNo: this.prodListPagination.pageNo,
+                pageSize: this.prodListPagination.pageSize
+            }];
+
+            commonAjax("cas.tenantManageService", "productList", params).then(res => {
+                if (res.code == 200) {
+                    $.each(res.body.data, function(index, el) {
+                        el.number = (index + 1) + (params[0].pageNo - 1) * (params[0].pageSize);
+                    });
+                    this.ProductTableData = res.body.data;
+                    this.ProductTableDataNum = res.body.total;
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    })
+                }
+            });
+        },
+        // 产品列表 - 单页条数
+        updateProdListPageSize(pageSize) {
+            this.prodListPagination.pageSize = pageSize;
+            this.getProdList();
+        },
+        // 产品列表 - 当前页码
+        updateProdListCurPage(curPage) {
+            this.prodListPagination.pageNo = curPage;
+            this.getProdList();
+        },
+        // 产品列表 - 查看产品
+        checkProduct(index, row) {
+            this.dialogTitle = "查看租户产品",
+                this.isProdReadOnly = true;
+            this.prodCheckDialogForm = true;
+            this.curProductCode = row.code;
+
+            let params = [row.code];
+
+            commonAjax('cas.tenantManageService', 'productDetail', params).then(res => {
+                if (res.code == 200) {
+                    this.productCheckData = res.body;
+                    switch (res.body.code) {
+                        case 'hcn.patient':
+                            this.productCheckData.productType = '患者版';
+                            break;
+                        case 'hcn.patient_ios':
+                            this.productCheckData.productType = '患者版_ios';
+                            break;
+                        case 'hcn.patient_android':
+                            this.productCheckData.productType = '患者版_android';
+                            break;
+                        case 'hcn.doctor':
+                            this.productCheckData.productType = '医生版';
+                            break;
+                        case 'hcn.doctor_ios':
+                            this.productCheckData.productType = '医生版_ios';
+                            break;
+                        case 'hcn.doctor_android':
+                            this.productCheckData.productType = '医生版_android';
+                            break;
+                        case 'hcn.admin':
+                            this.productCheckData.productType = '管理版';
+                            break;
+                        case 'hcn.admin_pc':
+                            this.productCheckData.productType = '管理版_pc';
+                            break;
+                        default:
+                            this.productCheckData.productType = '';
+                    }
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
+        // 产品列表 - 编辑产品类别
+        editProdType(val) {
+            console.log(val)
+        },
+        // 产品列表 - 编辑产品信息
+        editProductInfo() {
+            this.isProdReadOnly = false;
+            this.getFirstLevelProduct();
+            // this.productCheckData.productType = this.dictionary.productType;
+        },
+        // 产品列表 - 获取一级产品信息
+        getFirstLevelProduct() {
+            let params = [this.basicData.tenantId]; //租户编码
+
+            commonAjax('cas.tenantManageService', 'productFirstLevel', params).then(res => {
+                if (res.code == 200) {
+                    if (res.body.length != 0) { // 返回一级产品
+                        this.productFirstLevelData = res.body;
+                    } else {  // 没有返回一级产品
+                        this.isFstPrdEmpty = true;
+                    }
+                    this.dictionary.productType = [
+                        {
+                            "key": "patient",
+                            "text": "患者版",
+                            "leaf": true,
+                            "index": 0,
+                            "mcode": "hzb"
+                        },
+                        {
+                            "key": "doctor",
+                            "text": "医生版",
+                            "leaf": true,
+                            "index": 0,
+                            "mcode": "ysb"
+                        },
+                        {
+                            "key": "admin",
+                            "text": "管理版",
+                            "leaf": true,
+                            "index": 0,
+                            "mcode": "glb"
+                        }
+                    ];
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
+        // 产品列表 - 选择一级产品
+        choosePrtPrd() {
+            //  
+            if (this.addProdFormData.pCode) {
+                let myPcode = this.addProdFormData.pCode;
+                if (myPcode.indexOf('admin') != -1) {        // 管理
+                    this.dictionary.productType = [{
+                        "key": "admin_pc",
+                        "text": "管理版_pc",
+                        "leaf": true,
+                        "index": 0,
+                        "mcode": "glb_pc"
+                    }];
+                } else if (myPcode.indexOf('doctor') != -1) { // 医生
+                    this.dictionary.productType = [{
+                        "key": "doctor_ios",
+                        "text": "医生版_ios",
+                        "leaf": true,
+                        "index": 0,
+                        "mcode": "ysb_ios"
+                    }, {
+                        "key": "doctor_android",
+                        "text": "医生版_android",
+                        "leaf": true,
+                        "index": 0,
+                        "mcode": "ysb_android"
+                    }];
+                } else {                                        // 患者
+                    this.dictionary.productType = [{
+                        "key": "patient_ios",
+                        "text": "患者版_ios",
+                        "leaf": true,
+                        "index": 0,
+                        "mcode": "hzb_ios"
+                    }, {
+                        "key": "patient_android",
+                        "text": "患者版_android",
+                        "leaf": true,
+                        "index": 0,
+                        "mcode": "hzb_android"
+                    }];
+                }
+            }
+        },
+        // 产品列表 - 添加产品
+        addProduct() {
+            // 重置
+            this.addProdFormData.code = '';
+            this.addProdFormData.name = '';
+            this.addProdFormData.description = '';
+            this.addProdFormData.productType = '';
+            this.productFirstLevelData = [{ // 一级产品返回数据
+                code: "",
+                tenantId: "",
+                name: "",
+                pCode: "",
+                status: "",
+                createDt: "",
+                creater: ""
+            }],
+
+            this.dialogTitle = "添加租户产品";
+            this.addProdFormData.tenantName = this.basicData.tenantName;
+            this.prodDialogFormVisible = true;
+            this.getFirstLevelProduct();    //获取上级产品
+        },
+        // 产品列表 - 选择产品类型
+        setProductType(val) {
+            //  
+            console.log('选择产品类型')
+            var self = this;
+            $.each(self.dictionary.productType, function(index, ele) {
+                if (ele.key == val) {
+                    self.curProductType = ele.text;
+                }
+            });
+
+            // this.addProdFormData.productType = this.curProductType;
+            this.addProdFormData.code = this.basicData.tenantId + '.' + val;
+            this.addProdFormData.name = this.basicData.tenantName + '.' + this.curProductType;
+
+            // if (this.prodDialogFormVisible == false) {
+            //     this.addProdFormData.productType = '';
+            //     this.addProdFormData.code = '';
+            //     this.addProdFormData.name = '';
+            // }
+        },
+        // 产品列表 - 保存添加的产品
+        saveAddedProduct() {
+            //  ;
+            // delete this.addProdFormData.productType;
+            delete this.addProdFormData.tenantName;
+            this.addProdFormData.tenantId = this.basicData.tenantId;
+            if (this.isFstPrdEmpty) {
+                this.addProdFormData.pCode = -1;
+            }
+            let params = [this.addProdFormData];
+
+            commonAjax('cas.tenantManageService', 'productAdded', params).then(res => {
+                if (res.code == 200) {
+                    this.prodDialogFormVisible = false;
+                    this.getProdList();
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
+        // 产品列表 - 保存编辑后的产品信息
+        saveEditedProductInfo(index, row) {
+            delete this.productCheckData.productType;
+            delete this.productCheckData.createDt;
+            delete this.productCheckData.creater;
+            delete this.productCheckData.lastModify;
+            delete this.productCheckData.modifier;
+            // let params = [this.curProductCode, this.productCheckData];
+            let params = [this.productCheckData];
+
+            commonAjax('cas.tenantManageService', 'productUpdated', params).then(res => {
+                if (res.code == 200) {
+                    this.prodCheckDialogForm = false;
+                    this.getProdList();
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
+        // 产品列表 - 禁用启用
+        handleForbidden(index, row) {
+            if (row.status == 1) { // 禁用
+                const h = this.$createElement;
+
+                this.$msgbox({
+                    title: '确认禁用？',
+                    message: h('p', null, [
+                        h('span', null, ''),
+                        h('i', {
+                            style: 'color: teal'
+                        }, row.shortName)
+                    ]),
+                    showCancelButton: true,
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
+                                done();
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                }, 300);
+                            }, 1000);
+                        } else {
+                            done();
+                        }
+                    }
+                }).then(action => {
+                    if (action == 'cancel') {
+                        this.$message({
+                            type: 'info',
+                            message: "取消禁用"
+                        });
+                    } else {
+                        // 禁用服务
+                        commonAjax('cas.tenantManageService', 'productStatusUpdated', [{
+                            code: row.code,
+                            status: 0
+                        }]).then(res => {
+                            if (res.code == 200) {
+                                row.status = 0;
+                                this.$message({
+                                    type: 'success',
+                                    message: '禁用成功！'
+                                });
+                            } else {
+                                this.$message({
+                                    type: 'error',
+                                    message: res.msg
+                                })
+                            }
+                        })
+                    }
+                })
+            } else {
+                const h = this.$createElement;
+
+                this.$msgbox({
+                    title: '确认启用？',
+                    message: h('p', null, [
+                        h('span', null, ''),
+                        h('i', {
+                            style: 'color: teal'
+                        }, row.shortName)
+                    ]),
+                    showCancelButton: true,
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...',
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
                                     }, 300);
                                 }, 1000);
-                            } else {
-                                done();
-                            }
-                        }
-                    }).then(action => {
-                        if (action == 'cancel') {
-                            this.$message({
-                                type: 'info',
-                                message: "取消删除"
-                            });
                         } else {
-                            let params = [row.id];
-                            commonAjax("cas.tenantManageService", "tenantOrgDeleted", params).then(res => {
-                                if (res.code == 200) {
-                                    this.$message({
-                                        type: 'success',
-                                        message: "删除成功"
-                                    });
-                                    this.getOrgList();
-                                } else {
-                                    this.$message({
-                                        type: 'error',
-                                        message: res.msg
-                                    });
-                                }
-                            });
+                            done();
                         }
-                    })
-                },
-                // 机构添加 - 机构搜索（初始化列表视作搜索为空）
-                getHospitalList() {
-                    if (this.orgKeyword) {
-                        var params = [{
-                            'pageNo': this.addedOrgListPagination.pageNo,
-                            'pageSize': this.addedOrgListPagination.pageSize,
-                            'orgFullName': paramO.content
-                        }]
+                    }
+                }).then(action => {
+                    if (action === 'cancel') {
+                        this.$message({
+                            type: 'info',
+                            message: "取消启用"
+                        });
                     } else {
-                        var params = [{
-                            'pageNo': this.addedOrgListPagination.pageNo,
-                            'pageSize': this.addedOrgListPagination.pageSize
-                        }]
-                    }
-
-                    commonAjax('cas.tenantManageService', 'searchOrg', params).then(res => {
-                        if (res.code == 200) {
-                            $.each(res.body.data, function(index, el) {
-                                el.number = (index + 1) + (params[0].pageNo - 1) * (params[0].pageSize);
-                            });
-                            this.addedOrgTableData = res.body.data;
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            })
-                        }
-                    });
-                },
-                // 机构列表 - 添加医院
-                getAddedOrgList() {
-                    this.dialogTitle = "添加医院";
-                    this.navdialogFormVisible = true;
-
-                    if (this.addedOrgKeyword) {
-                        var params = [{
-                            orgFullName: this.addedOrgKeyword,
-                            pageNo: this.addedOrgListPagination.pageNo,
-                            pageSize: this.addedOrgListPagination.pageSize
-                        }];
-                    } else {
-                        var params = [{
-                            pageNo: this.addedOrgListPagination.pageNo,
-                            pageSize: this.addedOrgListPagination.pageSize
-                        }];
-                    }
-
-                    commonAjax('cas.tenantManageService', 'searchOrg', params).then(res => {
-                        if (res.code == 200) {
-                            $.each(res.body.data, function(index, el) {
-                                el.number = (index + 1) + (params[0].pageNo - 1) * (params[0].pageSize);
-                            });
-                            this.addedOrgTableData = res.body.data;
-                            this.addedOrgTableDataNum = res.body.total;
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            });
-                        }
-                    });
-                },
-                // 机构列表 - 获取上级医院列表
-                getParentOrgList() {
-                    if (this.addedParentOrgKeyword) {
-                        var params = [{
-                            orgName: this.addedParentOrgKeyword,
-                            tenantId: this.basicData.tenantId,
-                            pageNo: this.addedParentOrgListPagination.pageNo,
-                            pageSize: this.addedParentOrgListPagination.pageSize
-                        }];
-                    } else {
-                        var params = [{
-                            tenantId: this.basicData.tenantId,
-                            pageNo: this.addedParentOrgListPagination.pageNo,
-                            pageSize: this.addedParentOrgListPagination.pageSize
-                        }];
-                    }
-
-                    commonAjax('cas.tenantManageService', 'searchTenantOrg', params).then(res => {
-                        if (res.code == 200) {
-                            $.each(res.body.data, function(index, el) {
-                                el.number = (index + 1) + (params[0].pageNo - 1) * (params[0].pageSize);
-                            });
-                            this.addedParentOrgTableData = res.body.data;
-                            this.addedParentOrgTableDataNum = res.body.total;
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            });
-                        }
-                    });
-                },
-                // 机构列表 - 添加上级医院
-                getAddedParentOrgList(index, row) {
-                    this.dialogTitle = '添加上级机构';
-                    this.navdialogParentFormVisible = true;
-                    this.childOrgId = row.id;
-                    this.getParentOrgList();    
-                },
-                // 机构列表 - 删除上级医院
-                delParentOrg(index, row) {
-                    var params = [row.id];
-
-                    commonAjax('cas.tenantManageService', 'tenantOrgParentDeleted', params).then(res => {
-                        if (res.code == 200) {
-                            this.getOrgList();
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            });
-                        }
-                    });
-                },
-                // 机构列表 - 添加医院到机构列表
-                addHspt2OrgList(index, row) {
-                    let params = [{
-                        orderId: index,
-                        orgId: row.orgId,
-                        tenantId: this.basicData.tenantId
-                    }];
-
-                    commonAjax('cas.tenantManageService', 'tenantOrgAdded', params).then(res => {
-                        if (res.code == 200) {
-                            this.navdialogFormVisible = false; // 关闭模态框
-                            this.$message({
-                                type: 'success',
-                                message: '添加成功！'
-                            });
-                            this.getOrgList(); // 刷新机构列表
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            });
-                        }
-                    });
-                },
-                // 机构列表 - 添加'上级医院'到机构列表
-                addParentHspt2OrgList(index, row) {
-                    let params = [{
-                        id: this.childOrgId,
-                        orgPid: row.orgId
-                    }];
-
-                    commonAjax('cas.tenantManageService', 'tenantOrgParentUpdated', params).then(res => {
-                        if (res.code == 200) {
-                            this.navdialogParentFormVisible = false;
-                            this.$message({
-                                type: 'success',
-                                message: '添加成功！'
-                            });
-                            this.getOrgList();
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            });
-                        }
-                    });
-                },
-
-
-                /**
-                 *  产品信息 
-                 */
-                // 产品列表 - 获取产品列表
-                getProdList() {
-                    let params = [{
-                        tenantId: this.basicData.tenantId,
-                        pageNo: this.prodListPagination.pageNo,
-                        pageSize: this.prodListPagination.pageSize
-                    }];
-
-                    commonAjax("cas.tenantManageService", "productList", params).then(res => {
-                        if (res.code == 200) {
-                            $.each(res.body.data, function(index, el) {
-                                el.number = (index + 1) + (params[0].pageNo - 1) * (params[0].pageSize);
-                            });
-                            this.ProductTableData = res.body.data;
-                            this.ProductTableDataNum = res.body.total;
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            })
-                        }
-                    });
-                },
-                // 产品列表 - 单页条数
-                updateProdListPageSize(pageSize) {
-                    this.prodListPagination.pageSize = pageSize;
-                    this.getProdList();
-                },
-                // 产品列表 - 当前页码
-                updateProdListCurPage(curPage) {
-                    this.prodListPagination.pageNo = curPage;
-                    this.getProdList();
-                },
-                // 产品列表 - 查看产品
-                checkProduct(index, row) {
-                    this.dialogTitle = "查看租户产品",
-                    this.isProdReadOnly = true;
-                    this.prodCheckDialogForm = true;
-                    this.curProductCode = row.code;
-
-                    let params = [row.code];
-
-                    commonAjax('cas.tenantManageService', 'productDetail', params).then(res => {
-                        if (res.code == 200) {
-                            this.productCheckData = res.body;
-                            switch (res.body.code) {
-                                case 'hcn.patient':
-                                    this.productCheckData.productType = '患者版';
-                                    break;
-                                case 'hcn.patient_ios':
-                                    this.productCheckData.productType = '患者版_ios';
-                                    break;
-                                case 'hcn.patient_android':
-                                    this.productCheckData.productType = '患者版_android';
-                                    break;
-                                case 'hcn.doctor':
-                                    this.productCheckData.productType = '医生版';
-                                    break;
-                                case 'hcn.doctor_ios':
-                                    this.productCheckData.productType = '医生版_ios';
-                                    break;
-                                case 'hcn.doctor_android':
-                                    this.productCheckData.productType = '医生版_android';
-                                    break;
-                                case 'hcn.admin':
-                                    this.productCheckData.productType = '管理版';
-                                    break;
-                                case 'hcn.admin_pc':
-                                    this.productCheckData.productType = '管理版_pc';
-                                    break;
-                                default:
-                                    this.productCheckData.productType = '';
-                            }
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            });
-                        }
-                    });
-                },
-                // 产品列表 - 编辑产品类别
-                editProdType(val) {
-                    console.log(val)
-                },
-                // 产品列表 - 编辑产品信息
-                editProductInfo() {
-                    this.isProdReadOnly = false;
-                    this.getFirstLevelProduct();
-                    // this.productCheckData.productType = this.dictionary.productType;
-                },
-                // 产品列表 - 获取一级产品信息
-                getFirstLevelProduct() {
-                    let params = [this.basicData.tenantId]; //租户编码
-
-                    commonAjax('cas.tenantManageService', 'productFirstLevel', params).then(res => {
-                        if (res.code == 200) {
-                            if (res.body.length != 0) { // 返回一级产品
-                                this.productFirstLevelData = res.body;     
-                            } else {  // 没有返回
-                                this.isFstPrdEmpty = true;
-                                this.dictionary.productType = [
-                                    {
-                                      "key": "patient",
-                                      "text": "患者版",
-                                      "leaf": true,
-                                      "index": 0,
-                                      "mcode": "hzb"
-                                    },
-                                    {
-                                      "key": "doctor",
-                                      "text": "医生版",
-                                      "leaf": true,
-                                      "index": 0,
-                                      "mcode": "ysb"
-                                    },
-                                    {
-                                      "key": "admin",
-                                      "text": "管理版",
-                                      "leaf": true,
-                                      "index": 0,
-                                      "mcode": "glb"
-                                    }
-                                ];
-                            }
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            });
-                        }
-                    });
-                },
-                // 产品列表 - 选择一级产品
-                choosePrtPrd() {
-                    let myPcode = this.addProdFormData.pCode;
-                    if ( myPcode.indexOf('admin') != -1 ) {        // 管理
-                        this.dictionary.productType = [{
-                            "key": "admin_pc",
-                            "text": "管理版_pc",
-                            "leaf": true,
-                            "index": 0,
-                            "mcode": "glb_pc"
-                        }];
-                    } else if ( myPcode.indexOf('doctor') != -1 ) { // 医生
-                        this.dictionary.productType = [{
-                            "key": "doctor_ios",
-                            "text": "医生版_ios",
-                            "leaf": true,
-                            "index": 0,
-                            "mcode": "ysb_ios"
-                        }, {
-                              "key": "doctor_android",
-                              "text": "医生版_android",
-                              "leaf": true,
-                              "index": 0,
-                              "mcode": "ysb_android"
-                        }];
-                    } else {                                        // 患者
-                        this.dictionary.productType = [{
-                            "key": "patient_ios",
-                            "text": "患者版_ios",
-                            "leaf": true,
-                            "index": 0,
-                            "mcode": "hzb_ios"
-                        }, {
-                              "key": "patient_android",
-                              "text": "患者版_android",
-                              "leaf": true,
-                              "index": 0,
-                              "mcode": "hzb_android"
-                        }];
-                    }
-                },
-                // 产品列表 - 添加产品
-                addProduct() {
-                    this.addProdFormData.productType = '';
-                    this.addProdFormData.code = '';
-                    this.addProdFormData.name = '';
-                    this.addProdFormData.description = '';
-
-                    this.dialogTitle = "添加租户产品";
-                    this.addProdFormData.tenantName = this.basicData.tenantName;
-                    this.prodDialogFormVisible = true;
-                    this.getFirstLevelProduct();
-                },
-                // 产品列表 - 选择产品类型
-                setProductType(val) {
-                    var self = this;
-                    $.each(self.dictionary.productType, function(index, ele) {
-                        if (ele.key == val) {
-                            self.curProductType = ele.text;
-                        }
-                    });
-
-                    this.addProdFormData.productType = this.curProductType;
-                    this.addProdFormData.code = this.basicData.tenantId + '.' + val;
-                    this.addProdFormData.name = this.basicData.tenantName + '.' + this.curProductType;
-
-                    if (this.prodDialogFormVisible == false) {
-                        this.addProdFormData.productType = '';
-                        this.addProdFormData.code = '';
-                        this.addProdFormData.name = '';
-                    }
-                },
-                // 产品列表 - 保存添加的产品
-                saveAddedProduct() {
-                    delete this.addProdFormData.productType;
-                    delete this.addProdFormData.tenantName;
-                    this.addProdFormData.tenantId = this.basicData.tenantId;
-                    let params = [this.addProdFormData];
-
-                    commonAjax('cas.tenantManageService', 'productAdded', params).then(res => {
-                        if (res.code == 200) {
-                            this.prodDialogFormVisible = false;
-                            this.getProdList();
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            });
-                        }
-                    });
-                },
-                // 产品列表 - 保存编辑后的产品信息
-                saveEditedProductInfo(index, row) {
-                    delete this.productCheckData.productType;
-                    delete this.productCheckData.createDt;
-                    delete this.productCheckData.creater;
-                    delete this.productCheckData.lastModify;
-                    delete this.productCheckData.modifier;
-                    // let params = [this.curProductCode, this.productCheckData];
-                    let params = [this.productCheckData];
-
-                    commonAjax('cas.tenantManageService', 'productUpdated', params).then(res => {
-                        if (res.code == 200) {
-                            this.prodCheckDialogForm = false;
-                            this.getProdList();
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            });
-                        }
-                    });
-                },
-                // 产品列表 - 禁用启用
-                handleForbidden(index, row) {
-                    if (row.status == 1) { // 禁用
-                        const h = this.$createElement;
-
-                        this.$msgbox({
-                            title: '确认禁用？',
-                            message: h('p', null, [
-                                h('span', null, ''),
-                                h('i', {
-                                    style: 'color: teal'
-                                }, row.shortName)
-                            ]),
-                            showCancelButton: true,
-                            confirmButtonText: '确定',
-                            cancelButtonText: '取消',
-                            beforeClose: (action, instance, done) => {
-                                if (action === 'confirm') {
-                                    instance.confirmButtonLoading = true;
-                                    instance.confirmButtonText = '执行中...';
-                                    setTimeout(() => {
-                                        done();
-                                        setTimeout(() => {
-                                            instance.confirmButtonLoading = false;
-                                        }, 300);
-                                    }, 1000);
-                                } else {
-                                    done();
-                                }
-                            }
-                        }).then(action => {
-                            if (action == 'cancel') {
+                        // 启用服务
+                        commonAjax('cas.tenantManageService', 'productStatusUpdated', [{
+                            code: row.code,
+                            status: 1
+                        }]).then(res => {
+                            if (res.code == 200) {
+                                row.status = 1;
                                 this.$message({
-                                    type: 'info',
-                                    message: "取消禁用"
+                                    type: 'success',
+                                    message: '启用成功！'
                                 });
                             } else {
-                                // 禁用服务
-                                commonAjax('cas.tenantManageService', 'productStatusUpdated', [{
-                                    code: row.code,
-                                    status: 0
-                                }]).then(res => {
-                                    if (res.code == 200) {
-                                        row.status = 0;
-                                        this.$message({
-                                            type: 'success',
-                                            message: '禁用成功！'
-                                        });
-                                    } else {
-                                        this.$message({
-                                            type: 'error',
-                                            message: res.msg
-                                        })
-                                    }
+                                this.$message({
+                                    type: 'error',
+                                    message: res.msg
                                 })
                             }
                         })
-                    } else {
-                        const h = this.$createElement;
+                    }
+                });
+            }
+        },
+        // 点击生成二维码
+        showqrcode(index, row) {
+            this.qrcodeVisible = true;
+            this.qrcodetit = row.orgFullName;
+            let temobj = {
+                type: "1", //二维码类型，必传
+                tenantId: this.$route.params.id, //租户ID，必传
+                orgId: row.orgId, //机构ID，必传
+                t: new Date().getTime() //时间戳，必传
+            };
+            temobj = JSON.stringify(temobj);
+            let b = new Base64();
+            this.qrcodevalue = "https://app.bshcn.com.cn/download/apk/appdowmload.html?data=" + b.encode(temobj);
+            let str = b.decode(b.encode(temobj));//解码
+        },
 
-                        this.$msgbox({
-                            title: '确认启用？',
-                            message: h('p', null, [
-                                h('span', null, ''),
-                                h('i', {
-                                    style: 'color: teal'
-                                }, row.shortName)
-                            ]),
-                            showCancelButton: true,
-                            confirmButtonText: '确定',
-                            cancelButtonText: '取消',
-                            beforeClose: (action, instance, done) => {
-                                if (action === 'confirm') {
-                                    instance.confirmButtonLoading = true;
-                                    instance.confirmButtonText = '执行中...',
-                                        setTimeout(() => {
-                                            done();
-                                            setTimeout(() => {
-                                                instance.confirmButtonLoading = false;
-                                            }, 300);
-                                        }, 1000);
-                                } else {
-                                    done();
-                                }
-                            }
-                        }).then(action => {
-                            if (action === 'cancel') {
-                                this.$message({
-                                    type: 'info',
-                                    message: "取消启用"
-                                });
-                            } else {
-                                // 启用服务
-                                commonAjax('cas.tenantManageService', 'productStatusUpdated', [{
-                                    code: row.code,
-                                    status: 1
-                                }]).then(res => {
-                                    if (res.code == 200) {
-                                        row.status = 1;
-                                        this.$message({
-                                            type: 'success',
-                                            message: '启用成功！'
-                                        });
-                                    } else {
-                                        this.$message({
-                                            type: 'error',
-                                            message: res.msg
-                                        })
-                                    }
-                                })
-                            }
+
+        /**
+         *  服务信息 
+         */
+        // 服务列表 - 获取服务列表
+        getServList() {
+            let params = [{
+                tenantId: this.basicData.tenantId,
+                pageNo: this.servListPagination.pageNo,
+                pageSize: this.servListPagination.pageSize
+            }]
+
+            commonAjax("cas.tenantManageService", "tenantServiceList", params).then(res => {
+                if (res.code == 200) {
+                    this.ServiceTableData = res.body.data;
+                    this.ServiceTableDataNum = res.body.total;
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    })
+                }
+            })
+        },
+        // 服务列表 - 单页条数
+        updateServListPageSize(pageSize) {
+            this.servListPagination.pageSize = pageSize;
+            this.getServList();
+        },
+        // 服务列表 - 当前页码
+        updateServListCurPage(curPage) {
+            this.servListPagination.pageNo = curPage;
+            this.getServList();
+        },
+        // 服务列表 - 编辑查看的服务信息
+        editService() {
+            this.isServReadOnly = false;
+        },
+        // 服务列表 - 保存编辑过的服务信息
+        saveEditedService() {
+            let params = [this.ServiceDetailTableData];
+
+            commonAjax('cas.tenantManageService', 'tenantServicUpdated', params).then(res => {
+                if (res.code == 200) {
+                    this.servCheckDialogForm = false;
+                    this.getServList();
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
+        // 服务列表 - 添加扩展属性
+        addExtendField() {
+            this.dialogTitle = '添加租户服务扩展属性';
+            this.serextformdata.exPropertyCode = '';
+            this.serextformdata.exPropertyType = '';
+            this.serextformdata.exPropertyData = '';
+            this.serextformdata.effectiveFlag = '';
+            this.isEditStatus = false;
+            this.addSerExtDialogFormVisible = true; // 显示添加扩展属性模态框
+        },
+        // 服务列表 - 编辑扩展属性
+        editServExtFld(index, row) {
+            this.dialogTitle = '添加租户服务扩展属性';
+            this.addSerExtDialogFormVisible = true;
+            this.isEditStatus = true;
+            this.isEditStatusMark = false;
+
+            // this.serextformdata = this.exServiceTableData[index];
+            this.serextformdata.id = this.exServiceTableData[index].id;
+            this.serextformdata.exPropertyCode = this.exServiceTableData[index].exPropertyCode;
+            this.serextformdata.exPropertyType = this.exServiceTableData[index].exPropertyType;
+            this.serextformdata.exPropertyData = this.exServiceTableData[index].exPropertyData;
+            this.serextformdata.effectiveFlag = this.exServiceTableData[index].effectiveFlag;
+        },
+        // 服务列表 - 扩展属性 - 我要编辑 
+        goEditServExtFld() {
+            this.isEditStatusMark = true;
+        },
+        // 服务列表 - 服务新增和编辑时候选择服务项目时候的联动
+        mayclick(item, event) {
+            if (item == undefined && event == undefined) {
+                this.serformdata.serviceDesc = "";
+                this.serformdata.serviceCode = "";
+                this.serformdata.serviceId = "";
+                this.serformdata.serviceName = "";
+            } else {
+                this.serformdata.serviceDesc = item.serviceDesc;
+                this.serformdata.serviceCode = item.serviceCode;
+                this.serformdata.serviceId = item.serviceId;
+                this.serformdata.serviceName = item.serviceName;
+
+            }
+            $(".yishenglist").hide();
+        },
+        // 服务列表 - 点击添加服务
+        addService() {
+            this.dialogTitle = '新增租户服务';
+            this.servAddDialogFormVisible = true;
+        },
+        // 服务列表 - 添加服务 - 服务项目选择
+        chooseServItem(val) {
+            //  
+            if (this.servAddDialogFormVisible == false) {
+                return;
+            }
+
+            let params = [val];
+
+            commonAjax('cas.tenantManageService', 'getAvailableServiceByCode', params).then(res => {
+                if (res.code == 200) {
+                    // this.servAddedDialogData.serviceId = res.body.serviceId;
+                    this.servAddedDialogData.serviceCode = res.body.serviceCode;
+                    this.servAddedDialogData.serviceDesc = res.body.serviceDesc;
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
+        // 服务列表 - 保存新增租户服务
+        saveAddedService(formName) {
+            // var self = this;
+            // $.each(self.dictionary.svrItemType, function(index, ele) {
+            //     if (ele.key == self.servAddedDialogData.objectId) {
+            //         self.servAddedDialogData.objectType = ele.text;
+            //     }
+            // });
+
+            delete this.servAddedDialogData.serviceX;
+            delete this.servAddedDialogData.serviceCode;
+            delete this.servAddedDialogData.serviceDesc;
+            this.servAddedDialogData.objectId = this.basicData.tenantId;
+            this.servAddedDialogData.tenantId = this.basicData.tenantId;
+            let params = [this.servAddedDialogData];
+
+            commonAjax('cas.tenantManageService', 'tenantServicAdded', params).then(res => {
+                if (res.code == 200) {
+                    this.servAddDialogFormVisible = false;
+                    this.getServList();
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
+        // 服务列表开始
+        sergetTableData() {
+            if (this.orgOption.orgId) {
+                // var tenantId = sessionStorage.getItem('tenantId');
+                var tenantId = this.basicData.tenantId;
+                let params = `["${tenantId}","${this.orgOption.orgId}"]`;
+                commonAjax("cas.serviceOpenService", "queryOrgService", params).then(res => {
+                    if (res.code == 200) {
+                        this.sertableData = res.body;
+                    } else {
+                        this.$message({
+                            type: 'error',
+                            message: res.msg
                         });
                     }
-                },
-                // 点击生成二维码
-                showqrcode(index, row) {
-                    this.qrcodeVisible = true;
-                    this.qrcodetit = row.orgFullName;
-                    let temobj = {
-                        type: "1", //二维码类型，必传
-                        tenantId: this.$route.params.id, //租户ID，必传
-                        orgId:row.orgId, //机构ID，必传
-                        t: new Date().getTime() //时间戳，必传
-                    };
-                    temobj = JSON.stringify(temobj);
-                    let b = new Base64();
-                    this.qrcodevalue = "https://app.bshcn.com.cn/download/apk/appdowmload.html?data=" + b.encode(temobj);
-                    let str = b.decode(b.encode(temobj));//解码
-                    // alert(str);
-                },
-
-
-                /**
-                 *  服务信息 
-                 */
-                // 服务列表 - 获取服务列表
-                getServList() {
-                    let params = [{
-                        tenantId: this.basicData.tenantId,
-                        pageNo: this.servListPagination.pageNo,
-                        pageSize: this.servListPagination.pageSize
-                    }]
-
-                    commonAjax("cas.tenantManageService", "tenantServiceList", params).then(res => {
-                        if (res.code == 200) {
-                            this.ServiceTableData = res.body.data;
-                            this.ServiceTableDataNum = res.body.total;
+                });
+            }
+        },
+        // 服务列表 - 关闭和启用
+        servListSwitch(index, row) {
+            if (row.effectiveFlag == 1) { // 关闭
+                const h = this.$createElement;
+                this.$msgbox({
+                    title: '确认关闭？',
+                    message: h('p', null, [
+                        h('span', null, ''),
+                        h('i', {
+                            style: 'color: teal'
+                        }, '')
+                    ]),
+                    showCancelButton: true,
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
+                                done();
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                }, 300);
+                            }, 1000);
                         } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            })
+                            done();
                         }
-                    })
-                },
-                // 服务列表 - 单页条数
-                updateServListPageSize(pageSize) {
-                    this.servListPagination.pageSize = pageSize;
-                    this.getServList();
-                },
-                // 服务列表 - 当前页码
-                updateServListCurPage(curPage) {
-                    this.servListPagination.pageNo = curPage;
-                    this.getServList();
-                },
-                // 服务列表 - 编辑查看的服务信息
-                editService() {
-                    this.isServReadOnly = false;
-                },
-                // 服务列表 - 保存编辑过的服务信息
-                saveEditedService() {
-                    let params = [this.ServiceDetailTableData];
-
-                    commonAjax('cas.tenantManageService', 'tenantServicUpdated', params).then(res => {
-                        if (res.code == 200) {
-                            this.servCheckDialogForm = false;
-                            this.getServList();
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            });
-                        }
-                    });
-                },
-                // 服务列表 - 添加扩展属性
-                addExtendField() {
-                    this.dialogTitle = '添加租户服务扩展属性';
-                    this.serextformdata.exPropertyCode = '';
-                    this.serextformdata.exPropertyType = '';
-                    this.serextformdata.exPropertyData = '';
-                    this.serextformdata.effectiveFlag = '';
-                    this.isEditStatus = true;
-                    this.addSerExtDialogFormVisible = true; // 显示添加扩展属性模态框
-                },
-                // 服务列表 - 编辑扩展属性
-                editServExtFld(index, row) {
-                    this.dialogTitle = '添加租户服务扩展属性';
-                    this.addSerExtDialogFormVisible = true;
-                    this.isEditStatus = false;
-
-                    // this.serextformdata = this.exServiceTableData[index];
-                    this.serextformdata.id = this.exServiceTableData[index].id;
-                    this.serextformdata.exPropertyCode = this.exServiceTableData[index].exPropertyCode;
-                    this.serextformdata.exPropertyType = this.exServiceTableData[index].exPropertyType;
-                    this.serextformdata.exPropertyData = this.exServiceTableData[index].exPropertyData;
-                    this.serextformdata.effectiveFlag = this.exServiceTableData[index].effectiveFlag;
-                },
-                // 服务列表 - 扩展属性 - 我要编辑 
-                goEditServExtFld() {
-                    this.isEditStatus = true;
-                },
-                // 服务列表 - 服务新增和编辑时候选择服务项目时候的联动
-                mayclick(item, event) {
-                    if (item == undefined && event == undefined) {
-                        this.serformdata.serviceDesc = "";
-                        this.serformdata.serviceCode = "";
-                        this.serformdata.serviceId = "";
-                        this.serformdata.serviceName = "";
+                    }
+                }).then(action => {
+                    if (action == 'cancel') {
+                        this.$message({
+                            type: 'info',
+                            message: "取消关闭"
+                        });
                     } else {
-                        this.serformdata.serviceDesc = item.serviceDesc;
-                        this.serformdata.serviceCode = item.serviceCode;
-                        this.serformdata.serviceId = item.serviceId;
-                        this.serformdata.serviceName = item.serviceName;
-
-                    }
-                    $(".yishenglist").hide();
-                },
-                // 服务列表 - 点击添加服务
-                addService() {
-                    this.dialogTitle = '新增租户服务';
-                    this.servAddDialogFormVisible = true;
-                },
-                // 服务列表 - 添加服务 - 服务项目选择
-                chooseServItem(val) {
-                    debugger
-                    if (this.servAddDialogFormVisible == false) {
-                        return;
-                    }
-
-                    let params = [val];
-
-                    commonAjax('cas.tenantManageService', 'getAvailableServiceByCode', params).then(res => {
-                        if (res.code == 200) {
-                            // this.servAddedDialogData.serviceId = res.body.serviceId;
-                            this.servAddedDialogData.serviceCode = res.body.serviceCode;
-                            this.servAddedDialogData.serviceDesc = res.body.serviceDesc;
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            });
-                        }
-                    });
-                },
-                // 服务列表 - 保存新增租户服务
-                saveAddedService(formName) {
-                    // var self = this;
-                    // $.each(self.dictionary.svrItemType, function(index, ele) {
-                    //     if (ele.key == self.servAddedDialogData.objectId) {
-                    //         self.servAddedDialogData.objectType = ele.text;
-                    //     }
-                    // });
-
-                    delete this.servAddedDialogData.serviceX;
-                    delete this.servAddedDialogData.serviceCode;
-                    delete this.servAddedDialogData.serviceDesc;
-                    this.servAddedDialogData.objectId = this.basicData.tenantId;
-                    this.servAddedDialogData.tenantId = this.basicData.tenantId;
-                    let params = [this.servAddedDialogData];
-
-                    commonAjax('cas.tenantManageService', 'tenantServicAdded', params).then(res => {
-                        if (res.code == 200) {
-                            this.servAddDialogFormVisible = false;
-                            this.getServList();
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            });
-                        }
-                    });
-                },
-                // 服务列表开始
-                sergetTableData() {
-                    if (this.orgOption.orgId) {
-                        // var tenantId = sessionStorage.getItem('tenantId');
-                        var tenantId = this.basicData.tenantId;
-                        let params = `["${tenantId}","${this.orgOption.orgId}"]`;
-                        commonAjax("cas.serviceOpenService", "queryOrgService", params).then(res => {
+                        // let params = `[${row.id},'${row.effectiveFlag == 0 ? 1 : 0}']`
+                        let params = [{
+                            effectiveFlag: 0,
+                            id: row.id,
+                            tenantId: this.basicData.tenantId
+                        }];
+                        row.effectiveFlag = 0
+                        commonAjax("cas.tenantManageService", "tenantServicStatusUpdated", params).then(res => {
                             if (res.code == 200) {
-                                this.sertableData = res.body;
+                                this.$message({
+                                    type: 'success',
+                                    message: "关闭成功"
+                                });
+                                this.sergetTableData();
                             } else {
                                 this.$message({
                                     type: 'error',
@@ -1764,337 +1850,278 @@ export default {
                             }
                         });
                     }
-                },
-                // 服务列表 - 关闭和启用
-                servListSwitch(index, row) {
-                    if (row.effectiveFlag == 1) { // 关闭
-                        const h = this.$createElement;
-                        this.$msgbox({
-                            title: '确认关闭？',
-                            message: h('p', null, [
-                                h('span', null, ''),
-                                h('i', {
-                                    style: 'color: teal'
-                                }, '')
-                            ]),
-                            showCancelButton: true,
-                            confirmButtonText: '确定',
-                            cancelButtonText: '取消',
-                            beforeClose: (action, instance, done) => {
-                                if (action === 'confirm') {
-                                    instance.confirmButtonLoading = true;
-                                    instance.confirmButtonText = '执行中...';
-                                    setTimeout(() => {
-                                        done();
-                                        setTimeout(() => {
-                                            instance.confirmButtonLoading = false;
-                                        }, 300);
-                                    }, 1000);
-                                } else {
-                                    done();
-                                }
-                            }
-                        }).then(action => {
-                            if (action == 'cancel') {
-                                this.$message({
-                                    type: 'info',
-                                    message: "取消关闭"
-                                });
-                            } else {
-                                // let params = `[${row.id},'${row.effectiveFlag == 0 ? 1 : 0}']`
-                                let params = [{
-                                    effectiveFlag: 0,
-                                    id: row.id,
-                                    tenantId: this.basicData.tenantId
-                                }];
-                                row.effectiveFlag = 0
-                                commonAjax("cas.tenantManageService", "tenantServicStatusUpdated", params).then(res => {
-                                    if (res.code == 200) {
-                                        this.$message({
-                                            type: 'success',
-                                            message: "关闭成功"
-                                        });
-                                        this.sergetTableData();
-                                    } else {
-                                        this.$message({
-                                            type: 'error',
-                                            message: res.msg
-                                        });
-                                    }
-                                });
-                            }
-                        })
-                    } else { // 启用
-                        const h = this.$createElement;
-                        this.$msgbox({
-                            title: '确认启用？',
-                            message: h('p', null, [
-                                h('span', null, ''),
-                                h('i', {
-                                    style: 'color: teal'
-                                }, '')
-                            ]),
-                            showCancelButton: true,
-                            confirmButtonText: '确定',
-                            cancelButtonText: '取消',
-                            beforeClose: (action, instance, done) => {
-                                if (action === 'confirm') {
-                                    instance.confirmButtonLoading = true;
-                                    instance.confirmButtonText = '执行中...';
-                                    setTimeout(() => {
-                                        done();
-                                        setTimeout(() => {
-                                            instance.confirmButtonLoading = false;
-                                        }, 300);
-                                    }, 1000);
-                                } else {
-                                    done();
-                                }
-                            }
-                        }).then(action => {
-                            if (action == 'cancel') {
-                                this.$message({
-                                    type: 'info',
-                                    message: "取消启用"
-                                });
-                            } else {
-                                // let params = `[${row.id},'${row.effectiveFlag == 0 ? 1 : 0}']`
-                                let params = [{
-                                    effectiveFlag: 1,
-                                    id: row.id,
-                                    tenantId: this.basicData.tenantId
-                                }];
-                                row.effectiveFlag = 1
-                                commonAjax("cas.tenantManageService", "tenantServicStatusUpdated", params).then(res => {
-                                    if (res.code == 200) {
-                                        this.$message({
-                                            type: 'success',
-                                            message: "启用成功"
-                                        });
-                                    } else {
-                                        this.$message({
-                                            type: 'error',
-                                            message: res.msg
-                                        });
-                                    }
-                                });
-                            }
-                        })
-                    }
-                },
-                // 服务列表 - 新增扩展属性 - 保存
-                saveServExtFld(formName) {
-                    this.$refs[formName].validate((valid) => {
-                        if (valid) {
-                            var self = this;
-                            if (!this.isEditStatus) {
-                                commonAjax("cas.tenantManageService", "servicePropertyAdded", '[' + JSON.stringify(self.serextformdata) + ']').then(res => {
-                                    if (res.code == 200) {
-                                        self.$message({
-                                            type: 'success',
-                                            message: "保存成功"
-                                        });
-                                        self.addSerExtDialogFormVisible = false; //关闭模态框
-                                        self.getServListExtendFld(this.curOpenServiceId); //继续查询扩展属性
-                                    } else {
-                                        self.$message({
-                                            type: 'error',
-                                            message: res.msg
-                                        });
-                                    }
-                                });
-                            } else {
-                                commonAjax("cas.tenantManageService", "servicePropertyUpdated", '[' + JSON.stringify(self.serextformdata) + ']').then(res => {
-                                    if (res.code == 200) {
-                                        self.$message({
-                                            type: 'success',
-                                            message: "保存成功"
-                                        });
-                                        self.addSerExtDialogFormVisible = false;          //关闭模态框
-                                        self.getServListExtendFld(this.curOpenServiceId); //继续查询扩展属性
-                                    } else {
-                                        self.$message({
-                                            type: 'error',
-                                            message: res.msg
-                                        });
-                                    }
-                                });
-                            }
-                        } else {
-                            return false;
-                        }
-                    });
-                },
-                sersubmitForm(formName) {
-                    this.$refs[formName].validate((valid) => {
-                        if (valid) {
-                            commonAjax("cas.serviceOpenService", "addOrUpdateServiceOpen", '[' + JSON.stringify(this.serformdata) + ']', ).then(res => {
-                                if (res.code == 200) {
-                                    this.$message({
-                                        type: 'success',
-                                        message: "保存成功"
-                                    });
-                                    this.sergetTableData();
-                                    this.serdialogFormVisible = false;
-                                } else {
-                                    this.$message({
-                                        type: 'error',
-                                        message: res.msg
-                                    });
-                                }
-                            });
-                            // alert('submit!');
-                        } else {
-                            return false;
-                        }
-                    });
-                },
-                // 服务列表 - 请求服务包列表
-                getServicePacklist() {
-                    commonAjax("cas.serviceService", "queryServices", '[]', ).then(res => {
-                        if (res.code == 200) {
-                            this.servicePacklist = res.body;
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            });
-                        }
-                    });
-                },
-                // 服务列表 - 查看服務詳情
-                servListCheck(index, row) {
-                    this.dialogTitle = '查看租户服务';
-                    this.isServReadOnly = true;
-                    this.servCheckDialogForm = true;
-
-                    let params = [row.id];
-
-                    commonAjax('cas.tenantManageService', 'tenantServiceDetail', params).then(res => {
-                        if (res.code == 200) {
-                            this.ServiceDetailTableData = res.body;
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            });
-                        }
-                    });
-                },
-                // 点击服务列表的扩展属性
-                getServListExtendFld(row) {
-                    this.isShowTabList = false;
-                    this.isShowServExtend = true;
-
-                    if (row.id || row) { // 从服务列表过来
-                        if (row.id) {
-                            var params = [row.id]; // openserviceId
-                            this.serextformdata.openserviceId = row.id;
-                            this.curOpenServiceId = row.id; // 赋值给当前openServiceId
-                        } else {
-                            var params = [row]; //直接把row当作openserviceid
-                            this.curOpenServiceId = row;
-                        }
-                    } else { // 保存了新的扩展属性
-                        params = [this.curOpenServiceId];
-                    }
-
-                    commonAjax('cas.tenantManageService', 'servicePropertyList', params).then(res => {
-                        if (res.code == 200) {
-                            this.exServiceTableData = res.body;
-                            this.exServiceTableDataNum = res.body.length;
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.msg
-                            });
-                        }
-                    });
-                },
-                // 删除服务扩展属性方法
-                delServExtFld(index, row) {
-                    const h = this.$createElement;
-                    this.$msgbox({
-                        title: '确认删除',
-                        message: h('p', null, [
-                            h('span', null, '是否删除 '),
-                            h('i', {
-                                style: 'color: teal'
-                            }, row.exPropertyData)
-                        ]),
-                        showCancelButton: true,
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        beforeClose: (action, instance, done) => {
-                            if (action === 'confirm') {
-                                instance.confirmButtonLoading = true;
-                                instance.confirmButtonText = '执行中...';
-                                setTimeout(() => {
-                                    done();
-                                    setTimeout(() => {
-                                        instance.confirmButtonLoading = false;
-                                    }, 300);
-                                }, 1000);
-                            } else {
+                })
+            } else { // 启用
+                const h = this.$createElement;
+                this.$msgbox({
+                    title: '确认启用？',
+                    message: h('p', null, [
+                        h('span', null, ''),
+                        h('i', {
+                            style: 'color: teal'
+                        }, '')
+                    ]),
+                    showCancelButton: true,
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
                                 done();
-                            }
-                        }
-                    }).then(action => {
-                        if (action == 'cancel') {
-                            this.$message({
-                                type: 'info',
-                                message: "取消删除"
-                            });
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                }, 300);
+                            }, 1000);
                         } else {
-                            let params = [row.id];
-                            commonAjax("cas.tenantManageService", "servicePropertyDeleted", params).then(res => {
-                                if (res.code == 200) {
-                                    this.$message({
-                                        type: 'success',
-                                        message: "删除成功"
-                                    });
-                                    this.getServListExtendFld(this.curopenserviceId);
-                                } else {
-                                    this.$message({
-                                        type: 'error',
-                                        message: res.msg
-                                    });
-                                }
+                            done();
+                        }
+                    }
+                }).then(action => {
+                    if (action == 'cancel') {
+                        this.$message({
+                            type: 'info',
+                            message: "取消启用"
+                        });
+                    } else {
+                        // let params = `[${row.id},'${row.effectiveFlag == 0 ? 1 : 0}']`
+                        let params = [{
+                            effectiveFlag: 1,
+                            id: row.id,
+                            tenantId: this.basicData.tenantId
+                        }];
+                        row.effectiveFlag = 1
+                        commonAjax("cas.tenantManageService", "tenantServicStatusUpdated", params).then(res => {
+                            if (res.code == 200) {
+                                this.$message({
+                                    type: 'success',
+                                    message: "启用成功"
+                                });
+                            } else {
+                                this.$message({
+                                    type: 'error',
+                                    message: res.msg
+                                });
+                            }
+                        });
+                    }
+                })
+            }
+        },
+        // 服务列表 - 新增扩展属性 - 保存
+        saveServExtFld(formName) {
+            //  
+            this.$refs[formName].validate((valid) => {
+                if (valid) {
+                    var self = this;
+                    if (!this.isEditStatus) { //添加
+                        commonAjax("cas.tenantManageService", "servicePropertyAdded", '[' + JSON.stringify(self.serextformdata) + ']').then(res => {
+                            if (res.code == 200) {
+                                self.$message({
+                                    type: 'success',
+                                    message: "保存成功"
+                                });
+                                self.addSerExtDialogFormVisible = false; //关闭模态框
+                                self.getServListExtendFld(this.curOpenServiceId); //继续查询扩展属性
+                            } else {
+                                self.$message({
+                                    type: 'error',
+                                    message: res.msg
+                                });
+                            }
+                        });
+                    } else { //编辑
+                        commonAjax("cas.tenantManageService", "servicePropertyUpdated", '[' + JSON.stringify(self.serextformdata) + ']').then(res => {
+                            if (res.code == 200) {
+                                self.$message({
+                                    type: 'success',
+                                    message: "保存成功"
+                                });
+                                self.addSerExtDialogFormVisible = false;          //关闭模态框
+                                self.getServListExtendFld(this.curOpenServiceId); //继续查询扩展属性
+                            } else {
+                                self.$message({
+                                    type: 'error',
+                                    message: res.msg
+                                });
+                            }
+                        });
+                    }
+                } else {
+                    return false;
+                }
+            });
+        },
+        sersubmitForm(formName) {
+            this.$refs[formName].validate((valid) => {
+                if (valid) {
+                    commonAjax("cas.serviceOpenService", "addOrUpdateServiceOpen", '[' + JSON.stringify(this.serformdata) + ']', ).then(res => {
+                        if (res.code == 200) {
+                            this.$message({
+                                type: 'success',
+                                message: "保存成功"
+                            });
+                            this.sergetTableData();
+                            this.serdialogFormVisible = false;
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: res.msg
                             });
                         }
-
-                    })
-                },
-
-                // 初始化
-                init() {
-                    this.isShowTabList = true;
-                    this.isShowServExtend = false;
-                    this.dictionaryRequest();
-                    this.checkPrevBtn();
-                },
-
-                //传递数据都地区组件
-                postdefaultarea() {
-                    // this.defaultarea = {
-                    //     province: this.orgOption.province,
-                    //     city: this.orgOption.city,
-                    //     district: this.orgOption.district,
-                    //     street: this.orgOption.street,
-                    // };
-                },
+                    });
+                } else {
+                    return false;
+                }
+            });
         },
-         components: {
-            vueQrcodeComponent
+        // 服务列表 - 请求服务包列表
+        getServicePacklist() {
+            commonAjax("cas.serviceService", "queryServices", '[]', ).then(res => {
+                if (res.code == 200) {
+                    this.servicePacklist = res.body;
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
         },
-        beforeRouteEnter(to, from, next) {
-            next(vm => {
-                vm.postdefaultarea();
-                vm.OrgTableData = [];
-                vm.ProductTableData = [];
-                vm.ServiceTableData = [];
+        // 服务列表 - 查看服務詳情
+        servListCheck(index, row) {
+            this.dialogTitle = '查看租户服务';
+            this.isServReadOnly = true;
+            this.servCheckDialogForm = true;
+
+            let params = [row.id];
+
+            commonAjax('cas.tenantManageService', 'tenantServiceDetail', params).then(res => {
+                if (res.code == 200) {
+                    this.ServiceDetailTableData = res.body;
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
+        // 点击服务列表的扩展属性
+        getServListExtendFld(row) {
+            this.isShowTabList = false;
+            this.isShowServExtend = true;
+
+            if (row.id || row) { // 从服务列表过来
+                if (row.id) {
+                    var params = [row.id]; // openserviceId
+                    this.serextformdata.openserviceId = row.id;
+                    this.curOpenServiceId = row.id; // 赋值给当前openServiceId
+                } else {
+                    var params = [row]; //直接把row当作openserviceid
+                    this.curOpenServiceId = row;
+                }
+            } else { // 保存了新的扩展属性
+                params = [this.curOpenServiceId];
+            }
+
+            commonAjax('cas.tenantManageService', 'servicePropertyList', params).then(res => {
+                if (res.code == 200) {
+                    this.exServiceTableData = res.body;
+                    this.exServiceTableDataNum = res.body.length;
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
+        // 删除服务扩展属性方法
+        delServExtFld(index, row) {
+            const h = this.$createElement;
+            this.$msgbox({
+                title: '确认删除',
+                message: h('p', null, [
+                    h('span', null, '是否删除 '),
+                    h('i', {
+                        style: 'color: teal'
+                    }, row.exPropertyData)
+                ]),
+                showCancelButton: true,
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                beforeClose: (action, instance, done) => {
+                    if (action === 'confirm') {
+                        instance.confirmButtonLoading = true;
+                        instance.confirmButtonText = '执行中...';
+                        setTimeout(() => {
+                            done();
+                            setTimeout(() => {
+                                instance.confirmButtonLoading = false;
+                            }, 300);
+                        }, 1000);
+                    } else {
+                        done();
+                    }
+                }
+            }).then(action => {
+                if (action == 'cancel') {
+                    this.$message({
+                        type: 'info',
+                        message: "取消删除"
+                    });
+                } else {
+                    let params = [row.id];
+                    commonAjax("cas.tenantManageService", "servicePropertyDeleted", params).then(res => {
+                        if (res.code == 200) {
+                            this.$message({
+                                type: 'success',
+                                message: "删除成功"
+                            });
+                            this.getServListExtendFld(this.curopenserviceId);
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: res.msg
+                            });
+                        }
+                    });
+                }
+
             })
-        }
+        },
+
+        // 初始化
+        init() {
+            this.isShowTabList = true;
+            this.isShowServExtend = false;
+            this.dictionaryRequest();
+            this.checkPrevBtn();
+        },
+
+        //传递数据都地区组件
+        postdefaultarea() {
+            // this.defaultarea = {
+            //     province: this.orgOption.province,
+            //     city: this.orgOption.city,
+            //     district: this.orgOption.district,
+            //     street: this.orgOption.street,
+            // };
+        },
+    },
+    components: {
+        vueQrcodeComponent
+    },
+    beforeRouteEnter(to, from, next) {
+        next(vm => {
+            vm.postdefaultarea();
+            vm.OrgTableData = [];
+            vm.ProductTableData = [];
+            vm.ServiceTableData = [];
+        })
+    }
 }
 </script>
 <style type="text/css" scoped=''>
@@ -2230,6 +2257,7 @@ h2.account-title {
 }
 
 
+
 /*添加医院模态框样式*/
 
 .hospitalList {
@@ -2243,6 +2271,7 @@ h2.account-title {
 .serv_check {
     width: 175px;
 }
+
 #qrcode {
     width: 300px;
     height: 300px;

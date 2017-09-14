@@ -98,21 +98,20 @@
                 </el-row>
                 <el-table :data="renewallist" border style="width: 100%">
                     <el-table-column prop="paramName" label="名称">
-                      
                     </el-table-column>
-                      <el-table-column prop="status" label="启用状态">
-                            <template scope="scope">
-                                <p v-show="scope.row.status==1">是</p>
-                                <p v-show="scope.row.status==0">否</p>
-                            </template>
-                        </el-table-column>
+                    <el-table-column prop="status" label="启用状态">
+                        <template scope="scope">
+                            <p v-show="scope.row.status==1">是</p>
+                            <p v-show="scope.row.status==0">否</p>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="paramValue" label="提醒天数">
                     </el-table-column>
                     <el-table-column prop="mode" label="提醒方式">
-                          <template scope="scope">
-                                <p v-show="scope.row.mode==1">app消息</p>
-                                <p v-show="scope.row.mode==2">手机短信</p>
-                            </template>
+                        <template scope="scope">
+                            <p v-show="scope.row.mode==1">app消息</p>
+                            <p v-show="scope.row.mode==2">手机短信</p>
+                        </template>
                     </el-table-column>
                     <el-table-column prop="content" label="提醒内容">
                     </el-table-column>
@@ -174,10 +173,11 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="提醒内容" :label-width="formLabelWidth" prop="content">
-                    <quill-editor ref="myTextEditor" v-model="noteformdata.content" :config="editorOption" @showImageUI="imageHandler" @change="onEditorChange">
-                    </quill-editor>
+                    <!-- <quill-editor ref="myTextEditor" v-model="noteformdata.content" :config="editorOption" @showImageUI="imageHandler" @change="onEditorChange">
+                    </quill-editor> -->
+                    <el-input v-model="noteformdata.content" type="textarea" :autosize="{ minRows: 4, maxRows: 8}"></el-input>
                     <!-- 必须带上这个input 上传图片用-->
-                    <input type="file" name="file" id="fileinput" @change="customimgupload($event)" style="display:none">
+                    <!--  <input type="file" name="file" id="fileinput" @change="customimgupload($event)" style="display:none"> -->
                 </el-form-item>
             </el-form>
             <div class="dialog-footer center-foot">
@@ -407,9 +407,55 @@ import {
     commonAjax, imguploadAjax, imgview
 }
 from '../../api/api';
-import quillEditor from '../common/editor.vue';
+// import quillEditor from '../common/editor.vue';
 export default {
     data() {
+            // 提醒天数验证
+            var reminderdays = (rule, value, callback) => {
+                if (!value) {
+                    return callback(new Error('提醒天数不能为空'));
+                } else {
+                    if (value.length > 6) {
+                        return callback(new Error('最多只能6位'));
+                    } else {
+                        var g = /^[1-9]*[1-9][0-9]*$/;
+                        if (g.test(value)) {
+                            callback()
+                        } else {
+                            return callback(new Error('必须是正整数'));
+                        }
+                    }
+                }
+            };
+            var checkbaseset = (rule, value, callback) => {
+                if (!value) {
+                    return callback(new Error('请输入值'));
+                } else {
+                    if (this.basesetformdata.paramCode == "familyServiceAheadTimeLimit") {
+                            var g =/^([1-9]\d{0,1}|100)$/;
+                            if (g.test(value)) {
+                                callback()
+                            } else {
+                                return callback(new Error('必须是1-100整数'));
+                            }
+
+                    } else {
+                        if (value.length > 10) {
+                            return callback(new Error('最多只能10位'));
+                        } else {
+                            var g = /^[1-9]*[1-9][0-9]*$/;
+                            if (g.test(value)) {
+                                callback()
+                            } else {
+                                return callback(new Error('必须是正整数'));
+                            }
+                        }
+                    }
+
+
+                }
+            };
+
             return {
                 //通用
                 formLabelWidth: '160px',
@@ -436,10 +482,18 @@ export default {
                         required: true,
                         message: '请输入模板名称',
                         trigger: 'blur'
+                    }, {
+                        max: 15,
+                        message: '长度最大15个字符',
+                        trigger: 'blur'
                     }],
                     content: [{
                         required: true,
                         message: '请输入提醒内容',
+                        trigger: 'blur'
+                    }, {
+                        max: 150,
+                        message: '长度最大150个字符',
                         trigger: 'blur'
                     }],
                 },
@@ -524,42 +578,28 @@ export default {
                         required: true,
                         message: '请输入评价模板名称',
                         trigger: 'blur'
+                    }, {
+                        max: 10,
+                        message: '长度最大10个字符',
+                        trigger: 'blur'
                     }],
 
                 },
                 evaluationtpldialog: false,
                 curtenantId: sessionStorage.getItem("tenantId"),
                 // 评价项目开始
-                evaluationtdialog: false,
-                evaluationtformdata: {
-                    "defineId": "", //满意度评价定义表id
-                    "appendFlag": "", //追评标志：0首评 1追评
-                    "content": "", //内容
-                    "status": "", //状态 0.未启用 1.已启用
-                    "itemId": 0 //新增为0
-                },
+
                 // 表单验证
-                evaluationtformrules: {
-                    hpiCode: [{
+                evaluationformrules: {
+                    content: [{
                         required: true,
-                        message: '请输入代码',
+                        message: '请输入评价项目名称',
                         trigger: 'blur'
-                    }],
-                    hpiName: [{
-                        required: true,
-                        message: '请输入名称',
+                    }, {
+                        max: 10,
+                        message: '长度最大10个字符',
                         trigger: 'blur'
-                    }],
-                    upperLimit: [{
-                        required: true,
-                        message: '请输入上限',
-                        trigger: 'blur'
-                    }],
-                    lowerLimit: [{
-                        required: true,
-                        message: '请输入下限',
-                        trigger: 'blur'
-                    }],
+                    }]
                 },
                 evaluationtlist: [], //新加的评价
                 evaluationtlist2: [], //再次评价
@@ -599,8 +639,8 @@ export default {
                 },
                 basesetformrules: {
                     paramValue: [{
-                        required: true,
-                        message: '请输入值',
+                        validator: checkbaseset,
+                        trigger: 'blur'
                     }],
                 },
                 baselabel: "",
@@ -617,18 +657,25 @@ export default {
                 // 表单验证
                 renewalformrules: {
                     paramValue: [{
-                        required: true,
-                        message: '请输入提醒天数',
+                        validator: reminderdays,
                         trigger: 'blur'
                     }],
                     paramName: [{
                         required: true,
                         message: '请输入名称',
                         trigger: 'blur'
+                    }, {
+                        max: 15,
+                        message: '长度最大15个字符',
+                        trigger: 'blur'
                     }],
                     content: [{
                         required: true,
                         message: '请输入提醒内容',
+                        trigger: 'blur'
+                    }, {
+                        max: 30,
+                        message: '长度最大30个字符',
                         trigger: 'blur'
                     }],
                 },
@@ -802,30 +849,30 @@ export default {
                     });
                 },
                 // 编辑器内容变化触发
-                onEditorChange({
-                    editor, html, text
-                }) {
-                    // this.content = html;
-                    // console.log(this.content);
-                },
-                imageHandler() {
-                    fileinput.click();
-                },
-                customimgupload() {
-                    // var that=this;
-                    var formData = new FormData();
-                    formData.append('file', fileinput.files[0]);
-                    if (fileinput.files[0]) {
-                        imguploadAjax(formData).then(res => {
-                            var imageUrl = `${imgview+res.body}`
-                            var range = this.$refs.myTextEditor.quillEditor.getSelection();
-                            var length = range.index;
-                            this.$refs.myTextEditor.quillEditor.insertEmbed(length, 'image', imageUrl);
-                        }).catch(err => {
-                            console.log(err)
-                        })
-                    }
-                },
+                // onEditorChange({
+                //     editor, html, text
+                // }) {
+                //     // this.content = html;
+                //     // console.log(this.content);
+                // },
+                // imageHandler() {
+                //     fileinput.click();
+                // },
+                // customimgupload() {
+                //     // var that=this;
+                //     var formData = new FormData();
+                //     formData.append('file', fileinput.files[0]);
+                //     if (fileinput.files[0]) {
+                //         imguploadAjax(formData).then(res => {
+                //             var imageUrl = `${imgview+res.body}`
+                //             var range = this.$refs.myTextEditor.quillEditor.getSelection();
+                //             var length = range.index;
+                //             this.$refs.myTextEditor.quillEditor.insertEmbed(length, 'image', imageUrl);
+                //         }).catch(err => {
+                //             console.log(err)
+                //         })
+                //     }
+                // },
                 // 健康指标开始---------------------------------------------------------------------------------------
                 //获取健康类型列表
                 gethealthtypelist() {
@@ -1100,7 +1147,7 @@ export default {
                             "appendInputFlag": row.appendInputFlag, //追评是否启用输入框
                             "status": row.status, //是否启动
                             "id": row.id //新增为0
-                            
+
                         }
                         commonAjax("cas.evaluationManageService", "getByDefineId", `['${row.id}']`).then((res) => {
                             if (res.code == 200) {
@@ -1364,14 +1411,19 @@ export default {
                         }
                     });
                 },
+                //基础配置
                 editbaseset(index, row) {
                     this.basesetdialog = true;
+                    this.dialogtitle = "基础配置"
+                    if (row) {
+
+                    }
                     this.basesetformdata = {
                         "paramCode": row.paramCode,
                         "paramValue": row.paramValue,
                     }
                     this.baselabel = row.paramName;
-                   
+
                 },
                 basesetsubmitForm(formName) {
                     this.$refs[formName].validate((valid) => {
@@ -1383,7 +1435,7 @@ export default {
                                         type: 'success',
                                         message: "保存成功"
                                     });
-                                     this.getbasesetlist()
+                                    this.getbasesetlist()
                                 } else {
                                     this.$message({
                                         type: 'error',
@@ -1404,7 +1456,7 @@ export default {
                 },
                 //续约提醒--------------------------------------------------------------------------------
                 getrenewallist() {
-                     commonAjax("cas.signRemindParamService", "getSignRemindParam", '[]').then((res) => {
+                    commonAjax("cas.signRemindParamService", "getSignRemindParam", '[]').then((res) => {
                         if (res.code == 200) {
                             this.renewallist = res.body;
                         } else {
@@ -1445,7 +1497,7 @@ export default {
                 renewalsubmitForm(formName) {
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
-                            let param=this.renewalformdata.paramId?"updateSignRemindParam":"addSignRemindParam";
+                            let param = this.renewalformdata.paramId ? "updateSignRemindParam" : "addSignRemindParam";
                             commonAjax("cas.signRemindParamService", param, '[' + JSON.stringify(this.renewalformdata) + ']').then(res => {
                                 if (res.code == 200) {
                                     this.renewaldialog = false;
@@ -1547,7 +1599,7 @@ export default {
 
         },
         components: {
-            quillEditor
+            // quillEditor
         },
         mounted() {
             this.getbasesetlist();

@@ -363,7 +363,7 @@ export default {
         chooseItem(val) {
             if (val == 1) {
                 this.isGenePlan = true;
-                this.addServItemForm.generatePlanTime = '';
+                this.addServItemForm.generatePlanTime = 0;
             } else {
                 this.isGenePlan = false;
             }
@@ -470,6 +470,7 @@ export default {
         editServItem(row) {
             this.addServItemForm = row;
             this.isReadOnly = false;
+            this.isAddOrEdit = 2;
             this.dialogTitle = '编辑服务项详情';
             this.dialogFormVisible = true;
         },
@@ -594,7 +595,18 @@ export default {
         },
         // 删除服务说明模块
         delExplModule() {
-            alert('删除该执行模块！？')
+            let params = [];
+
+            commonAjax('cas.baseServiceService', 'deleteServiceitemTmpl', params).then(res => {
+                if (res.code == 200) {
+                    
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
         },
 
 
@@ -669,7 +681,6 @@ export default {
         },
         // 保存'复制其他模板项'表单
         saveCopyTplData(val) {
-            debugger
             // if (this.isAddOrEdit == 1) {
             if (false) {
                 this.servExplModule.push(this.copyTplForm.option);
