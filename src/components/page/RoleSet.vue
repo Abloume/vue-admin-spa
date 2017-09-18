@@ -74,7 +74,7 @@
                 <el-button type="primary" @click="submitForm('adinfoForm')" v-show="isshowsave">确 定</el-button>
             </div>
         </el-dialog>
-        <el-dialog title="角色授权" v-model="empowerdialogFormVisible">
+        <el-dialog title="角色授权" v-model="empowerdialogFormVisible" @close="cleartree()">
             <el-row class="search_con2" :gutter="20">
                 <el-col :span="10">
                     {{curroleName}}角色的授权
@@ -423,7 +423,7 @@ export default {
                     let checkedarr_act = checkedarr.filter(function(item) {
                         return item.actionValue;
                     });
-                   
+
                     $.each(checkedarr, function(index, el) {
                         el.actionValue = 0;
                         $.each(checkedarr_act, function(index2, el2) {
@@ -439,7 +439,7 @@ export default {
                         if (el.type != "action") {
                             let temobj = {
                                 id: el.id,
-                                actionValue: el.actionValue==0?"":el.actionValue,
+                                actionValue: el.actionValue == 0 ? "" : el.actionValue,
                             };
                             temarr.push(temobj);
                         }
@@ -498,6 +498,11 @@ export default {
 
 
                 },
+                cleartree() {
+                    this.zNodes = [];
+                    $.fn.zTree.init($("#treeDemo"), this.setting, this.zNodes);
+                    this.zTree = $.fn.zTree.getZTreeObj("treeDemo");
+                }
         },
         components: {
 
@@ -510,19 +515,22 @@ export default {
         },
         watch: {
             'curprocode' (val, oldval) {
-                let param = `['${val}','${this.curroleId}']`;
-                commonAjax('cas.menuManageService', 'productMenuMenuActionTree', param).then(res => {
-                    if (res.code == 200) {
-                        this.zNodes = res.body;
-                        $.fn.zTree.init($("#treeDemo"), this.setting, this.zNodes);
-                        this.zTree = $.fn.zTree.getZTreeObj("treeDemo");
-                    } else {
-                        this.$message({
-                            type: 'error',
-                            message: res.msg
-                        });
-                    };
-                })
+                if (val) {
+                    let param = `['${val}','${this.curroleId}']`;
+                    commonAjax('cas.menuManageService', 'productMenuMenuActionTree', param).then(res => {
+                        if (res.code == 200) {
+                            this.zNodes = res.body;
+                            $.fn.zTree.init($("#treeDemo"), this.setting, this.zNodes);
+                            this.zTree = $.fn.zTree.getZTreeObj("treeDemo");
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: res.msg
+                            });
+                        };
+                    })
+                }
+
             }
         }
 

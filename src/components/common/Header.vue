@@ -15,7 +15,7 @@
             </el-dropdown>
         </div>
         <div class="user-info">
-            <el-select v-model="selectroles" multiple filterable allow-create placeholder="请选择角色" :width="300" @change="selectchange">
+            <el-select v-model="selectroles" multiple filterable allow-create placeholder="请选择角色" :width="300" @change="selectchange" :disabled="isdisabed">
                 <el-option v-for="item in rolelist" :key="item.id" :label="item.name" :value="item.id">
                 </el-option>
             </el-select>
@@ -40,6 +40,7 @@ export default {
                 name: 'admin',
                 rolelist: [],
                 selectroles: [],
+                isdisabed:false,
             }
         },
         computed: {
@@ -69,6 +70,7 @@ export default {
                     commonAjax("cas.roleManageService", "roleByUserIdAndProductCode", param).then(res => {
                         if (res.code == 200) {
                             this.rolelist = res.body;
+                            this.isdisabed=res.body.length==1?true:false;
                             this.selectroles = [];
                             $.each(this.rolelist, function(index, el) {
                                 this.selectroles.push(el.id)
@@ -90,6 +92,7 @@ export default {
                     // let param = `[${rolelist},'hcn.tongxiang']`;
                     commonAjax("cas.menuManageService", "getRoleMenuTree", param).then(res => {
                         if (res.code == 200) {
+                                
                             $.each(res.body,function(index, el) {
                                 if(el.menuIconId!=undefined){
                                     el.menuIconId=imgview+el.menuIconId

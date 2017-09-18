@@ -273,7 +273,7 @@
     
         <!-- 添加服务项对话框 -->
         <el-dialog :title="dialogItemTitle" v-model="addServItemFormVisible" @close="(closeDialog('addItem'))">
-            <el-form :model="addServItemForm" :rules="formrules" ref="addItemForm" auto-complete="off" id="addItemForm">
+            <el-form :model="addServItemForm" :rules="addSrvItemRules" ref="addItemForm" auto-complete="off" id="addItemForm">
                 <el-form-item label="服务项名称" class="as_inline" :label-width="formLabelWidth" prop="serviceName">
                     <el-select placeholder="无" class="serv_name serv_no" v-model="addServItemForm.serviceName" :disabled="isReadOnly" @change="getItsFields">
                         <el-option v-for="item in servItemSelect" :key="item.serviceId" :label="item.serviceName" :value="item.serviceId">
@@ -292,8 +292,8 @@
                 <el-form-item label="服务次数" class="as_inline min_width" :label-width="formLabelWidth" prop="times">
                     <el-input placeholder="为空代表无限制次数" class="serv_no" v-model="addServItemForm.times" :disabled="isReadOnly"></el-input>
                 </el-form-item>
-                <el-form-item label="服务频率" class="as_inline min_width" :label-width="formLabelWidth" prop="evaluationTplId">
-                    <el-input placeholder="" class="serv_freq_input" v-model="addServItemForm.frequency"></el-input>
+                <el-form-item label="服务频率" class="as_inline min_width" :label-width="formLabelWidth" prop="frequency">
+                    <el-input placeholder="" class="serv_freq_input" v-model.number="addServItemForm.frequency"></el-input>
                     <el-select placeholder="周" class="serv_freq" v-model="addServItemForm.frequencyType">
                         <el-option v-for="item in dictionary.base_frequencyType" :key="item.key" :label="item.text" :value="item.key">
                         </el-option>
@@ -486,6 +486,19 @@ export default {
             // 添加服务包
             dialogPackTitle: '',        // 添加包对话框标题
             addServItemFormVisible: false, // 添加包显示
+            addSrvItemRules: {           // 校验
+                serviceName: [{
+                    required: true,
+                    message:'名称不能为空'
+                }],
+                frequency: [{
+                    required: true,
+                    message:'频率不能为空'
+                }, {
+                    type: 'number',
+                    message: '频率为数字！'
+                }]
+            },
             addPackFormData: {   // 添加服务包表单绑定数据用
                 packDesc: "",         // 简介
                 packName: "",         // 服务包名称
@@ -790,6 +803,26 @@ export default {
         },
         // 保存添加的服务项
         saveServItemForm() {
+            if (this.addServItemForm.serviceName == '') {
+                this.$message({
+                    type: 'error',
+                    message: '请选择服务项名称'
+                });
+                return;
+            } else if (this.addServItemForm.frequency == '' || this.addServItemForm.frequency == 0) {
+                this.$message({
+                    type: 'error',
+                    message: '请填写服务频率'
+                });
+                return;
+            } else if (this.addServItemForm.frequencyType == '') {
+                this.$message({
+                    type: 'error',
+                    message: '请填写服务频率单位'
+                });
+                return;
+            }
+
             var sServiceId = this.addServItemForm.serviceId;
             var self = this;
             $.each(self.servItemSelect, function(idx, ele) {

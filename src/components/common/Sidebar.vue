@@ -4,9 +4,9 @@
             <el-menu-item index="readme">
                 <i class="el-icon-menu"></i>主页
             </el-menu-item>
-             <el-menu-item index="signAdd">
+             <!-- <el-menu-item index="signAdd">
                 <i class="el-icon-menu"></i>签约新增
-            </el-menu-item>
+            </el-menu-item> -->
             <!-- <el-submenu index="33333">
                 <template slot="title"><i class="el-icon-menu"></i>租户管理</template>
                 <el-menu-item index="organizationList">机构管理</el-menu-item>

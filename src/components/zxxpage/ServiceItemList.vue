@@ -41,7 +41,7 @@
         </div>
         <!--列表-->
         <el-table :data="servItemData" border style="width: 100%">
-            <el-table-column label="编号" prop="serviceCode" width="80"></el-table-column>
+            <el-table-column label="编号" prop="number" width="80"></el-table-column>
             <el-table-column label="服务名称" prop="serviceName" width="120"></el-table-column>
             <el-table-column label="简介" prop="serviceDesc" width="220"></el-table-column>
             <el-table-column label="上限价格(元)" prop="upperPrice" width="80"></el-table-column>
@@ -68,8 +68,8 @@
             </el-pagination>
         </div>
 
-        <!-- 新增服务项详情对话框 -->
-        <el-dialog :title="dialogTitle" v-model="dialogFormVisible" @close="closeDialog">
+        <!-- 新增|编辑服务项详情对话框 -->
+        <el-dialog :title="dialogTitle" v-model="dialogFormVisible" @close="closeDialog('addEditItem')">
             <el-form :model="addServItemForm" :rules="addItemRules" ref="addItemForm" auto-complete="off" id="addItemForm">
                 <el-form-item label="服务项名称" class="as_inline" :label-width="formLabelWidth" prop="serviceName">
                     <el-input class="serv_no" v-model="addServItemForm.serviceName" :disabled="isReadOnly"></el-input>
@@ -86,9 +86,9 @@
                 <el-form-item label="默认价格(元)" class="as_inline" :label-width="formLabelWidth" prop="price">
                     <el-input class="serv_no" v-model.number="addServItemForm.price" :disabled="isReadOnly"></el-input>
                 </el-form-item>
-                <el-form-item label="关联模块" class="as_inline" :label-width="formLabelWidth" prop="correlation">
-                    <el-select placeholder="无" v-model="addServItemForm.correlation" disabled="true">
-                        <el-option v-for="item in dictionary.hyperLink" :key="item.key" :label="item.text" :value="item.key">
+                <el-form-item label="关联模块" class="as_inline min_width" :label-width="formLabelWidth" prop="correlation">
+                    <el-select placeholder="无" v-model="addServItemForm.correlation" :disabled="isReadOnly">
+                        <el-option v-for="item in dictionary.serviceItemRelateModule" :key="item.key" :label="item.text" :value="item.key">
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -96,8 +96,8 @@
                     <el-input placeholder="0" class="serv_no" v-model.number="addServItemForm.validPeriod" :disabled="isReadOnly"></el-input>
                 </el-form-item>
                 <el-form-item label="关联评价" class="as_inline min_width" :label-width="formLabelWidth" prop="evaluationTplId">
-                    <el-select placeholder="无" v-model="addServItemForm.evaluationTplId" disabled="true">
-                        <el-option v-for="item in dictionary.hyperLink" :key="item.key" :label="item.text" :value="item.key">
+                    <el-select placeholder="无" v-model="addServItemForm.evaluationTplId" :disabled="isReadOnly">
+                        <el-option v-for="item in assoEvalArr" :key="item.id" :label="item.defineTpName" :value="item.id">
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -118,15 +118,15 @@
                 </el-form-item>
                 <el-form-item label="是否生成计划" prop="generatePlanFlag">
                     <el-radio-group v-model="addServItemForm.generatePlanFlag" @change='chooseItem' :disabled="isReadOnly">
-                        <el-radio label="1">是</el-radio>
-                        <el-radio label="0">否</el-radio>
+                        <el-radio :label="1">是</el-radio>
+                        <el-radio :label="0">否</el-radio>
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item v-show='isGenePlan' label="计划开始时间" prop="generatePlanTime">
-                    <el-radio-group class="plan_start" v-model="addServItemForm.generatePlanTime" :disabled="isReadOnly">
-                        <el-radio label="1">签约生效日期</el-radio>
-                        <el-radio label="0">签约生效后</el-radio>
-                        <el-input class="day" v-model="addServItemForm.generatePlanTime"></el-input>
+                    <el-radio-group class="plan_start" v-model="addServItemForm.generatePlanTime" :disabled="isReadOnly" @change="chsPlanTime">
+                        <el-radio label="0">签约生效日期</el-radio>
+                        <el-radio label="1">签约生效后</el-radio>
+                        <el-input :disabled='later' class="day" v-model="addServItemForm.generatePlanTime"></el-input>
                     </el-radio-group>
                     <span class="days">天</span>
                 </el-form-item>
@@ -144,8 +144,8 @@
             </div>
             <div class="serv_expl_module">
                 <div v-for="item in servExplModule" :key="item">
-                    <span class="serv_content">{{item}}</span>
-                    <el-button type="danger" size="mini" @click='delExplModule'>删除</el-button>
+                    <span class="serv_content">{{item.content}}</span>
+                    <el-button type="danger" size="mini" @click='delExplModule(item)'>删除</el-button>
                 </div>
             </div>
             <div class="dialog-footer center-foot bottom_btn">
@@ -171,7 +171,7 @@
         </el-dialog>
 
         <!-- 添加模板项 -->
-        <el-dialog :title="dialogTitle" v-model="addTplFormVisible" @close="closeAddTplDialog">
+        <el-dialog :title="tplDialogTitle" v-model="addTplFormVisible" @close="closeAddTplDialog">
             <el-form :model="addTplForm" ref="addTpl" auto-complete="off" id="addTpl">
                 <el-form-item label="模板内容:" class="as_inline" label-width="150px" prop="name">
                     <el-input class="serv_no" v-model="addTplForm.content" placeholder="请输入模板内容"></el-input>
@@ -194,6 +194,7 @@ export default {
             dialogTitle: '',
             dialogFormVisible: false,
             isAddOrEdit: '',          // 1表示添加，2表示编辑
+            curSrvItemId: 0,
             dictionary: {
                 bannerPostion: [{       
                     key: "",
@@ -208,8 +209,16 @@ export default {
                     leaf: "",
                     index: "",
                     mcode: ""
-                }]
+                }],
+                serviceItemRelateModule: [{    // 关联模版
+                    key: "",
+                    text: "",
+                    leaf: "",
+                    index: "",
+                    mcode: ""
+                }],
             },
+            assoEvalArr: [],    // 关联评价
             page: {
                 pageNo: 1,
                 pageSize: 10
@@ -262,13 +271,13 @@ export default {
                     message: '简介不能为空'
                 }]
             },
-
             // 列表查看
             searchContent: {
                 name: '',
                 no: '',
                 status: ''
             },
+            saveEditTpl: {},                // 编辑后返回项
             servExplModule: [],             // 服务说明模块数组
             servItemData: [],               // 本页列表数据源
             servItemData2: [{               // 本页列表模拟数据源
@@ -295,6 +304,7 @@ export default {
             addTplFormVisible: false,
             isReadOnly: false,        // 查看状态
             isGenePlan: false,
+            later: false,
             createUser: '3c41b79e-6484-11e7-8229-005056c00008',
             addServItemForm: {        // 新增服务项详情表单
                 serviceName: '',      // 服务项目名称
@@ -302,12 +312,12 @@ export default {
                 lowerPrice: 0,       // 价格下限
                 price: 0,            // 价格
                 correlation: '',      // 关联模块
-                validPeriod: '',      // 有效期
-                evaluationTplId: 0,  // 关联评价
+                validPeriod: 365,      // 有效期
+                evaluationTplId: '',  // 关联评价
                 actOrgType: '',       // 执行机构分类
                 // allowanceRatio: '',   // 补助系数
                 relateFormId: 0,     // 关联表单 
-                generatePlanFlag: '', // 是否生成计划
+                generatePlanFlag: 0, // 是否生成计划
                 generatePlanTime: 0,  // 生成计划时机
                 serviceDesc: '',      // 简介
                 helpDoc: '',          // 服务指导
@@ -329,9 +339,10 @@ export default {
         // 获取字典
         dictionaryRequest() {
             // 参数
-            var that = this;
+            let that = this;
             let arr = [
-                "cfs.dic.base_organizationType"  // 执行机构
+                "cfs.dic.base_organizationType",           // 执行机构
+                "cfs.dic.base_serviceItemRelateModule"     // 关联模块
             ]; 
             // 调用服务
             commonAjax("cas.multipleDictionaryService", "findDic", '[' + JSON.stringify(arr) + ']').then(res => {
@@ -339,6 +350,9 @@ export default {
                     res.body.forEach(function (ele, index) {
                         if (ele.dicId == arr[0]) {
                             that.dictionary.organizationType = ele.items;
+                        }
+                        if (ele.dicId == arr[1]) {
+                            that.dictionary.serviceItemRelateModule = ele.items;
                         }
                     })
                 } else {
@@ -359,6 +373,14 @@ export default {
             this.page.pageNo = val;
             this.getServItemList();
         },
+        // 計劃開始時間
+        chsPlanTime(type) {
+            if (type == 0) {
+                this.later = true;
+            } else if (type == 1) {
+                this.later = false;
+            }
+        },
         // 单选按钮
         chooseItem(val) {
             if (val == 1) {
@@ -369,8 +391,11 @@ export default {
             }
         },
         // 关闭窗口
-        closeDialog() {
+        closeDialog(mark) {
             this.dialogFormVisible = false;
+            if (mark == 'addEditItem') {
+                this.addServItemForm.generatePlanFlag = 0;
+            }
         },
         closeCopyDialog() {
             this.copyOtherFormVisible = false;
@@ -403,6 +428,9 @@ export default {
 
             commonAjax('cas.baseServiceService', 'getBaseServiceitemsList', params).then(res => {
                 if (res.code == 200) {
+                    $.each(res.body.items, function(index, el) {
+                        el.number = (index + 1) + (params[0].pageNo - 1) * (params[0].pageSize);
+                    });
                     this.servItemData = res.body.items;
                     this.total = res.body.total;
                 } else {
@@ -437,7 +465,7 @@ export default {
             this.addServItemForm.lowerPrice = 0;  // 价格下限
             this.addServItemForm.price = 0;       // 价格
             this.addServItemForm.correlation = ''; // 关联模块
-            this.addServItemForm.validPeriod = 0; // 有效期
+            this.addServItemForm.validPeriod = 365; // 有效期
             
             this.addServItemForm.actOrgType = '';      // 执行机构分类
             // this.addServItemForm.allowanceRatio = '';  // 补助系数
@@ -466,13 +494,30 @@ export default {
         search() {
             this.getServItemList();        
         },
+        // 获取模版列表
+        getTplList() {
+            let params = [this.curSrvItemId];
+
+            commonAjax('cas.baseServiceService', 'getServiceitemTmplList', params).then(res => {
+                if (res.code == 200) {
+                    this.servExplModule = res.body;
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
         // 编辑
         editServItem(row) {
             this.addServItemForm = row;
+            this.curSrvItemId = row.serviceId;
             this.isReadOnly = false;
             this.isAddOrEdit = 2;
             this.dialogTitle = '编辑服务项详情';
             this.dialogFormVisible = true;
+            this.getTplList();
         },
         // 切换状态
         switchStatus(index, row) {
@@ -594,12 +639,37 @@ export default {
             });
         },
         // 删除服务说明模块
-        delExplModule() {
-            let params = [];
+        delExplModule(item) {
+            let tplId = item.tmplId;
+            
+            if (this.isAddOrEdit == 1) { // 添加服务项
+                this.servExplModule.splice(this.servExplModule.indexOf(item), 1);
+            } else {  //编辑服务项
+                let params = [tplId];
+                commonAjax('cas.baseServiceService', 'deleteServiceitemTmpl', params).then(res => {
+                    if (res.code == 200) {
+                        this.servExplModule.splice(this.servExplModule.indexOf(item.content), 1);
+                    } else {
+                        this.$message({
+                            type: 'error',
+                            message: res.msg
+                        });
+                    }
+                });
+            }
+        },
 
-            commonAjax('cas.baseServiceService', 'deleteServiceitemTmpl', params).then(res => {
+
+        /**
+         *  添加
+         */ 
+        // 获取关联评价
+        getAssoEval() {
+            let params = [sessionStorage.getItem('tenantId')];
+
+            commonAjax('cas.baseServiceService', 'findEvaluationDefineList', params).then(res => {
                 if (res.code == 200) {
-                    
+                    this.assoEvalArr = res.body;
                 } else {
                     this.$message({
                         type: 'error',
@@ -608,22 +678,19 @@ export default {
                 }
             });
         },
-
-
-        /**
-         *  添加
-         */ 
         // 添加服务
         addServiceItem() {
             this.resetAddServItemForm();
-            this.dialogTitle = '新增服务项详情';
+            this.getAssoEval();
             this.isGenePlan = false;
             this.isAddOrEdit = 1;
+            this.isReadOnly = false;
+            this.dialogTitle = '新增服务项详情';
             this.dialogFormVisible = true;
         },
         // 添加
         addServExplModule() {
-            this.dialogTitle = '添加服务说明模版';
+            this.tplDialogTitle = '添加服务说明模版';
             this.addTplFormVisible = true;
         },
         // 保存新增服务项表单数据
@@ -635,6 +702,9 @@ export default {
                         this.addServItemForm.content = this.servExplModule; // 服务说明模板内容
                         if (this.addServItemForm.allowanceRatio) {
                             this.addServItemForm.allowanceRatio = parseInt(this.addServItemForm.allowanceRatio);
+                        }
+                        if (this.addServItemForm.evaluationTplId == '') {
+                            this.addServItemForm.evaluationTplId = 0;
                         }
                         this.addServItemForm.generatePlanTime = parseFloat(this.addServItemForm.generatePlanTime);
                         this.addServItemForm.lowerPrice = parseFloat(this.addServItemForm.lowerPrice);
@@ -716,9 +786,9 @@ export default {
         },
         // 保存手录的模板
         saveAddTplData() {
-            if (this.isAddOrEdit == 1) { // 添加
+            if (this.isAddOrEdit == 1) { // 添加服务项
                 this.servExplModule.push(this.addTplForm.content);
-            } else { // 编辑
+            } else { // 编辑服务项
                 // 保存到表
                 let params = {
                     content: this.addTplForm.content,
@@ -727,8 +797,9 @@ export default {
                 };
                 commonAjax('cas.baseServiceService', 'addServiceitemTmpl', [params]).then(res => {
                     if (res.code == 200) {
-                        console.log('添加成功！');
-                        this.servExplModule.push(this.addTplForm.content);
+                        // this.saveEditTpl = res.body;
+                        // this.servExplModule.push(this.addTplForm.content);
+                        this.servExplModule = [res.body];
                     } else {
                         this.$message({
                             type: 'error',

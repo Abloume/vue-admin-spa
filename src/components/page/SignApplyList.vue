@@ -163,16 +163,16 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="签约生效日期" :label-width="formLabelWidth" prop="signValidDate">
+                <el-form-item label="签约生效日期" :label-width="formLabelWidth" prop="signValidDate" v-show="formdata.signState2=='13'">
                     <el-date-picker type="date" placeholder="选择日期" v-model="formdata.signValidDate" style="width: 100%;" @change="dateformat" format="yyyy-MM-dd" :disabled="islook"></el-date-picker>
                 </el-form-item>
-                <el-form-item label="管理类型" :label-width="formLabelWidth" prop="personGroup">
+                <el-form-item label="管理类型" :label-width="formLabelWidth" prop="personGroup" v-show="formdata.signState2=='13'">
                     <el-select v-model="formdata.personGroup" placeholder="请选择管理类型" :disabled="islook">
                         <el-option v-for="item in dictionary.group" :key="item.key" :label="item.text" :value="item.key">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="区级医院" :label-width="formLabelWidth" prop="districtOrgName" v-if="formdata.openOneFlag==1">
+                <el-form-item label="区级医院" :label-width="formLabelWidth" prop="districtOrgName" v-if="formdata.openOneFlag==1&&formdata.signState2=='13'">
                     <el-row :gutter="20">
                         <el-col :span="16">
                             <el-input v-model="formdata.districtOrgName" disabled></el-input>
@@ -182,7 +182,7 @@
                         </el-col>
                     </el-row>
                 </el-form-item>
-                <el-form-item label="市级医院" :label-width="formLabelWidth" prop="cityOrgName" v-if="formdata.openOneFlag==1">
+                <el-form-item label="市级医院" :label-width="formLabelWidth" prop="cityOrgName" v-if="formdata.openOneFlag==1&&formdata.signState2=='13'">
                     <el-row :gutter="20">
                         <el-col :span="16">
                             <el-input v-model="formdata.cityOrgName" disabled></el-input>
@@ -337,7 +337,11 @@ export default {
                     signState2: [{
                         required: true,
                         message: '请选择确认意见',
-                    }]
+                    }],
+                    operInfo:[{
+                        required: true,
+                        message: '请输入备注',
+                    }],
                 },
                 imageUrl: "", //文件或者图片上传预览图片的src地址
                 //字典查询数据
@@ -442,7 +446,7 @@ export default {
                                 "openOneFlag": this.islook ? res.body.openOneFlag : "",
                                 "personGroup": this.islook ? res.body.personGroup : "",
                                 "signValidDate": this.islook ? res.body.signValidDate : "",
-                                "signState2": this.islook ? res.body.signState : "",
+                                "signState2": this.islook ? res.body.signState : "13",
                                
                             }
                             if (row.signState == 11) {

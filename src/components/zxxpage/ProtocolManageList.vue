@@ -9,20 +9,25 @@
                         <el-breadcrumb-item>协议管理</el-breadcrumb-item>
                     </el-breadcrumb>
                 </el-col>
+                <el-col :span="12" class="range">
+                    <el-select v-model="searchContent.tenantId" :disabled="isCheckPattern">
+                        <el-option v-for="item in tenantNameList" :key="item.tenantId" :label="item.tenantName" :value="item.tenantId"></el-option>
+                    </el-select>
+                </el-col>
             </el-row>
             <el-row class="search_con">
                 <el-col :span="24" class="addServItem">
-                    <el-button type="primary" icon="plus" @click="addServiceItem">医联体协议</el-button>
+                    <el-button type="primary" icon="plus" @click="chkUnionProt">医联体协议</el-button>
                 </el-col>
             </el-row>
             <el-row class="search_line">
                 <el-col :span="20">
                     <el-form :inline="true" :model="searchContent" class="demo-form-inline">
                         <el-form-item label="机构:">
-                            <el-input placeholder="机构名称" class="serv_name" v-model="searchContent.name"></el-input>
+                            <el-input placeholder="机构名称" class="serv_name" v-model="searchContent.orgFullName"></el-input>
                         </el-form-item>
                         <el-form-item label="执行机构" class="as_inline" :label-width="formLabelWidth">
-                            <el-select placeholder="无" class="serv_name" v-model="searchContent.orgType">
+                            <el-select placeholder="无" class="serv_name" v-model="searchContent.orgClassify">
                                 <el-option v-for="item in dictionary.organizationType" :key="item.key" :label="item.text" :value="item.key">
                                 </el-option>
                             </el-select>
@@ -37,9 +42,9 @@
         </div>
         <!--列表-->
         <el-table :data="protOrgListData" border style="width: 100%">
-            <el-table-column label="机构" prop="name" width="200"></el-table-column>
-            <el-table-column label="分类" prop="type" width="200"></el-table-column>
-            <el-table-column label="使用协议" prop="protName" width="200"></el-table-column>
+            <el-table-column label="机构" prop="orgFullName" width="200"></el-table-column>
+            <el-table-column label="分类" prop="orgClassify" width="200"></el-table-column>
+            <el-table-column label="使用协议" prop="protocalName" width="200"></el-table-column>
             <el-table-column label="操作">
                 <template scope="scope">
                     <el-button size="small" @click="editProtocol(scope.$index, scope.row)">编辑</el-button>
@@ -53,7 +58,7 @@
         </div>
 
         <!-- 编辑医联体协议对话框 -->
-        <el-dialog :title="dialogTitle" :gutter="20" class="unionDialog" v-model="editUnionFormVisible" @close="closeDialog">
+        <el-dialog :title="dialogTitle" :gutter="20" class="unionDialog" v-model="editUnionFormVisible" @close="closeDialog('unionProt')">
             <!-- 动态字段 -->
             <el-col :span="8">
                 <div class="commontit">
@@ -84,14 +89,14 @@
         </el-dialog>
 
         <!-- 编辑机构协议对话框 -->
-        <el-dialog :title="dialogTitle" :gutter="20" class="orgDialog" v-model="editOrgFormVisible" @close="closeDialog">
+        <el-dialog :title="dialogTitle" :gutter="20" class="orgDialog" v-model="editOrgFormVisible" @close="closeDialog('orgProt')">
             <el-row>
                 <el-col :span="12">
                     <el-form :model="orgFormData" :rules="formrules" ref="addItemForm" auto-complete="off" id="addItemForm">
                         <el-form-item label="使用协议" prop="protocalTypeCurrentUse">
-                            <el-radio-group v-model="orgFormData.protocalTypeCurrentUse" @change='chooseItem'>
-                                <el-radio label="1">使用医联体协议</el-radio>
-                                <el-radio label="2">使用本机构协议</el-radio>
+                            <el-radio-group v-model="orgFormData.protocalTypeCurrentUse" @change='chsProt'>
+                                <el-radio :label="1">使用医联体协议</el-radio>
+                                <el-radio :label="2">使用本机构协议</el-radio>
                             </el-radio-group>
                         </el-form-item>
                     </el-form>
@@ -113,15 +118,15 @@
             <!-- 本机构协议 -->
             <el-col :span="16">
                 <div class="commontit">
-                    <h2>本机构协议</h2>
+                    <h2>本机构协议<span v-show="isShowText" class="unionTip">&nbsp;&nbsp;(注意医联体协议无法修改)</span></h2>
                 </div>
                 <div class="right-con">
                     <el-form :model="orgFormData" :rules="departformrules" ref="departForm" auto-complete="off">
-                        <el-form-item :label-width="formLabelWidth" class="org_prot" prop="peopleClassifyIds">
-                            <quill-editor ref="myTextEditor" v-model="orgFormData.protocalText" :config="editorOption" @showImageUI="imageHandler" @change="onEditorChange">
+                        <el-form-item :label-width="formLabelWidth" class="org_prot" prop="peopleClassifyIds" >
+                            <quill-editor ref="myTextEditor" v-model="orgFormData.protocalText" disabled="true" :config="editorOption" @showImageUI="imageHandler" @change="onEditorChange">
                             </quill-editor>
                             <!-- 必须带上这个input 上传图片用-->
-                            <input type="file" name="file" id="fileinput" @change="customimgupload($event)" style="display:none">
+                            <!-- <input type="file" name="file" id="fileinput" @change="customimgupload($event)" style="display:none"> -->
                         </el-form-item>
                     </el-form>
                 </div>
@@ -137,6 +142,7 @@ export default {
     data() {
         return {
             formLabelWidth: '90px',
+            tenantNameList: [],
             dictionary: {
                 organizationType: [{  // 机构分类
                     key: "",
@@ -152,35 +158,16 @@ export default {
             },
             total: 0,
             searchContent: {
-                name: '',
-                no: '',
-                orgType: ''
+                tenantId: '',
+                orgFullName: '',
+                orgClassify: ''
             },
             protOrgListData: [],  // 本页列表数据源
-            // protOrgListData2: [{  // 本页列表模拟数据源
-            //     name: '新1',
-            //     type: '社区1',
-            //     protName: '医联体协议'
-            // }, {
-            //     name: '新2',
-            //     type: '社区2',
-            //     protName: '医联体协议'
-            // }, {
-            //     name: '新3',
-            //     type: '社区3',
-            //     protName: '医联体协议'
-            // }, {
-            //     name: '新4',
-            //     type: '社区4',
-            //     protName: '医联体协议'
-            // }, {
-            //     name: '新5',
-            //     type: '社区5',
-            //     protName: '医联体协议'
-            // }],
             dialogTitle: '',
+            curOrgProtTxt: '',  // 当前机构协议内容
             editUnionFormVisible: false,
             editOrgFormVisible: false,
+            curOrgId: '',   // 当前机构ID
             dynamicFldFormData: [],
             editorOption: {
                 placeholder: '',
@@ -189,14 +176,19 @@ export default {
             addServItemForm: {
                 generatePlanFlag: ''
             },
+            isShowText: false,
+            curProt: '',    // 当前协议
             // 医联体协议内容
             unionFormData: {
+                protocalName: '医联体协议',  // 协议名称
                 protocalText: "",           // 协议内容
                 protocalObjType: 1,         // 协议主体类型
-                protocalTypeCurrentUse: 1   // 当前使用的协议类型
+                protocalTypeCurrentUse: 1,  // 当前使用的协议类型
+                tenantId: ''
             },
             // 机构协议内容
             orgFormData: {
+                protocalName: '机构协议',    // 协议名称
                 protocalText: "",           // 协议内容
                 protocalObjType: 2,         // 协议主体类型
                 protocalTypeCurrentUse: 2   // 当前使用的协议类型
@@ -213,9 +205,26 @@ export default {
         /**
          *  通用
          */
-        // 关闭对话框
-        closeDialog() {
-            this.editUnionFormVisible = false;
+        // 获取租户名字
+        getTenantName() {
+            let params = [{
+                pageNo: 1,
+                pageSize: 1000
+            }];
+
+            commonAjax('cas.tenantManageService', 'tenantList', params).then(res => {
+                if (res.code == 200) {
+                    this.tenantNameList = res.body.data;
+                    this.searchContent.tenantId = this.tenantNameList[0].tenantId;
+                    this.searchContent.tenantName = this.tenantNameList[0].tenantName;
+                    this.getProtocalList();  // 获取协议列表数据
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
         },
         // 获取字典
         dictionaryRequest() {
@@ -228,9 +237,11 @@ export default {
                 if (res.code == 200) {
                     res.body.forEach(function(ele, index) {
                         if (ele.dicId == arr[0]) {
-                            // that.dictionary.organizationType = ele.items;
+                            // that.dictionary.organizationType = ele.items; //Only support three org types.
                             that.dictionary.organizationType.push(ele.items[1]);
                             that.dictionary.organizationType.push(ele.items[10]);
+                            that.dictionary.organizationType.push(ele.items[11]);
+                            that.dictionary.organizationType.splice(0, 1);
                         }
                     })
                 } else {
@@ -253,34 +264,53 @@ export default {
         },
         // 清除
         clear() {
-            this.searchContent.name = '';
-            this.searchContent.orgType = '';
+            this.searchContent.tenantId = '';
+            this.searchContent.orgFullName = '';
+            this.searchContent.orgClassify = '';
         },
         // 搜索
         search() {
             this.getProtocalList();
         },
-        // 获取协议列表
-        getProtocalList() {
-            if (this.searchContent.name == "" && this.searchContent.orgType == "") {
-                var params = [
-                    '',
-                    '',
-                    this.page.pageNo,
-                    this.page.pageSize
-                ];
-            } else {
-                var params = [
-                    this.page.pageNo,
-                    this.page.pageSize,
-                    this.searchContent.name,
-                    this.searchContent.orgType
-                ];
+        // 关闭对话框
+        closeDialog(type) {
+            this.editUnionFormVisible = false;
+            if (type == 'orgProt') {
+                this.orgFormData.protocalText = '';
+            } else if (type == 'unionProt') {
+                this.unionFormData.protocalText = '';
             }
+        },
+
+
+        /**
+         * 获取协议列表
+         */ 
+        getProtocalList() {
+            let tId = this.searchContent.tenantId;
+            let name = this.searchContent.orgFullName;
+            let type = this.searchContent.orgClassify;
+            let params = [
+                tId, 
+                name, 
+                type, 
+                this.page.pageNo, 
+                this.page.pageSize
+            ];
 
             commonAjax('cas.protocalParamService', 'getProtocalList', params).then(res => {
                 if (res.code == 200) {
-                    this.protOrgListData = res.body.items;
+                    $.each(res.body, function(idx, el) {
+                        if (el.orgClassify == '02') {
+                            el.orgClassify = '社区卫生服务中心';
+                        } else if (el.orgClassify == '11') {
+                            el.orgClassify = '卫生服务站';
+                        } else if (el.orgClassify == '12') {
+                            el.orgClassify = '村卫生室';
+                        }
+                    });
+                    this.protOrgListData = res.body;
+                    this.total = res.body.length;
                 } else {
                     this.$message({
                         type: 'error',
@@ -296,9 +326,10 @@ export default {
          */
         // 保存医联体协议
         saveUnionProtocol() {
+            this.unionFormData.tenantId = this.searchContent.tenantId;
             let params = [this.unionFormData];
 
-            commonAjax('cas.protocalParamService', 'addprotocal', params).then(res => {
+            commonAjax('cas.protocalParamService', 'saveorupdateprotocal', params).then(res => {
                 if (res.code == 200) {
                     this.editUnionFormVisible = false;
                     this.getProtocalList();
@@ -310,13 +341,40 @@ export default {
                 }
             });
         },
-        // 添加服务
-        addServiceItem() {
+        // 检查协议内容
+        getUnionProt() {
+            let params = [
+                1,
+                this.searchContent.tenantId
+            ];
+
+            commonAjax('cas.protocalParamService', 'getunionprotocal', params).then(res => {
+                if (res.code == 200) {
+                    if (this.curProt == 'orgProt') {
+                        this.orgFormData.protocalText = res.body.protocalText;
+                    } else {
+                        this.unionFormData.protocalText = res.body.protocalText;
+                    }
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
+        // 打开医联体协议
+        chkUnionProt() {
+            this.curProt = '';
+            this.getUnionProt();
             this.dialogTitle = '编辑医联体协议';
             this.editUnionFormVisible = true;
         },
         // 编辑
-        editProtocol() {
+        editProtocol(index, row) {
+            this.curOrgId = row.orgId;
+            this.orgFormData.protocalText = row.protocalText;
+            this.curOrgProtTxt = row.protocalText;
             this.dialogTitle = "协议管理-编辑协议";
             this.editOrgFormVisible = true;
         },
@@ -370,8 +428,25 @@ export default {
         /**
          *  机构协议
          */
+        // 选择协议类型
+        chsProt(type) {
+            let curType = type;
+            if (type == 1) {
+                this.orgFormData.protocalText = '';
+                this.getUnionProt();
+                this.curProt = 'orgProt';
+                this.isShowText = true;
+                this.$refs.myTextEditor.quillEditor.disable();
+            } else if (type == 2) {
+                this.orgFormData.protocalText = '';
+                this.orgFormData.protocalText = this.curOrgProtTxt;
+                this.isShowText = false;
+                this.$refs.myTextEditor.quillEditor.enable();
+            }
+        },
         // 机构协议 - 保存协议
         saveOrgProtocol() {
+            this.orgFormData.protocalObjId = this.curOrgId;
             let params = [this.orgFormData];
 
             commonAjax('cas.protocalParamService', 'updateprotocal', params).then(res => {
@@ -387,11 +462,12 @@ export default {
             });
         },
 
+
         // 初始化
         init() {
+            this.getTenantName();
             this.dictionaryRequest();
             this.getDynamicFields();
-            this.getProtocalList();  // 获取协议列表数据
         }
     }
 }
@@ -436,6 +512,14 @@ export default {
 
 .btn_save_org {
     text-align: right;
+}
+
+.range {
+    text-align: right;
+}
+
+.unionTip {
+    color: red;
 }
 </style>
 <style>

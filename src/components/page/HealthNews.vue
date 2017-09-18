@@ -178,7 +178,7 @@ export default {
             handleEdit(index, row,str) {
                     if (row) {
                         this.dialogFormVisible = true;
-                        this.dialogtitle = "编辑新闻";
+                        this.dialogtitle = "编辑资讯";
                         if(str=='look'){
                             this.islook=true
                         }else{
@@ -209,7 +209,7 @@ export default {
                         this.islook=false;
                         this.imageUrl = "";
                         this.dialogFormVisible = true;
-                        this.dialogtitle = "新增广告";
+                        this.dialogtitle = "新增资讯";
                         this.formdata = {
                             "id": undefined, //健康资讯id,当为新增时不传,修改时必传
                             "title": "", //标题

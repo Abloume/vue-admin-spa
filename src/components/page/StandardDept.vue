@@ -24,9 +24,9 @@
                         <el-col :span="6">
                             <el-button type="primary" icon="search" @click="searchClick">查询</el-button>
                         </el-col>
-                        <el-col :span="6">
+                      <!--   <el-col :span="6">
                             <el-button type="primary" icon="search" @click="submitForm()">保存</el-button>
-                        </el-col>
+                        </el-col> -->
                     </el-row>
                     <el-row :gutter="20" class="search_con">
                         <el-col :span="24">
@@ -62,7 +62,7 @@
                 <div class="right-con">
                     <el-row :gutter="20" class="search_con2">
                         <el-col :span="12">
-                            <el-input v-model="params.content" :label-width="formLabelWidth" placeholder="科室拼音码"></el-input>
+                            <el-input v-model="stdparams.content" :label-width="formLabelWidth" placeholder="科室拼音码"></el-input>
                         </el-col>
                         <el-col :span="6">
                             <el-button type="primary" icon="search" @click="stdsearchClick">查询</el-button>
@@ -127,23 +127,23 @@ export default {
                     this.currentRow = val;
                     console.log(this.currentRow);
                 },
-                submitForm() {
+                // submitForm() {
 
-                    commonAjax("cas.standardDeptCampareService", "saveCampares", '[' + JSON.stringify(this.tableData) + ']').then(res => {
-                        if (res.code == 200) {
-                            this.$message({
-                                type: 'success',
-                                message: "保存成功"
-                            });
-                            this.getTableData(this.orgId);
-                        } else {
-                            this.$message({
-                                type: 'error',
-                                message: res.data.msg
-                            });
-                        }
-                    });
-                },
+                //     commonAjax("cas.standardDeptCampareService", "saveCampares", '[' + JSON.stringify(this.tableData) + ']').then(res => {
+                //         if (res.code == 200) {
+                //             this.$message({
+                //                 type: 'success',
+                //                 message: "保存成功"
+                //             });
+                //             this.getTableData(this.orgId);
+                //         } else {
+                //             this.$message({
+                //                 type: 'error',
+                //                 message: res.data.msg
+                //             });
+                //         }
+                //     });
+                // },
                 //获取当前选中机构下的科室列表数据
                 getTableData(val) {
                     let params = `['${val}','${this.params.content}',${this.params.pageNo},${this.params.pageSize}]`;
@@ -238,6 +238,20 @@ export default {
                     this.currentRow.standardDeptId = row.stardardDeptId;
                     this.currentRow.stardardDeptName = row.stardardDeptName;
                     this.tableData.splice(this.currentRow.index, 1, this.currentRow)
+                     commonAjax("cas.standardDeptCampareService", "saveCampares", '[' + JSON.stringify(this.tableData) + ']').then(res => {
+                        if (res.code == 200) {
+                            this.$message({
+                                type: 'success',
+                                message: "保存成功"
+                            });
+                            this.getTableData(this.orgId);
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: res.data.msg
+                            });
+                        }
+                    });
                 },
                 //页面显示的条数变化
                 handleSizeChange(val) {
@@ -270,7 +284,7 @@ export default {
                 if (res.code == 200) {
                     this.orglist = res.body.data;
                     if (this.orglist[0]) {
-                        this.orgId = this.orglist[0].id
+                        this.orgId = this.orglist[0].orgId
                     }
                 } else {
                     this.$message({

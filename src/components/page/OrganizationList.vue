@@ -54,7 +54,7 @@
                     <el-button size="small" @click="handleEdit(scope.$index, scope.row,'baseInfo')">编辑</el-button>
                     <el-button size="small" @click="handleEdit(scope.$index, scope.row,'orgnavigation')">医院导航</el-button>
                     <el-button size="small" @click="handleEdit(scope.$index, scope.row,'reportDes')">报告说明</el-button>
-                    <!-- <el-button size="small" @click="handleEdit(scope.$index, scope.row,'countInfo')">账号信息</el-button> -->
+                    <el-button size="small" @click="handleEdit(scope.$index, scope.row,'countInfo')">账号信息</el-button>
                     <!-- <el-button size="small" @click="handleEdit(scope.$index, scope.row,'qrCode')">二维码</el-button> -->
                     <el-button size="small" @click="handleEdit(scope.$index, scope.row,'serviceList')">服务列表</el-button>
                     <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
@@ -115,6 +115,7 @@ export default {
                         "orgShortName": row && row.orgShortName ? row.orgShortName : "", //简称
                         "orgClassify": row && row.orgClassify ? row.orgClassify : "", //机构分类
                         // "area": row&&row.area?row.area:"",
+                        "areaLevel":row && row.areaLevel ? row.areaLevel : "",
                         "orgNature": row && row.orgNature ? row.orgNature : "", //机构性质
                         "orgLevel": row && row.orgLevel ? row.orgLevel : "", //机构级别
                         "orgMnemonic": row && row.orgMnemonic ? row.orgMnemonic : "",

@@ -36,14 +36,20 @@
                                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                             </el-upload>
                         </el-form-item>
-                        <el-form-item label="医院分类" :label-width="formLabelWidth" prop="orgClassify">
-                            <el-select v-model="orgOption.orgClassify" placeholder="请选择医院分类" :disabled="orgOption.isdisabled">
+                         <el-form-item label="机构级别" :label-width="formLabelWidth" prop="areaLevel">
+                            <el-select v-model="orgOption.areaLevel" placeholder="请选择机构级别" :disabled="orgOption.isdisabled">
+                                <el-option v-for="item in dictionary.areaLevel" :key="item.key" :label="item.text" :value="item.key">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="机构分类" :label-width="formLabelWidth" prop="orgClassify">
+                            <el-select v-model="orgOption.orgClassify" placeholder="请选择机构分类" :disabled="orgOption.isdisabled">
                                 <el-option v-for="item in dictionary.orgClassify" :key="item.key" :label="item.text" :value="item.key">
                                 </el-option>
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="医院性质" :label-width="formLabelWidth" prop="orgNature">
-                            <el-select v-model="orgOption.orgNature" placeholder="请选择医院性质" :disabled="orgOption.isdisabled">
+                        <el-form-item label="机构性质" :label-width="formLabelWidth" prop="orgNature">
+                            <el-select v-model="orgOption.orgNature" placeholder="请选择机构性质" :disabled="orgOption.isdisabled">
                                 <el-option v-for="item in dictionary.orgNature" :key="item.key" :label="item.text" :value="item.key">
                                 </el-option>
                             </el-select>
@@ -54,8 +60,8 @@
                                 </el-option>
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="医院等级" :label-width="formLabelWidth" prop="orgLevel">
-                            <el-select v-model="orgOption.orgLevel" placeholder="请选择医院等级" :disabled="orgOption.isdisabled">
+                        <el-form-item label="机构等级" :label-width="formLabelWidth" prop="orgLevel">
+                            <el-select v-model="orgOption.orgLevel" placeholder="请选择机构等级" :disabled="orgOption.isdisabled">
                                 <el-option v-for="item in dictionary.orgLevel" :key="item.key" :label="item.text" :value="item.key">
                                 </el-option>
                             </el-select>
@@ -102,7 +108,7 @@
                         <el-form-item label="机构地址" :label-width="formLabelWidth" prop="orgAddress">
                             <el-input v-model="orgOption.orgAddress" :disabled="orgOption.isdisabled"></el-input>
                         </el-form-item>
-                        <el-form-item label="医院地图" :label-width="formLabelWidth" prop="">
+                        <el-form-item label="机构地图" :label-width="formLabelWidth" prop="">
                             <div id="allmap"></div>
                         </el-form-item>
                         <el-form-item label="经度" :label-width="formLabelWidth" prop="longitude">
@@ -120,7 +126,7 @@
                         <el-form-item label="联系电话" :label-width="formLabelWidth" prop="contactNo">
                             <el-input v-model="orgOption.contactNo" :disabled="orgOption.isdisabled"></el-input>
                         </el-form-item>
-                        <el-form-item label="医院网址" :label-width="formLabelWidth" prop="homepage">
+                        <el-form-item label="机构网址" :label-width="formLabelWidth" prop="homepage">
                             <el-input v-model="orgOption.homepage" :disabled="orgOption.isdisabled"></el-input>
                         </el-form-item>
                         <el-form-item label="机构介绍" :label-width="formLabelWidth" prop="description">
@@ -165,7 +171,7 @@
                         </el-pagination>
                     </div>
                 </el-tab-pane>
-                <!--<el-tab-pane label="账号信息" name="countInfo" class="eltabpane" v-if="orgOption.ishowtab">
+                <el-tab-pane label="账号信息" name="countInfo" class="eltabpane" v-if="orgOption.ishowtab">
                     <h2 class="account-title">支付宝</h2>
                     <el-form :model="countformdata" :rules="conutinformrules" ref="countForm" auto-complete="off">
                         <el-form-item label="支付宝账号" :label-width="formLabelWidth" prop="AliPay.account">
@@ -235,7 +241,7 @@
                             <el-button type="primary" @click="editForm()" v-if="orgOption.isdisabled">我要编辑</el-button>
                         </div>
                     </el-form> 
-                </el-tab-pane>-->
+                </el-tab-pane>
                 <el-tab-pane label="报告说明" name="reportDes" class="eltabpane" v-if="orgOption.ishowtab">
                     <el-row class="addbtn">
                         <el-col :span="24">
@@ -502,6 +508,7 @@ export default {
                     // objectType: [],
                     svrOpenProperty: [],
                     baseDataType: [],
+                    areaLevel:[]
                 },
                 //机构基本信息开始
                 orgimguploaddata: {
@@ -795,7 +802,7 @@ export default {
                 dictionaryRequest() {
                     var that = this;
                     // let arr = ["cfs.dic.base_organizationType", "cfs.dic.base_mechanismProperties", "cfs.dic.base_organizationGrade", "cfs.dic.base_reportType", "cfs.dic.base_inspectionReportType", "cfs.dic.base_objectType", "cfs.dic.base_svrOpenProperty", "cfs.dic.base_baseDataType"];
-                    let arr = ["cfs.dic.base_organizationType", "cfs.dic.base_mechanismProperties", "cfs.dic.base_organizationGrade", "cfs.dic.base_reportType", "cfs.dic.base_inspectionReportType", "cfs.dic.base_svrOpenProperty", "cfs.dic.base_baseDataType"];
+                    let arr = ["cfs.dic.base_organizationType", "cfs.dic.base_mechanismProperties", "cfs.dic.base_organizationGrade", "cfs.dic.base_reportType", "cfs.dic.base_inspectionReportType", "cfs.dic.base_svrOpenProperty", "cfs.dic.base_baseDataType","cfs.dic.base_areaLevel"];
                     commonAjax("cas.multipleDictionaryService", "findDic", '[' + JSON.stringify(arr) + ']').then(res => {
                         // 
                         if (res.code == 200) {
@@ -823,6 +830,9 @@ export default {
                                 }
                                 if (ele.dicId == arr[6]) {
                                     that.dictionary.baseDataType = ele.items;
+                                }
+                                if (ele.dicId == arr[7]) {
+                                    that.dictionary.areaLevel = ele.items;
                                 }
                             })
 
@@ -856,7 +866,7 @@ export default {
 
                                     this.orgOption.orgId = res.body.orgId ? res.body.orgId : res.body;
                                     this.orgOption.ishowtab = true;
-
+                                    this.orgOption.isdisabled=true
                                     // this.$router.push('organizationList');
                                 } else {
                                     this.$message({
@@ -1076,7 +1086,7 @@ export default {
                         }
                     });
                 },
-                //获取医院导航列表数据
+                //获取机构导航列表数据
                 navgetTableData() {
                     if (this.orgOption.orgId) {
                         let {

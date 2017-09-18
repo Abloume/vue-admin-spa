@@ -1,29 +1,31 @@
 <template>
     <div class="feedback">
+        <!--标题-->
         <div class="crumbs">
-            <!-- 标题栏 -->
             <el-row class="navbreadcrumb cbafter">
                 <el-col :span="12" class="zuhu">
                     <el-breadcrumb separator="/">
-                        <el-breadcrumb-item>业务管理</el-breadcrumb-item>
-                        <el-breadcrumb-item>意见反馈</el-breadcrumb-item>
+                        <el-breadcrumb-item>签约服务</el-breadcrumb-item>
+                        <el-breadcrumb-item>预约挂号</el-breadcrumb-item>
                     </el-breadcrumb>
                 </el-col>
-                <el-col :span="12" class="range">
+                <el-col :span="8" class="newRrv">
+                    <el-button type="primary">新增预约</el-button>
+                </el-col>
+                <el-col :span="4" class="range">
                     <el-select v-model="searchContent.tenantId" placeholder="请选择" :disabled="isCheckPattern">
                         <el-option v-for="item in this.tenantNameList" :key="item.tenantId" :label="item.tenantName" :value="item.tenantId"></el-option>
                     </el-select>
                 </el-col>
             </el-row>
-            <!-- 过滤条件 -->
             <el-row v-show="!isCheckPattern" class="search_line">
                 <el-col :span="22">
                     <el-form :inline="true" :model="searchContent" class="demo-form-inline">
-                        <el-form-item label="反馈内容" class="fb_ctnt">
-                            <el-input v-model="searchContent.content" class="fb_ctnt_val"></el-input>
+                        <el-form-item class="fb_ctnt">
+                            <el-input placeholder="患者姓名" v-model="searchContent.content" class="fb_ctnt_val"></el-input>
                         </el-form-item>
                         <el-form-item label="反馈时间" class="fb_time">
-                            <div> 
+                            <div>
                                 <el-date-picker v-model="searchContent.date" type="daterange" placeholder="选择日期" @change="dateChange">
                                 </el-date-picker>
                             </div>
@@ -46,13 +48,13 @@
                 </el-col>
             </el-row>
         </div>
-        <!-- 列表 -->
+        <!--列表-->
         <el-table v-show="!isCheckPattern" :data="fbTableData" border style="width: 100%">
-            <el-table-column label="用户" prop="name" width="90"></el-table-column>
-            <el-table-column label="反馈类型" prop="classifyText" width="100"></el-table-column>
-            <el-table-column label="反馈内容" prop="content" width="410"></el-table-column>
-            <el-table-column label="反馈时间" prop="createDt" width="160"></el-table-column>
-            <el-table-column label="状态" width="100">
+            <el-table-column label="用户" prop="name"></el-table-column>
+            <el-table-column label="反馈类型" prop="classifyText"></el-table-column>
+            <el-table-column label="反馈内容" prop="content"></el-table-column>
+            <el-table-column label="反馈时间" prop="createDt"></el-table-column>
+            <el-table-column label="状态">
                 <template scope="scope">
                     <span v-if='scope.row.statusType==1'>已处理</span>
                     <span v-if='scope.row.statusType==0'>未处理</span>
@@ -244,6 +246,8 @@ export default {
         },
         // 获取反馈列表
         getFbList() {
+            // this.searchContent.tenantId = sessionStorage.getItem('tenantId');
+            this.searchContent.tenantId = 'hcn.tongxiang'; // Tmp
             let params = [this.searchContent];
 
             commonAjax('cas.feedBackService', 'queryFeedBack', params).then(res => {
@@ -353,6 +357,11 @@ export default {
     padding-left: 30px
 }
 
+.newRrv {
+    text-align: right;
+    padding-right: 10px;
+}
+
 .search_line {
     margin-top: 10px;
 }
@@ -374,7 +383,7 @@ export default {
 }
 
 .fb_ctnt {
-    width: 21%;
+    width: 10%;
     margin-right: 0;
 }
 
@@ -397,5 +406,8 @@ img {
 <style>
 .feedback .fb_ctnt > div {
     width: 62%;
-}    
+}   
+.feedback .fb_ctnt_val > input {
+    width: 80px;
+}
 </style>

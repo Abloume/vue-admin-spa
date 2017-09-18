@@ -20,7 +20,7 @@
         <el-table :data="tenantListData" border style="width: 100%">
             <el-table-column label="序号" prop="number"></el-table-column>
             <el-table-column label="租户标识" prop="tenantId"></el-table-column>
-            <el-table-column label="类型" prop="tenantType"></el-table-column>
+            <el-table-column label="类型" prop="tenantTypeText"></el-table-column>
             <el-table-column label="名称" prop="tenantName"></el-table-column>
             <el-table-column label="操作">
                 <template scope="scope">
@@ -42,6 +42,15 @@ import { commonAjax } from '../../api/api';
 export default {
     data() {
         return {
+            dictionary: { // 字典查询数据
+                medicalCombType: [{ // 租户维护-基本信息-类型
+                    key: "",
+                    text: "",
+                    leaf: "",
+                    index: "",
+                    mcode: ""
+                }]
+            },
             tenantListData: [],   // 租户列表
             total: "",            // 条数
             isEnaleStatus: false, // 禁用和启用按钮
@@ -53,9 +62,31 @@ export default {
         }
     },
     activated() {
-        this.getTenantListData();
+        this.init();
     },
     methods: {
+        // 获取字典
+        dictionaryRequest() {
+            var that = this;
+            let arr = [
+                "cfs.dic.base_medicalCombType" // 租户维护-基本信息-类型
+            ];
+
+            commonAjax("cas.multipleDictionaryService", "findDic", '[' + JSON.stringify(arr) + ']').then(res => {
+                if (res.code == 200) {
+                    res.body.forEach(function(ele, index) {
+                        if (ele.dicId == arr[0]) {
+                            that.dictionary.medicalCombType = ele.items;
+                        }
+                    })
+                } else {
+                    this.$message({
+                        type: 'error',
+                        message: res.msg
+                    });
+                }
+            });
+        },
         //获取租户列表数据
         getTenantListData() {
             let params = [{
@@ -69,6 +100,18 @@ export default {
                     $.each(res.body.data, function(index, el) {
                         el.number = (index + 1) + (params[0].pageNo - 1) * (params[0].pageSize);
                     });
+                    // $.each(res.body.data, function(index, el) {
+                    //     if (res.body.data.tenantType == '01') {
+                    //         res.body.data.tenantType = '集团化医院';
+                    //     } else if (res.body.data.tenantType == '02') {
+                    //         res.body.data.tenantType = '医疗中心';
+                    //     } else if (res.body.data.tenantType == '03') {
+                    //         res.body.data.tenantType = '城市级医联';
+                    //     } else {
+                    //         res.body.data.tenantType = '互联网医联';
+                    //     }
+                    // });
+                    
                     this.tenantListData = res.body.data;
                     this.total = res.body.total;
                 } else {
@@ -211,6 +254,11 @@ export default {
         // 输入框翻页效果
         handleCurrentChange(val) {
             this.params.pageNo = val;
+            this.getTenantListData();
+        },
+
+        init() {
+            this.dictionaryRequest();
             this.getTenantListData();
         }
     },

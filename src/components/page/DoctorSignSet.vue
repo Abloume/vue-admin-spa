@@ -455,7 +455,42 @@ export default {
 
                 }
             };
+            var checktypeCode=(rule, value, callback) => {
+                if (!value) {
+                    return callback(new Error('请输入代码'));
+                } else {
+                        if (value.length > 15) {
+                            return callback(new Error('最多只能15位'));
+                        } else {
+                            var g = /^[a-zA-Z]+$/;
+                            if (g.test(value)) {
+                                callback()
+                            } else {
+                                return callback(new Error('必须是英文字母'));
+                            }
+                        }
 
+                }
+            };
+            var checkupperLimit=(rule, value, callback) => {
+                if (!value) {
+                    return callback(new Error('请输入内容'));
+                } else {
+                        if (value.length > 15) {
+                            return callback(new Error('最多只能15位'));
+                        } else {
+                            var g = /^(?=[\d.]{1,15})([1-9]\d{1,14}|\d)(\.\d{1,2})?$/;
+                            // let pointindex=value.indexof(".");
+                            // value=value.substring(pointindex)<3?value:value+"0"
+                            if (g.test(value)) {
+                                callback()
+                            } else {
+                                return callback(new Error('必须是数字,并且小数最多只保留2位'));
+                            }
+                        }
+
+                }
+            };
             return {
                 //通用
                 formLabelWidth: '160px',
@@ -510,18 +545,26 @@ export default {
                 // 表单验证
                 healthtypeformrules: {
                     typeCode: [{
+                        validator: checktypeCode,
                         required: true,
-                        message: '请输入代码',
                         trigger: 'blur'
                     }],
                     typeName: [{
                         required: true,
                         message: '请输入名称',
                         trigger: 'blur'
+                    },{
+                        max: 15,
+                        message: '长度最大15个字符',
+                        trigger: 'blur'
                     }],
                     hpiUnit: [{
                         required: true,
                         message: '请输入单位',
+                        trigger: 'blur'
+                    },{
+                        max: 15,
+                        message: '长度最大15个字符',
                         trigger: 'blur'
                     }],
                 },
@@ -548,15 +591,19 @@ export default {
                         required: true,
                         message: '请输入名称',
                         trigger: 'blur'
+                    },{
+                        max: 15,
+                        message: '长度最大15个字符',
+                        trigger: 'blur'
                     }],
                     upperLimit: [{
                         required: true,
-                        message: '请输入上限',
+                        validator: checkupperLimit,
                         trigger: 'blur'
                     }],
                     lowerLimit: [{
                         required: true,
-                        message: '请输入下限',
+                         validator: checkupperLimit,
                         trigger: 'blur'
                     }],
                 },

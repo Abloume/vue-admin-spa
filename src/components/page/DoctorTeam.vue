@@ -108,7 +108,7 @@
                             <el-input v-model="spPackParam.spName" placeholder="请输入服务名称"></el-input>
                         </el-col>
                         <el-col :span="4">
-                            <el-input v-model="spPackParam.packCode" placeholder="请输入编号"></el-input>
+                            <el-input v-model="spPackParam.packCode" placeholder="请输入编号" v-show="!this.editTeamformdata.teamId"></el-input>
                         </el-col>
                         <el-col :span="4">
                             <el-select v-model="spPackParam.status" placeholder="启用情况">
@@ -215,8 +215,8 @@
                 <el-form-item label="有效期(天)" :label-width="formLabelWidth" prop="spPack.validPeriod">
                     <el-input v-model="editserpackformdata.spPack.validPeriod" disabled></el-input>
                 </el-form-item>
-                <el-form-item label="适合人群" :label-width="formLabelWidth" prop="spPack.packDesc">
-                    <el-input v-model="editserpackformdata.spPack.packDesc" disabled></el-input>
+                <el-form-item label="适合人群" :label-width="formLabelWidth" prop="spPack.suitableObjectText">
+                    <el-input v-model="editserpackformdata.spPack.suitableObjectText" disabled></el-input>
                 </el-form-item>
                 <el-form-item label="启用时间" :label-width="formLabelWidth" prop="spPack.startDt">
                     <el-input v-model="editserpackformdata.spPack.startDt" disabled></el-input>
@@ -394,6 +394,7 @@ export default {
                         "packCode": "",
                         "price": "",
                         "suitableObject": "",
+                        "suitableObjectText":"",
                         "startDt": "",
                         "spPackId": "",
                         "spId": "",
@@ -561,10 +562,11 @@ export default {
                         if (valid) {
                             commonAjax('cas.teamManageService', 'saveTeamInfo', '[' + JSON.stringify(this.editTeamformdata) + ']').then(res => {
                                 if (res.code == 200) {
-                                    // this.editTeamdialogFormVisible = false;
+                                    this.editTeamdialogFormVisible = false;
                                     this.ishowtab = true;
                                     this.param.orgId = this.editTeamformdata.orgId;
                                     this.curteamId = res.body;
+                                    this.editTeamformdata.teamId=res.body;
                                     // this.activeName = 'baseInfo';
                                     this.getTableData();
                                     this.$message({
@@ -859,6 +861,7 @@ export default {
                                         "packCode": res.body.spPack.packCode,
                                         "price": res.body.spPack.price,
                                         "suitableObject": res.body.spPack.suitableObject,
+                                        "suitableObjectText":res.body.spPack.suitableObjectText,
                                         "startDt": res.body.spPack.startDt,
                                         "spPackId": res.body.spPack.spPackId,
                                         "spId": res.body.spPack.spId,
@@ -898,6 +901,7 @@ export default {
                                 "packCode": "",
                                 "price": "",
                                 "suitableObject": "",
+                                suitableObjectText:"",
                                 "startDt": "",
                                 "spPackId": undefined,
                                 "spId": this.curteamId,
@@ -1011,6 +1015,7 @@ export default {
                                 this.editserpackformdata.spPack.packCode = el.packCode;
                                 this.editserpackformdata.spPack.spId = this.curteamId;
                                 this.editserpackformdata.spPack.suitableObject = el.suitableObject;
+                                 this.editserpackformdata.spPack.suitableObjectText = el.suitableObjectText;
                                 this.editserpackformdata.spPack.startDt = el.startDt;
                                 this.editserpackformdata.spPack.spPackId = 0;
                                 this.editserpackformdata.spPack.validPeriod = el.validPeriod

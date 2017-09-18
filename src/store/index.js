@@ -15,6 +15,7 @@ export default new Vuex.Store({
 			"localOrgId": "", //机构代码
 			"orgFullName": "", //机构全称
 			"orgShortName": "", //简称
+			"areaLevel": "",
 			"orgClassify": "", //机构分类
 			"area": "",
 			"orgNature": "", //机构性质

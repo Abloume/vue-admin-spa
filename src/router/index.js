@@ -191,6 +191,22 @@ export default new Router({
                         },
                         component: resolve => require(['../components/zxxpage/FeedbackList.vue'], resolve)
                     }]
+                }, { // 预约记录
+                    path: '/reservationRecord',
+                    name: 'ReservationRecord',
+                    component: resolve => require(['../components/zxxpage/ReservationRecord.vue'], resolve)
+                }, {
+                    path: '/serviceRecord',
+                    name: 'ServiceRecord',
+                    component: resolve => require(['../components/zxxpage/ServiceRecord.vue'], resolve)
+                }, {
+                    path: '/contractManage',
+                    name: 'ContractManage',
+                    component: resolve => require(['../components/zxxpage/ContractManage.vue'], resolve)
+                }, { // 预约家医
+                    path: '/contractDoctor',
+                    name: 'ContractDoctor',
+                    component: resolve => require(['../components/zxxpage/ContractDoctor.vue'], resolve)
                 }
 
             ]

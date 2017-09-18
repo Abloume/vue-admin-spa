@@ -4,6 +4,9 @@ jenkins地址：http://10.8.3.32:8080/jenkins/view/hcn/  账号：admin  密码：bsoft@1
 
 cas-admin测试环境访问地址：http://10.8.3.48:7010/cas-admin/#/login?pro=hcn.admin_pc
 
+
+测试环境 http://10.8.3.166:8119/cas-admin/#/login?pro=hcn.admin_pc
+
 外网访问地址
 http://122.224.131.235:9096/cas-admin/ 外网接口地址
 

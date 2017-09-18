@@ -347,7 +347,7 @@ export default {
                 },
                 //获取banner列表数据
                 getTableData() {
-                    var temparams = `['${this.params.bannerPostion}','${this.params.proCode}','${this.params.isEnable}',${this.params.pageNo},${this.params.pageSize}]`;
+                    var temparams = `['${this.params.proCode}','${this.params.bannerPostion}','${this.params.isEnable}',${this.params.pageNo},${this.params.pageSize}]`;
                     commonAjax("cas.productbannerService", "searchProductBannerList", temparams).then(res => {
                         if (res.code == 200) {
                             $.each(res.body.list, function(index, el) {

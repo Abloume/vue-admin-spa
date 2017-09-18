@@ -245,13 +245,13 @@
                     <el-input v-model="addProdFormData.tenantName" disabled="true"></el-input>
                 </el-form-item>
                 <el-form-item label="上级产品" :label-width="formLabelWidth" prop="pCode">
-                    <el-select placeholder="请选择" v-model="addProdFormData.pCode" @change="choosePrtPrd">
+                    <el-select placeholder="无" v-model="addProdFormData.pCode" @change="choosePrtPrd">
                         <el-option v-for="item in productFirstLevelData" :key="item.code" :label="item.name" :value="item.code">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="产品类型" :label-width="formLabelWidth" prop="productType">
-                    <el-select placeholder="请选择" v-model="addProdFormData.productType" @change="setProductType" >
+                    <el-select placeholder="无" v-model="addProdFormData.productType" @change="setProductType">
                         <el-option v-for="item in dictionary.productType" :key="item.key" :label="item.text" :value="item.key">
                         </el-option>
                     </el-select>
@@ -267,7 +267,7 @@
         </el-dialog>
 
         <!-- 查看产品模态框 -->
-        <el-dialog :title="dialogTitle" v-model="prodCheckDialogForm" @close="closeModal('serinfoForm')">
+        <el-dialog :title="dialogTitle" v-model="prodCheckDialogForm" @close="closeModal('prodInfoForm')">
             <el-form :model="productCheckData" :rules="serformdata.serinforules" ref="prodInfoForm" auto-complete="off">
                 <el-form-item label="租户产品标识" :label-width="formLabelWidth" prop="code">
                     <el-input v-model="productCheckData.code" disabled='true'></el-input>
@@ -305,14 +305,14 @@
         <el-dialog :title="dialogTitle" v-model="servAddDialogFormVisible" @close="closeModal('servAddDialogForm')">
             <el-form :model="servAddedDialogData" :rules="serformdata.serinforules" ref="servAddDialogForm" auto-complete="off">
                 <!-- <el-form-item label="服务项目" :label-width="formLabelWidth" prop="serviceX">
-                        <el-select v-model="servAddedDialogData.serviceX" placeholder="请选择" @change='chooseServItem'>
-                            <el-option v-for="item in dictionary.svrItemCode" :key="item.key" :label="item.text" :value="item.key">
-                            </el-option>
-                        </el-select>
-                    </el-form-item> -->
+                                    <el-select v-model="servAddedDialogData.serviceX" placeholder="请选择" @change='chooseServItem'>
+                                        <el-option v-for="item in dictionary.svrItemCode" :key="item.key" :label="item.text" :value="item.key">
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item> -->
                 <el-form-item label="服务项目" :label-width="formLabelWidth" prop="serviceId">
                     <el-select v-model="servAddedDialogData.serviceId" placeholder="请选择" @change='chooseServItem'>
-                        <el-option v-for="item in dictionary.svrItemCode" :key="item.key" :label="item.text" :value="item.key">
+                        <el-option v-for="item in srvItemArr" :key="item.serviceCode" :label="item.serviceName" :value="item.serviceId">
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -350,17 +350,17 @@
         <!-- 查看服务模态框 -->
         <el-dialog :title="dialogTitle" v-model="servCheckDialogForm" @close="closeModal('servCheck')">
             <el-form :model="ServiceDetailTableData" ref="servCheck">
-                <el-form-item label="服务项目" :label-width="formLabelWidth" prop="serviceId">
-                    <el-select class="serv_check" v-model="ServiceDetailTableData.serviceId" placeholder="请选择" :disabled="isServReadOnly">
+                <el-form-item label="服务项目" :label-width="formLabelWidth" prop="serviceName">
+                    <el-select class="serv_check" v-model="ServiceDetailTableData.serviceName" placeholder="请选择" disabled="true">
                         <el-option v-for="item in dictionary.svrItemCode" :key="item.key" :label="item.text" :value="item.key">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="服务编码" :label-width="formLabelWidth" prop="serviceNo">
-                    <el-input class="serv_check" v-model="ServiceDetailTableData.serviceNo" :disabled="isServReadOnly"></el-input>
+                <el-form-item label="服务编码" :label-width="formLabelWidth" prop="serviceCode">
+                    <el-input class="serv_check" v-model="ServiceDetailTableData.serviceCode" disabled="true"></el-input>
                 </el-form-item>
                 <el-form-item label="服务说明" :label-width="formLabelWidth" prop="serviceDesc">
-                    <el-input class="serv_check" v-model="ServiceDetailTableData.serviceDesc" :disabled="isServReadOnly"></el-input>
+                    <el-input class="serv_check" v-model="ServiceDetailTableData.serviceDesc" disabled="true"></el-input>
                 </el-form-item>
                 <el-form-item label="开通服务对象类别" :label-width="formLabelWidth" prop="objectId">
                     <el-select placeholder="请选择" class="serv_check" v-model="ServiceDetailTableData.objectType" :disabled="isServReadOnly">
@@ -596,6 +596,7 @@ export default {
             addProdTenantName: '', // 添加租户产品模态框-租户名称
             curProductTypeObj: '', // 当前已选产品类型
             isFstPrdEmpty: false,  // 一级产品是否为空
+            isGoSave: false,        //
             addProdFormData: {     // 添加产品表单数据
                 code: '',
                 description: '',
@@ -605,9 +606,12 @@ export default {
                 status: 1,
                 tenantName: ''     // 租户名称
             },
+            isNeedChange: true,   //   
+            isMyClean: false,   //
             isProdEnable: false, // 产品列表启用和禁用状态
             prodDialogFormVisible: false, // 产品列表-添加产品模态框
             prodCheckDialogForm: false, // 产品列表-查看产品模态框
+            isEditProd: false,
             isProdReadOnly: true, // 查看或编辑
             prodListPagination: { // 分页
                 pageNo: 1,
@@ -658,6 +662,24 @@ export default {
             tenantServicUpdatedForm: {},        // 服务列表编辑保存的数据
             isServReadOnly: true,               // 查看服务是否只读
             servAddDialogFormVisible: false,    // 服务列表添加模态框
+            srvItemArr: [{
+                serviceId: "",
+                serviceType: "",
+                serviceCode: "",
+                serviceName: "",
+                serviceDesc: "",
+                serviceGuide: "",
+                orgServiceFlag: "1",
+                deptServiceFlag: "0",
+                doctorServiceFlag: "0",
+                serviceStackFlag: "0",
+                planFlag: "0",
+                urgentFlag: "0",
+                urgentFee: 0.0,
+                servicePaytype: "1",
+                serviceNo: "queueCall",
+                effectiveFlag: "1"
+            }],
             addSerExtDialogFormVisible: false,  // 扩展属性添加模态框model
             isShowServExtend: false,            // 是否显示服务扩展列表页
             isEditStatus: false,                // 是否显示编辑按钮
@@ -764,6 +786,17 @@ export default {
         // 模态框 - 关闭和取消按钮
         closeModal(formName) {
             this.$refs[formName].resetFields();
+            if (formName == 'prodInfoForm') {             // 查看产品模态框
+                this.prodCheckDialogForm = false;
+            } else if (formName == 'prodAddDialogForm') { // 添加产品模态框
+                this.prodDialogFormVisible = false;
+            } else if (formName == 'servAddDialogForm') { // 添加服务模态框
+                this.servAddDialogFormVisible = false;
+            } else if (formName == 'addExtFldForm') {
+                this.addSerExtDialogFormVisible = false;  // 添加扩展属性模态框
+            } else if (formName == 'servCheck') {
+                this.servCheckDialogForm = false;
+            }
         },
         showlist() {
             $(".yishenglist").show();
@@ -916,6 +949,9 @@ export default {
                 pageNo: this.orgListPagination.pageNo,
                 pageSize: this.orgListPagination.pageSize
             }]
+            if (this.basicData.tenantId == '') {
+                return;
+            }
 
             commonAjax("cas.tenantManageService", "searchTenantOrg", params).then(res => {
                 if (res.code == 200) {
@@ -1264,6 +1300,7 @@ export default {
             this.dialogTitle = "查看租户产品",
                 this.isProdReadOnly = true;
             this.prodCheckDialogForm = true;
+            this.isEditProd = true;
             this.curProductCode = row.code;
 
             let params = [row.code];
@@ -1271,6 +1308,18 @@ export default {
             commonAjax('cas.tenantManageService', 'productDetail', params).then(res => {
                 if (res.code == 200) {
                     this.productCheckData = res.body;
+                    if (this.productCheckData.pCode == -1) {
+                        this.productCheckData.pCode = '';
+                    }
+                    if (this.productCheckData.pCode && typeof this.productCheckData.pCode == 'string') {
+                        if (this.productCheckData.pCode.indexOf('admin') != -1) {
+                            this.productCheckData.pCode = '管理版';
+                        } else if (this.productCheckData.pCode.indexOf('doctor') != -1) {
+                            this.productCheckData.pCode = '医生版';
+                        } else {
+                            this.productCheckData.pCode = '患者版';
+                        }
+                    }
                     switch (res.body.code) {
                         case 'hcn.patient':
                             this.productCheckData.productType = '患者版';
@@ -1314,8 +1363,74 @@ export default {
         // 产品列表 - 编辑产品信息
         editProductInfo() {
             this.isProdReadOnly = false;
-            this.getFirstLevelProduct();
-            // this.productCheckData.productType = this.dictionary.productType;
+            this.isEditProd = false;
+            // this.getFirstLevelProduct();
+            this.productCheckData.productType = this.dictionary.productType;
+
+            /*if (this.productCheckData.pCode != '') {
+                let myPcode = this.addProdFormData.pCode;
+                if (myPcode.indexOf('admin') != -1) {        // 管理
+                    this.dictionary.productType = [{
+                        "key": "admin_pc",
+                        "text": "管理版_pc",
+                        "leaf": true,
+                        "index": 0,
+                        "mcode": "glb_pc"
+                    }];
+                } else if (myPcode.indexOf('doctor') != -1) { // 医生
+                    this.dictionary.productType = [{
+                        "key": "doctor_ios",
+                        "text": "医生版_ios",
+                        "leaf": true,
+                        "index": 0,
+                        "mcode": "ysb_ios"
+                    }, {
+                        "key": "doctor_android",
+                        "text": "医生版_android",
+                        "leaf": true,
+                        "index": 0,
+                        "mcode": "ysb_android"
+                    }];
+                } else {                                        // 患者
+                    this.dictionary.productType = [{
+                        "key": "patient_ios",
+                        "text": "患者版_ios",
+                        "leaf": true,
+                        "index": 0,
+                        "mcode": "hzb_ios"
+                    }, {
+                        "key": "patient_android",
+                        "text": "患者版_android",
+                        "leaf": true,
+                        "index": 0,
+                        "mcode": "hzb_android"
+                    }];
+                }
+            } else {
+                this.dictionary.productType = [
+                    {
+                        "key": "patient",
+                        "text": "患者版",
+                        "leaf": true,
+                        "index": 0,
+                        "mcode": "hzb"
+                    },
+                    {
+                        "key": "doctor",
+                        "text": "医生版",
+                        "leaf": true,
+                        "index": 0,
+                        "mcode": "ysb"
+                    },
+                    {
+                        "key": "admin",
+                        "text": "管理版",
+                        "leaf": true,
+                        "index": 0,
+                        "mcode": "glb"
+                    }
+                ];
+            }*/
         },
         // 产品列表 - 获取一级产品信息
         getFirstLevelProduct() {
@@ -1361,10 +1476,65 @@ export default {
         },
         // 产品列表 - 选择一级产品
         choosePrtPrd() {
-            //  
-            if (this.addProdFormData.pCode) {
-                let myPcode = this.addProdFormData.pCode;
-                if (myPcode.indexOf('admin') != -1) {        // 管理
+            if (this.isGoSave) {
+                return;
+            }
+            if (this.addProdFormData.code != '') { //已经选过
+                this.addProdFormData.code = '';
+                this.addProdFormData.name = '';
+                this.addProdFormData.productType = '';
+                this.isNeedChange = false;
+            } else {
+                this.isNeedChange = true;
+            }
+            var self = this;
+            setTimeout(function() {
+                self.isNeedChange = true;
+            }, 500);
+            if (this.addProdFormData.pCode != -1) {
+                if (this.addProdFormData.pCode && typeof this.addProdFormData.pCode == 'string') {
+                    let myPcode = this.addProdFormData.pCode;
+                    if (myPcode.indexOf('admin') != -1) {        // 管理
+                        this.dictionary.productType = [{
+                            "key": "admin_pc",
+                            "text": "管理版_pc",
+                            "leaf": true,
+                            "index": 0,
+                            "mcode": "glb_pc"
+                        }];
+                    } else if (myPcode.indexOf('doctor') != -1) { // 医生
+                        this.dictionary.productType = [{
+                            "key": "doctor_ios",
+                            "text": "医生版_ios",
+                            "leaf": true,
+                            "index": 0,
+                            "mcode": "ysb_ios"
+                        }, {
+                            "key": "doctor_android",
+                            "text": "医生版_android",
+                            "leaf": true,
+                            "index": 0,
+                            "mcode": "ysb_android"
+                        }];
+                    } else {                                        // 患者
+                        this.dictionary.productType = [{
+                            "key": "patient_ios",
+                            "text": "患者版_ios",
+                            "leaf": true,
+                            "index": 0,
+                            "mcode": "hzb_ios"
+                        }, {
+                            "key": "patient_android",
+                            "text": "患者版_android",
+                            "leaf": true,
+                            "index": 0,
+                            "mcode": "hzb_android"
+                        }];
+                    }
+                }
+            } else {
+                let myCode = this.addProdFormData.code;
+                if (myCode.indexOf('admin') != -1) {        // 管理
                     this.dictionary.productType = [{
                         "key": "admin_pc",
                         "text": "管理版_pc",
@@ -1372,7 +1542,7 @@ export default {
                         "index": 0,
                         "mcode": "glb_pc"
                     }];
-                } else if (myPcode.indexOf('doctor') != -1) { // 医生
+                } else if (myCode.indexOf('doctor') != -1) { // 医生
                     this.dictionary.productType = [{
                         "key": "doctor_ios",
                         "text": "医生版_ios",
@@ -1419,6 +1589,7 @@ export default {
                 createDt: "",
                 creater: ""
             }],
+                this.isNeedChange = true;
 
             this.dialogTitle = "添加租户产品";
             this.addProdFormData.tenantName = this.basicData.tenantName;
@@ -1427,32 +1598,35 @@ export default {
         },
         // 产品列表 - 选择产品类型
         setProductType(val) {
-            //  
-            console.log('选择产品类型')
-            var self = this;
-            $.each(self.dictionary.productType, function(index, ele) {
-                if (ele.key == val) {
-                    self.curProductType = ele.text;
-                }
-            });
-
-            // this.addProdFormData.productType = this.curProductType;
-            this.addProdFormData.code = this.basicData.tenantId + '.' + val;
-            this.addProdFormData.name = this.basicData.tenantName + '.' + this.curProductType;
-
-            // if (this.prodDialogFormVisible == false) {
-            //     this.addProdFormData.productType = '';
-            //     this.addProdFormData.code = '';
-            //     this.addProdFormData.name = '';
-            // }
+            if (this.isNeedChange) {
+                var self = this;
+                $.each(self.dictionary.productType, function(index, ele) {
+                    if (ele.key == val) {
+                        self.curProductType = ele.text;
+                    }
+                });
+                // this.addProdFormData.productType = this.curProductType;
+                this.addProdFormData.code = this.basicData.tenantId + '.' + val;
+                this.addProdFormData.name = this.basicData.tenantName + '.' + this.curProductType;
+            }
         },
         // 产品列表 - 保存添加的产品
         saveAddedProduct() {
-            //  ;
             // delete this.addProdFormData.productType;
             delete this.addProdFormData.tenantName;
             this.addProdFormData.tenantId = this.basicData.tenantId;
-            if (this.isFstPrdEmpty) {
+            this.isGoSave = true;
+            if (this.addProdFormData.pCode !='' ) {
+                this.isFstPrdEmpty = false;
+                if (this.addProdFormData.productType == '') {
+                    this.$message({
+                        type: 'error',
+                        message: '请选择产品类别'
+                    });
+                    return;
+                }
+            }
+            if (this.isFstPrdEmpty || this.addProdFormData.pCode=='') {
                 this.addProdFormData.pCode = -1;
             }
             let params = [this.addProdFormData];
@@ -1460,6 +1634,7 @@ export default {
             commonAjax('cas.tenantManageService', 'productAdded', params).then(res => {
                 if (res.code == 200) {
                     this.prodDialogFormVisible = false;
+                    this.isGoSave = false;
                     this.getProdList();
                 } else {
                     this.$message({
@@ -1632,6 +1807,9 @@ export default {
                 pageNo: this.servListPagination.pageNo,
                 pageSize: this.servListPagination.pageSize
             }]
+            if (this.basicData.tenantId == '') {
+                return;
+            }
 
             commonAjax("cas.tenantManageService", "tenantServiceList", params).then(res => {
                 if (res.code == 200) {
@@ -1719,25 +1897,11 @@ export default {
             }
             $(".yishenglist").hide();
         },
-        // 服务列表 - 点击添加服务
-        addService() {
-            this.dialogTitle = '新增租户服务';
-            this.servAddDialogFormVisible = true;
-        },
-        // 服务列表 - 添加服务 - 服务项目选择
-        chooseServItem(val) {
-            //  
-            if (this.servAddDialogFormVisible == false) {
-                return;
-            }
-
-            let params = [val];
-
-            commonAjax('cas.tenantManageService', 'getAvailableServiceByCode', params).then(res => {
+        // 服务项目
+        getSrvItem() {
+            commonAjax('cas.tenantManageService', 'servicList', []).then(res => {
                 if (res.code == 200) {
-                    // this.servAddedDialogData.serviceId = res.body.serviceId;
-                    this.servAddedDialogData.serviceCode = res.body.serviceCode;
-                    this.servAddedDialogData.serviceDesc = res.body.serviceDesc;
+                    this.srvItemArr = res.body;
                 } else {
                     this.$message({
                         type: 'error',
@@ -1745,6 +1909,51 @@ export default {
                     });
                 }
             });
+        },
+        // 服务列表 - 点击添加服务
+        addService() {
+            this.servAddedDialogData = { // 服务列表-添加服务数据源
+                serviceId: '',
+                serviceCode: '',
+                serviceDesc: '',
+                objectId: '',
+                objectType: '',
+                mainFlag: '1',
+                effectiveFlag: '1',
+                serviceX: ''
+            },
+                this.dialogTitle = '新增租户服务';
+            this.servAddDialogFormVisible = true;
+            this.getSrvItem();  // 获取服务项目
+        },
+        // 服务列表 - 添加服务 - 服务项目选择
+        chooseServItem(val) {
+            // if (this.servAddDialogFormVisible == false) {
+            //     return;
+            // }
+
+            let serviceId = val;
+            var self = this;
+            $.each(self.srvItemArr, function(idx, el) {
+                if (el.serviceId == serviceId) {
+                    self.servAddedDialogData.serviceCode = el.serviceCode;
+                    self.servAddedDialogData.serviceDesc = el.serviceDesc;
+                }
+            });
+
+            // let params = [val];
+            // commonAjax('cas.tenantManageService', 'getAvailableServiceByCode', params).then(res => {
+            //     if (res.code == 200) {
+            //         // this.servAddedDialogData.serviceId = res.body.serviceId;
+            //         this.servAddedDialogData.serviceCode = res.body.serviceCode;
+            //         this.servAddedDialogData.serviceDesc = res.body.serviceDesc;
+            //     } else {
+            //         this.$message({
+            //             type: 'error',
+            //             message: res.msg
+            //         });
+            //     }
+            // });
         },
         // 服务列表 - 保存新增租户服务
         saveAddedService(formName) {
@@ -1754,6 +1963,14 @@ export default {
             //         self.servAddedDialogData.objectType = ele.text;
             //     }
             // });
+
+            if (this.servAddedDialogData.objectType == '') {
+                this.$message({
+                    type: 'error',
+                    message: '请填写开通服务对象类别'
+                });
+                return;
+            }
 
             delete this.servAddedDialogData.serviceX;
             delete this.servAddedDialogData.serviceCode;
@@ -2255,6 +2472,9 @@ h2.account-title {
     background: #1dc499;
     color: #fff
 }
+
+
+
 
 
 

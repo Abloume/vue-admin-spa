@@ -94,6 +94,7 @@ export default {
         },
         mounted() {
             this.getprolists();
+          
         },
         methods: {
             // //获取产品列表数据

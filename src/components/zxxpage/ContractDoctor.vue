@@ -1,12 +1,12 @@
 <template>
     <div class="feedback">
+        <!--标题-->
         <div class="crumbs">
-            <!-- 标题栏 -->
             <el-row class="navbreadcrumb cbafter">
                 <el-col :span="12" class="zuhu">
                     <el-breadcrumb separator="/">
-                        <el-breadcrumb-item>业务管理</el-breadcrumb-item>
-                        <el-breadcrumb-item>意见反馈</el-breadcrumb-item>
+                        <el-breadcrumb-item>签约服务</el-breadcrumb-item>
+                        <el-breadcrumb-item>预约家医</el-breadcrumb-item>
                     </el-breadcrumb>
                 </el-col>
                 <el-col :span="12" class="range">
@@ -15,52 +15,57 @@
                     </el-select>
                 </el-col>
             </el-row>
-            <!-- 过滤条件 -->
             <el-row v-show="!isCheckPattern" class="search_line">
-                <el-col :span="22">
+                <el-col :span="20">
                     <el-form :inline="true" :model="searchContent" class="demo-form-inline">
-                        <el-form-item label="反馈内容" class="fb_ctnt">
-                            <el-input v-model="searchContent.content" class="fb_ctnt_val"></el-input>
+                        <el-form-item class="fb_ctnt">
+                            <el-input placeholder="服务对象" v-model="searchContent.personName" class="fb_ctnt_val"></el-input>
                         </el-form-item>
-                        <el-form-item label="反馈时间" class="fb_time">
-                            <div> 
-                                <el-date-picker v-model="searchContent.date" type="daterange" placeholder="选择日期" @change="dateChange">
-                                </el-date-picker>
-                            </div>
+                        <el-form-item class="fb_ctnt">
+                            <el-input placeholder="联系电话" v-model="searchContent.tel" class="fb_ctnt_val"></el-input>
                         </el-form-item>
-                        <el-form-item label="状态" class="fb_status">
-                            <el-select class="status" v-model="searchContent.statusType" placeholder="全部">
-                                <el-option v-for="item in dictionary.feedback" :key="item.key" :label="item.text" :value="item.key"></el-option>
-                            </el-select>
-                        </el-form-item> 
-                        <el-form-item label="类型">
+                        <el-form-item class="fb_ctnt">
+                            <el-input placeholder="服务项" v-model="searchContent.serviceName" class="fb_ctnt_val"></el-input>
+                        </el-form-item>
+                        <el-form-item class="fb_ctnt">
+                            <el-input placeholder="预约团队" v-model="searchContent.teamName" class="fb_ctnt_val"></el-input>
+                        </el-form-item>
+                        <el-form-item label="状态">
                             <el-select class="status" v-model="searchContent.classify" placeholder="全部">
-                                <el-option v-for="item in dictionary.feedbackClassify" :key="item.key" :label="item.text" :value="item.key"></el-option>
+                                <el-option v-for="item in dictionary.state" :key="item.key" :label="item.text" :value="item.key"></el-option>
                             </el-select>
                         </el-form-item> 
                     </el-form>
                 </el-col>
-                <el-col :span="2" class="oper_btn">
-                    <!-- <el-button type="warning" @click="clear">清除</el-button> -->
+                <el-col :span="4" class="oper_btn">
+                    <el-button type="warning" @click="clear">清除</el-button>
                     <el-button type="success" @click="search">搜索</el-button>
                 </el-col>
             </el-row>
         </div>
-        <!-- 列表 -->
-        <el-table v-show="!isCheckPattern" :data="fbTableData" border style="width: 100%">
-            <el-table-column label="用户" prop="name" width="90"></el-table-column>
-            <el-table-column label="反馈类型" prop="classifyText" width="100"></el-table-column>
-            <el-table-column label="反馈内容" prop="content" width="410"></el-table-column>
-            <el-table-column label="反馈时间" prop="createDt" width="160"></el-table-column>
-            <el-table-column label="状态" width="100">
+        <!--列表-->
+        <el-table v-show="!isCheckPattern" :data="patientListArr" border style="width: 100%">
+            <el-table-column label="服务对象" prop="personName"></el-table-column>
+            <el-table-column label="联系电话" prop="contact"></el-table-column>
+            <el-table-column label="服务包" prop="packName"></el-table-column>
+            <el-table-column label="服务项" prop="serviceName"></el-table-column>
+            <el-table-column label="预约团队" prop="teamName"></el-table-column>
+            <el-table-column label="申请时间" prop="apptDt"></el-table-column>
+            <el-table-column label="状态">
                 <template scope="scope">
-                    <span v-if='scope.row.statusType==1'>已处理</span>
-                    <span v-if='scope.row.statusType==0'>未处理</span>
+                    <span v-if='scope.row.apptStatus==1'>待确认</span>
+                    <span v-if='scope.row.apptStatus==2'>已取消</span>
+                    <span v-if='scope.row.apptStatus==3'>已确认</span>
+                    <span v-if='scope.row.apptStatus==4'>未通过</span>
+                    <span v-if='scope.row.apptStatus==5'>已执行</span>
                 </template>
             </el-table-column>
             <el-table-column label="操作">
                 <template scope="scope">
-                    <el-button size="small" @click="checkFbDetail(scope.row)">查看</el-button>
+                    <el-button type="success" v-if="scope.row.apptStatus==1" size="small" @click="confirmReser(scope.row)">确认</el-button>
+                    <el-button type="success" v-if="(scope.row.apptStatus==2)||(scope.row.apptStatus==3)||(scope.row.apptStatus==4)||(scope.row.apptStatus==5)" 
+                        size="small" @click="chkSrvDtl(scope.row)">查看</el-button>
+                    <el-button type="danger" v-if="scope.row.apptStatus==3" size="small" @click="cancelReser(scope.row)">取消</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -110,6 +115,21 @@
                 <el-button v-show="!isReadOnly" type="primary" @click="submitForm">提交</el-button>
             </div>
         </el-form>
+
+        <!-- 取消对话框 -->
+        <el-dialog :title="cancelTitle" v-model="cancelReserVisible" @close="closeDialog">
+            <el-row>
+                <el-col :span="12">
+                    <label>取消原因</label>
+                </el-col :span="12">
+                <el-col :span="12">
+                    <div><el-radio class="radio" v-model="radio" label="1">临时有急事不能提供服务</el-radio></div>
+                    <div><el-radio class="radio" v-model="radio" label="2">已经线下完成服务</el-radio></div>
+                    <div><el-radio class="radio" v-model="radio" label="2">近阶段不能提供该项服务</el-radio></div>
+                    <div><el-radio class="radio" v-model="radio" label="2">其他</el-radio><el-input></el-input></div>
+                </el-col>
+            </el-row>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -128,14 +148,7 @@ export default {
             imgUrl: '',
             imgUrls: '',
             dictionary: {
-                feedback: [{            // 状态
-                    key: "",
-                    text: "",
-                    leaf: "",
-                    index: "",
-                    mcode: ""
-                }],
-                feedbackClassify: [{    // 意见类型
+                state: [{            // 状态
                     key: "",
                     text: "",
                     leaf: "",
@@ -143,31 +156,42 @@ export default {
                     mcode: ""
                 }]
             },
+            isConfirmBtn: false,
+            isCheckBtn: false,
+            isCancelBtn: false,
+
 
             /**
              *  反馈列表页面数据
              */
             searchContent: {    // 搜索关键字
                 classify: '',
-                content: '',
-                date: '',
-                endDate: '',
+                personName: '',
                 pageNo: 1,
                 pageSize: 10,
-                startDate: '',
-                statusType: '',
+                serviceName: '',
+                tel: '',
+                teamName: '',
                 tenantId: ''
             },
             tenantNameList: [],   // 租户名称数组
-            fbTableData: [],      // 反馈内容列表数据源
+            patientListArr: [],   // 反馈内容列表数据源
+
             
             /**
              *  反馈详情页面数据 
              */ 
-            fbDetailTableData: [] // 反馈详情数组
+            fbDetailTableData: [],// 反馈详情数组
+
+
+            /**
+             * 取消对话框
+             */
+            cancelTitle: '取消预约',
+            cancelReserVisible: false
         }
     },
-    activated() {
+    mounted() {
          this.init();
     },
     methods: {
@@ -178,18 +202,14 @@ export default {
         dictionaryRequest() {
             var that = this;
             let arr = [
-                "cfs.dic.base_feedback",          // 状态
-                "cfs.dic.base_feedbackClassify"   // 类型
+                "cfs.dic.base_appointmentState"    // 状态
             ];
            
             commonAjax("cas.multipleDictionaryService", "findDic", '[' + JSON.stringify(arr) + ']').then(res => {
                 if (res.code == 200) {
                     res.body.forEach(function (ele, index) {
                         if (ele.dicId == arr[0]) {
-                            that.dictionary.feedback = ele.items;
-                        }
-                        if (ele.dicId == arr[1]) {
-                            that.dictionary.feedbackClassify = ele.items;
+                            that.dictionary.state = ele.items;
                         }
                     })
                 } else {
@@ -203,22 +223,47 @@ export default {
         // 条数变化
         handleSizeChange(val) {
             this.searchContent.pageSize = val;
-            this.getFbList();
+            this.getPatientList();
         },
         // 当前页变化
         handleCurrentChange(val) {
             this.searchContent.pageNo = val;
-            this.getFbList();
+            this.getPatientList();
         },
         // 选择日期
         dateChange(val) {
             this.searchContent.startDate = val.substr(0, 10);
             this.searchContent.endDate = val.substr(-10);
         },
+        // 清除
+        clear() {
+            this.searchContent.personName = '';
+            this.searchContent.tel = '';
+            this.searchContent.serviceName = '';
+            this.searchContent.teamName = '';
+        },
+        // 关闭对话框
+        closeDialog() {
+            this.srvRcdFormVisible = false;
+        },
 
 
         /**
-         *  反馈列表页面 
+         *  预约处理
+         */
+        // 取消预约
+        cancelReser() {
+            this.cancelTitle = '取消预约';
+            this.cancelReserVisible = true;
+        },
+        // 确认预约
+        confirmReser() {
+            console.log( 11 )
+        },
+
+
+        /**
+         *  患者列表页面 
          */
         // 获取租户名字
         getTenantName() {
@@ -240,16 +285,18 @@ export default {
         },
         // 搜索
         search() {
-            this.getFbList();        
+            this.getPatientList();        
         },
-        // 获取反馈列表
-        getFbList() {
+        // 获取患者列表
+        getPatientList() {
+            this.searchContent.tenantId = sessionStorage.getItem('tenantId');
+            // this.searchContent.tenantId = 'hcn.tongxiang'; // Tmp
             let params = [this.searchContent];
 
-            commonAjax('cas.feedBackService', 'queryFeedBack', params).then(res => {
+            commonAjax('cas.signorderAdminsService', 'queryApptFamilyDoctorList', params).then(res => {
                 if (res.code == 200) {
-                    this.fbTableData = res.body.items;
-                    this.total = res.body.total;
+                    this.patientListArr = res.body.data;
+                    this.total = res.body.count;
                 } else {
                     this.$message({
                         type: 'error',
@@ -261,10 +308,10 @@ export default {
 
 
         /**
-         *  反馈详情页面
+         *  服务详情页面
          */
-        // 查看反馈页面详情
-        checkFbDetail(row) {
+        // 查看服务详情
+        chkSrvDtl(row) {
             if (row.statusType == 0) {  // 未处理
                 this.isReadOnly = false;
             } else { // 已处理
@@ -316,7 +363,7 @@ export default {
         // 返回
         goback() {
             this.isCheckPattern = false;
-            this.getFbList();
+            this.getPatientList();
         },
         // 获取当前时间
         getNowFormatDate() {
@@ -342,7 +389,7 @@ export default {
         init() {
             this.getTenantName();
             this.dictionaryRequest();
-            this.getFbList();
+            this.getPatientList();
         }
     }
 }
@@ -351,6 +398,11 @@ export default {
 .zuhu {
     background: url(../../assets/img/zuhu.png) no-repeat left center;
     padding-left: 30px
+}
+
+.newRrv {
+    text-align: right;
+    padding-right: 10px;
 }
 
 .search_line {
@@ -374,7 +426,7 @@ export default {
 }
 
 .fb_ctnt {
-    width: 21%;
+    width: 10%;
     margin-right: 0;
 }
 
@@ -393,9 +445,20 @@ export default {
 img {
     width: 30%;
 }
+
+.fb_ctnt {
+    width: 130px;
+}
+
+.fb_ctnt_val {
+    width: 125px;
+}
 </style>
 <style>
 .feedback .fb_ctnt > div {
     width: 62%;
-}    
+}   
+/* .feedback .fb_ctnt_val > input {
+    width: 80px;
+} */
 </style>
