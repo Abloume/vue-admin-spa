@@ -35,8 +35,10 @@ export default {
     data: function() {
         return {
             ruleForm: {
-                username: 'hcn.admin2',
-                password: 'qwerty'
+                // username: 'hcn.admin2',
+                // password: 'qwerty'
+                username: '',
+                password: ''
             },
             rules: {
                 username: [{

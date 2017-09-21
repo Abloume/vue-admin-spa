@@ -751,8 +751,7 @@ export default {
          */ 
         // 删除服务包下的服务项
         delEditedServItem(index, row) {
-            let params = [row.serviceId];
-
+            let params = [row.id, 2];
             commonAjax('cas.baseServiceService', 'deleteServiceitemTmpl', params).then(res => {
                 if (res.code == 200) {
                     // this.addPackFormData.association.splice(index, 1);

@@ -126,7 +126,7 @@
                     <el-radio-group v-model="addServItemForm.generatePlanTimeX" @change="chsAddPlanTime" :disabled="isReadOnly" class="plan_start">
                         <el-radio :label="0">签约生效日期</el-radio>
                         <el-radio :label="1">签约生效后</el-radio>
-                        <el-input class="day" v-model="addServItemForm.generatePlanTime" :disabled="isReadOnly"></el-input>
+                        <el-input class="day" v-model="addServItemForm.generatePlanTime" :disabled="isDays"></el-input>
                     </el-radio-group>
                     <span class="days">天</span>
                 </el-form-item>
@@ -299,7 +299,7 @@
                     <el-radio-group v-model="editServItemForm.generatePlanTimeY" @change="chsEditPlanTime" :disabled="isReadOnly" class="plan_start">
                         <el-radio :label="0">签约生效日期</el-radio>
                         <el-radio :label="1">签约生效后</el-radio>
-                        <el-input class="day" v-model="editServItemForm.generatePlanTime" :disabled="isReadOnly"></el-input>
+                        <el-input class="day" v-model="editServItemForm.generatePlanTime" :disabled="isDays"></el-input>
                     </el-radio-group>
                     <span class="days">天</span>
                 </el-form-item>
@@ -468,6 +468,7 @@ export default {
             // 服务项新增
             addTplFormVisible: false,
             isReadOnly: false,        // 查看状态
+            isDays: false,             // 后几天
             isGenePlan: false,
             createUser: '3c41b79e-6484-11e7-8229-005056c00008',
             addServItemForm: {        // 新增服务项详情表单
@@ -559,19 +560,26 @@ export default {
         // 計劃開始時間-添加
         chsAddPlanTime(type) {
             if (type == 0) {
+                this.isDays = true;
                 this.addServItemForm.generatePlanTime = 0;
+            } else {
+                this.isDays = false;
             }
         },
         // 计划开始时间-编辑
         chsEditPlanTime(type) {
             if (type == 0) {
+                this.isDays = true;
                 this.editServItemForm.generatePlanTime = 0;
+            } else {
+                this.isDays = false;
             }
         },
         // 是否生成计划-添加
         addChooseItem(val) {
             if (val == 1) {
                 this.isGenePlan = true;
+                this.isDays = true;
                 this.addServItemForm.generatePlanTimeX = 0;
             } else {
                 this.isGenePlan = false;
@@ -581,6 +589,7 @@ export default {
         editChooseItem(val) {
             if (val == 1) {
                 this.isGenePlan = true;
+                this.isDays = true;
                 this.editServItemForm.generatePlanTimeY = 0;
             } else {
                 this.isGenePlan = false;
@@ -711,7 +720,7 @@ export default {
             this.searchContent.no = '';
             this.searchContent.status = '';
         },
-        // 获取列表数据
+        // 获取编辑列表数据
         fetchEditItemData() {
             let params = [this.curSrvItemId];
 
@@ -725,18 +734,19 @@ export default {
                         } else {
                             res.body.generatePlanTimeY = 0;
                         }
-                    } else{
-                        
+                    } else {
                         res.body.generatePlanFlag = 0;
-                         res.body.generatePlanTimeY = 0;
+                        res.body.generatePlanTimeY = 0;
                     }
-
-                    // this.chkServItemForm = res.body;
-                    // this.chkServItemForm.generatePlanTimeY = res.body.generatePlanTimeY;
 
                     this.editServItemForm = res.body;
                     this.editServItemForm.generatePlanTimeY = res.body.generatePlanTimeY;
-                    console.log(this.editServItemForm.generatePlanTimeY);
+                    // if (this.editServItemForm.evaluationTplId = 0) {    //无评价内容
+                    //     this.editServItemForm.evaluationTplId = ''
+                    // } else {
+                    //     this.getAssoEval(); //关联评价
+                    // }
+                    this.getAssoEval(); //关联评价
                     this.isReadOnly = false;
                     this.isAddOrEdit = 2;
                     this.dialogTitle = '编辑服务项详情';
@@ -908,7 +918,7 @@ export default {
                 this.servExplModule.splice(this.servExplModule.indexOf(item), 1);
             } else {  //编辑服务项
                 let tplId = item.tmplId;
-                let params = [tplId];
+                let params = [tplId, 1];
                 commonAjax('cas.baseServiceService', 'deleteServiceitemTmpl', params).then(res => {
                     if (res.code == 200) {
                         // this.servExplModule.splice(this.servExplModule.indexOf(item.content), 1);
@@ -939,6 +949,19 @@ export default {
             commonAjax('cas.baseServiceService', 'findEvaluationDefineList', params).then(res => {
                 if (res.code == 200) {
                     this.assoEvalArr = res.body;
+                    if (this.isAddOrEdit == 2) {  //编辑场景
+                        let curEvalId = this.editServItemForm.evaluationTplId; // 当前关联评价ID
+                        if (curEvalId == 0) {
+                            this.editServItemForm.evaluationTplId = '';
+                        } else {  //有评价
+                            let self = this;
+                            $.each(self.assoEvalArr, function(idx, el) {
+                                if (el.id = curEval) {
+                                    self.editServItemForm.defineTpName = el.defineTpName;
+                                }
+                            });
+                        }
+                    }
                 } else {
                     this.$message({
                         type: 'error',
@@ -967,22 +990,22 @@ export default {
             this.$refs[formName].validate((valid) => {
                 if (valid) {
                     if (this.isAddOrEdit == 1) { // 添加服务项
-                        if (this.addServItemForm.generatePlanFlag == 1) {   //生成计划和时间
-                            if (this.addServItemForm.generatePlanTimeX=='' && this.addServItemForm.generatePlanTime=='') {
-                                this.$message({
-                                    type: 'error',
-                                    message: '请选择计划开始时间！'
-                                });
-                                return;
-                            }
-                            if (this.addServItemForm.generatePlanTimeX=='1' && this.addServItemForm.generatePlanTime=='') {
-                                this.$message({
-                                    type: 'error',
-                                    message: '请填写计划开始时间！'
-                                });
-                                return;
-                            }
-                        }
+                        // if (this.addServItemForm.generatePlanFlag == 1) {   //生成计划和时间
+                        //     if (this.addServItemForm.generatePlanTimeX=='' && this.addServItemForm.generatePlanTime=='') {
+                        //         this.$message({
+                        //             type: 'error',
+                        //             message: '请选择计划开始时间！'
+                        //         });
+                        //         return;
+                        //     }
+                        //     if (this.addServItemForm.generatePlanTimeX=='1' && this.addServItemForm.generatePlanTime=='') {
+                        //         this.$message({
+                        //             type: 'error',
+                        //             message: '请填写计划开始时间！'
+                        //         });
+                        //         return;
+                        //     }
+                        // }
                         if (this.addServItemForm.lowerPrice > this.addServItemForm.upperPrice) {
                             this.$message({
                                 type: 'error',
@@ -1020,25 +1043,32 @@ export default {
                         });
                     } else {  // 编辑服务项
                         this.isAddOrEdit = 2;
-                        if (this.addServItemForm.generatePlanFlag == 1) {
-                            console.log( 'this.addServItemForm.generatePlanTimeX: '+this.addServItemForm.generatePlanTimeX )
-                            console.log( 'this.addServItemForm.generatePlanTimeX=="": '+this.addServItemForm.generatePlanTimeX=='' )
-                            console.log( 'this.addServItemForm.generatePlanTime=="": '+this.addServItemForm.generatePlanTime=='' )
-                            if (this.addServItemForm.generatePlanTimeX=='' && this.addServItemForm.generatePlanTime=='') {
-                                this.$message({
-                                    type: 'error',
-                                    message: '请选择计划开始时间！'
-                                });
-                                console.log( '编辑数据' )
-                                return;
-                            }
-                            if (this.addServItemForm.generatePlanTimeX=='1' && this.addServItemForm.generatePlanTime=='') {
-                                this.$message({
-                                    type: 'error',
-                                    message: '请填写计划开始时间！'
-                                });
-                                return;
-                            }
+                        // if (this.addServItemForm.generatePlanFlag == 1) {
+                        //     console.log( 'this.addServItemForm.generatePlanTimeX: '+this.addServItemForm.generatePlanTimeX )
+                        //     console.log( 'this.addServItemForm.generatePlanTimeX=="": '+this.addServItemForm.generatePlanTimeX=='' )
+                        //     console.log( 'this.addServItemForm.generatePlanTime=="": '+this.addServItemForm.generatePlanTime=='' )
+                        //     if (this.addServItemForm.generatePlanTimeX=='' && this.addServItemForm.generatePlanTime=='') {
+                        //         this.$message({
+                        //             type: 'error',
+                        //             message: '请选择计划开始时间！'
+                        //         });
+                        //         console.log( '编辑数据' )
+                        //         return;
+                        //     }
+                        //     if (this.addServItemForm.generatePlanTimeX=='1' && this.addServItemForm.generatePlanTime=='') {
+                        //         this.$message({
+                        //             type: 'error',
+                        //             message: '请填写计划开始时间！'
+                        //         });
+                        //         return;
+                        //     }
+                        // }
+                        if (this.editServItemForm.lowerPrice > this.editServItemForm.upperPrice) {
+                            this.$message({
+                                type: 'error',
+                                message: '上限不能低于下限！'
+                            });
+                            return;
                         }
                         delete this.editServItemForm.generatePlanTimeX;
                         delete this.editServItemForm.content;
@@ -1068,7 +1098,6 @@ export default {
         },
         // 保存'复制其他模板项'表单
         saveCopyTplData(val) {
-            debugger
             if (this.isAddOrEdit == 1) { //添加服务项
                 var self = this;
                 this.servExplModule.push(this.copyTplForm.option);

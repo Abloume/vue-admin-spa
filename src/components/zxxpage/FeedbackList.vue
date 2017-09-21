@@ -86,10 +86,10 @@
                 <p v-show="fbDetailTableData.flag==0">不接受</p>
             </el-form-item>
             <el-form-item label="反馈类型:">
-                <el-input class="form_item_width" v-model="fbDetailTableData.statusType" label-width="200px" disabled="true"></el-input>
+                <el-input class="form_item_width" v-model="fbDetailTableData.classifyText" label-width="200px" disabled="true"></el-input>
             </el-form-item>
             <el-form-item label="反馈内容:">
-                <el-input class="form_item_width" type="textarea" v-model="fbDetailTableData.replyContent" label-width="200px" disabled="true"></el-input>
+                <el-input class="form_item_width" type="textarea" v-model="fbDetailTableData.content" label-width="200px" disabled="true"></el-input>
             </el-form-item>
             <el-form-item label="图片:">
                 <span v-for="imgUrl in imgUrls" :key='imgUrl'>
@@ -248,7 +248,6 @@ export default {
         // 获取反馈列表
         getFbList() {
             let params = [this.searchContent];
-debugger
             commonAjax('cas.feedBackService', 'queryFeedBack', params).then(res => {
                 if (res.code == 200) {
                     this.fbTableData = res.body.items;

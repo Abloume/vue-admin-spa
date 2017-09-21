@@ -4,8 +4,11 @@
             <el-menu-item index="readme">
                 <i class="el-icon-menu"></i>主页
             </el-menu-item>
-             <!-- <el-menu-item index="signAdd">
-                <i class="el-icon-menu"></i>签约新增
+            <!-- <el-menu-item index="signApplyList">
+                <i class="el-icon-menu"></i>签约申请
+            </el-menu-item> -->
+            <!--  <el-menu-item index="BaseTable">
+                <i class="el-icon-menu"></i>租户管理
             </el-menu-item> -->
             <!-- <el-submenu index="33333">
                 <template slot="title"><i class="el-icon-menu"></i>租户管理</template>
@@ -28,7 +31,17 @@
                 <el-menu-item index="healthNewsType">健康资讯类别</el-menu-item>
                 <el-menu-item index="doctorTeam">家医团队</el-menu-item>
             </el-submenu> -->
+            <!-- <el-submenu index="34">
+                <template slot="title"><i class="el-icon-menu"></i>签约服务</template>
+                <el-menu-item index="reservationRecord">预约挂号</el-menu-item>
+                <el-menu-item index="serviceRecord">服务记录</el-menu-item>
+                <el-menu-item index="contractManage">签约管理</el-menu-item>
+                <el-menu-item index="contractDoctor">预约家医</el-menu-item>
+            </el-submenu> -->
              <template v-for="(item,index) in rolemenulists">
+                <!-- <el-menu-item :index="item.linkedUrl" v-if="item.pId=='m_-1'">
+                    <i class="el-icon-menu"></i>{{item.name}}
+                </el-menu-item> -->
                 <el-submenu :index="item.id">
                     <template slot="title"><img :src="item.menuIconId" width="14" height="14" style="margin-right:10px" /><!-- <i class="el-icon-menu"></i>-->{{item.name}}</template>
                     <el-menu-item :index="sitem.linkedUrl" v-for="(sitem,sindex) in item.child"><img :src="sitem.menuIconId" width="14" height="14" style="margin-right:10px" />{{sitem.name}}</el-menu-item>

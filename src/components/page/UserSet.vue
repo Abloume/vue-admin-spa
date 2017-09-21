@@ -67,10 +67,10 @@
                 </el-form-item>
                 <el-form-item label="密码" prop="password" :label-width="formLabelWidth">
                     <el-row>
-                        <el-col :span="16">
+                        <el-col :span="24">
                             <el-input type="password" v-model="formdata.password" auto-complete="off" :disabled="ispwedit"></el-input>
                         </el-col>
-                        <el-col :span="5" >
+                        <el-col :span="0" >
                             <el-button type="primary" @click="pwedit" v-show="ispwedit">编辑密码</el-button>
                         </el-col>
                     </el-row>
@@ -418,7 +418,7 @@ export default {
 
                     } else {
                         this.dialogtitle = "新增用户";
-                         this.ispwedit=false;
+                        this.ispwedit=false;
                         this.formdata = {
                             "email": "",
                             "id": undefined,

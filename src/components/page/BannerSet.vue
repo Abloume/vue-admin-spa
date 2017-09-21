@@ -200,10 +200,9 @@ export default {
 
                     }],
                     linkAddress: [{
-                        required: true,
+                        required: false,
                         validator: checkaddrlink,
                         message: '请输入链接地址',
-
                     }],
                     picture: [{
                         required: true,

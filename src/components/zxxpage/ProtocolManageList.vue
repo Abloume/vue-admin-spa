@@ -374,7 +374,6 @@ export default {
         },
         // 编辑
         editProtocol(index, row) {
-            debugger
             let type = 0;
             if (row.protocalName == '医联体协议') {
                 type = 1;
