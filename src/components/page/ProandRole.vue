@@ -216,8 +216,7 @@ export default {
                 },
                 //获取搜索下拉框的一级产品列表
                 getprolist() {
-                    let pararm = sessionStorage.getItem('tenantId')
-                    commonAjax('cas.tenantManageService', 'productFirstLevel', `['${pararm}']`).then(res => {
+                    commonAjax('cas.tenantManageService', 'productFirstLevel', '[]').then(res => {
                         if (res.code == 200) {
                             this.prolist = res.body;
                             this.curprocode = this.prolist[0].code;

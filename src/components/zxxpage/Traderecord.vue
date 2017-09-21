@@ -4,12 +4,12 @@
             <el-row class="navbreadcrumb cbafter">
                 <el-col :span="12" class="zuhu">
                     <el-breadcrumb separator="/">
-                        <el-breadcrumb-item>租户管理</el-breadcrumb-item>
-                        <el-breadcrumb-item>广告管理</el-breadcrumb-item>
+                        <el-breadcrumb-item>业务管理</el-breadcrumb-item>
+                        <el-breadcrumb-item>交易管理</el-breadcrumb-item>
                     </el-breadcrumb>
                 </el-col>
             </el-row>
-            <el-row class="search_con" :gutter="20">
+            <!-- <el-row class="search_con" :gutter="20">
                 <el-col :span="18">
                     <el-select v-model="params.bannerPostion" placeholder="请选择广告位置">
                         <el-option v-for="item in dictionary.bannerPostion" :key="item.key" :label="item.text" :value="item.key">
@@ -28,9 +28,9 @@
                 <el-col :span="6" class="addorg">
                     <el-button type="primary" icon="plus" @click="handleEdit">添加广告</el-button>
                 </el-col>
-            </el-row>
+            </el-row> -->
         </div>
-        <el-table :data="tableData" border style="width: 100%">
+        <el-table v-show="false" :data="tableData" border style="width: 100%">
             <el-table-column prop="productName" label="产品">
             </el-table-column>
             <el-table-column prop="positionText" label="广告位置">
@@ -59,7 +59,7 @@
                 </template>
             </el-table-column>
         </el-table>
-        <div class="pagination">
+        <div v-show="false" class="pagination">
             <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="total" :page-sizes="[10,20,50]" @size-change="handleSizeChange" @current-change="handleCurrentChange" :page-size="params.pageSize">
             </el-pagination>
         </div>
@@ -131,19 +131,6 @@ import {
 from '../../api/api';
 export default {
     data() {
-            // 链接地址
-            var checkaddrlink = (rule, value, callback) => {
-                if (this.formdata.linkType == "03" || this.formdata.linkType == "00") {
-                    callback()
-                } else {
-                    if (!value) {
-                        return callback(new Error('链接地址不能为空'));
-                    }else{
-                        callback()
-                    }
-                }
-
-            };
             return {
                 // 通用
                 formLabelWidth: '120px',
@@ -201,7 +188,6 @@ export default {
                     }],
                     linkAddress: [{
                         required: true,
-                        validator: checkaddrlink,
                         message: '请输入链接地址',
 
                     }],
@@ -402,9 +388,7 @@ export default {
                             message: "请上传图片"
                         });
                     }
-
                     this.$refs[formName].validate((valid) => {
-                        
                         if (valid) {
                             commonAjax("cas.productbannerService", "addAndUpdate", '[' + JSON.stringify(this.formdata) + ']', ).then(res => {
                                 if (res.code == 200) {

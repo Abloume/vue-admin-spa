@@ -261,31 +261,40 @@ export default {
                                 el.createDt = el.createDt.substring(0, 10);
                                 el.platformtext = el.platform == 1 ? "IOS" : "Android"
                             });
-                           
+
                             commonAjax('cas.productRelatedService', 'productSecondLevelList', '[]').then(res2 => {
                                 if (res2.code == 200) {
-                                    let temarr = res2.body.filter(function(el, index) {//过滤出android和ios的产品
-                                        el.productCode=el.code;
-                                        el.productName=el.name;
-                                        if(el.code.toLowerCase().indexOf("android")>0){//给安卓赋值产品类型
-                                            el.platform="2";
+                                    console.log(res.body.data);
+                                    console.log(res2.body);
+                                    let temarr = res2.body.filter(function(el, index) { //过滤出android和ios的产品
+                                        el.productCode = el.code;
+                                        el.productName = el.name;
+                                        if (el.code.toLowerCase().indexOf("android") > 0) { //给安卓赋值产品类型
+                                            el.platform = "2";
                                             el.platformtext = "Android"
                                         }
-                                        if(el.code.toLowerCase().indexOf("ios")>0){//给ios赋值产品类型
-                                            el.platform="1";
+                                        if (el.code.toLowerCase().indexOf("ios") > 0) { //给ios赋值产品类型
+                                            el.platform = "1";
                                             el.platformtext = "IOS"
                                         }
                                         return el.code.indexOf("_pc") == -1;
                                     });
-                                    $.each(temarr, function(index, el) {//从二级产品列表中去掉版本中有的产品
-                                        $.each(res.body.data, function(index2, el2) {
-                                            if(el.productCode==el2.productCode){
-                                                temarr.splice(index,1)
-                                            }
-                                        });
-                                    });
-                                     this.tableData =temarr.concat(res.body.data)
 
+                                 
+                                        $.each(temarr, function(index, el) {//从二级产品列表中去掉版本中有的产品
+                                             el.isremian=true;
+                                             el.createDt="";
+                                            $.each(res.body.data, function(index2, el2) {
+                                                if(el.productCode==el2.productCode){
+                                                    el.isremian=false
+                                                }
+                                            });
+                                        });
+                                    temarr=temarr.filter(function(el, index) {
+                                        return el.isremian
+                                    })
+                                    this.tableData = temarr.concat(res.body.data)
+                                    console.log(this.tableData.length)
                                 } else {
                                     this.$message({
                                         type: 'error',

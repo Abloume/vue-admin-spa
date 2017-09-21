@@ -168,6 +168,8 @@ export default {
             editUnionFormVisible: false,
             editOrgFormVisible: false,
             curOrgId: '',   // 当前机构ID
+            curOrgName: '', //当前机构名称
+            curOrgProtType: 0,  //当前机构协议类型
             dynamicFldFormData: [],
             editorOption: {
                 placeholder: '',
@@ -372,7 +374,22 @@ export default {
         },
         // 编辑
         editProtocol(index, row) {
+            debugger
+            let type = 0;
+            if (row.protocalName == '医联体协议') {
+                type = 1;
+                this.curOrgProtType = 1;
+            } else {
+                type = 2;
+                this.curOrgProtType = 2;
+            }
+            if (type == 1) { // 医联体
+                this.orgFormData.protocalTypeCurrentUse = 1;
+            } else {    // 机构
+                this.orgFormData.protocalTypeCurrentUse = 2;
+            }
             this.curOrgId = row.orgId;
+            this.curOrgName = row.orgFullName;
             this.orgFormData.protocalText = row.protocalText;
             this.curOrgProtTxt = row.protocalText;
             this.dialogTitle = "协议管理-编辑协议";
@@ -431,22 +448,38 @@ export default {
         // 选择协议类型
         chsProt(type) {
             let curType = type;
-            if (type == 1) {
+            if (curType == 1) {    // 医联体
+                this.orgFormData.protocalTypeCurrentUse == 1;
                 this.orgFormData.protocalText = '';
                 this.getUnionProt();
                 this.curProt = 'orgProt';
                 this.isShowText = true;
                 this.$refs.myTextEditor.quillEditor.disable();
-            } else if (type == 2) {
-                this.orgFormData.protocalText = '';
-                this.orgFormData.protocalText = this.curOrgProtTxt;
+            } else if (curType == 2) { // 机构
+                this.orgFormData.protocalTypeCurrentUse == 2;
+                if (this.orgFormData.protocalText = '') {
+                    this.orgFormData.protocalText = '';
+                }
+                if (this.curOrgProtType == 2) { //当前机构使用机构协议
+                    this.orgFormData.protocalText = this.curOrgProtTxt;
+                }
                 this.isShowText = false;
                 this.$refs.myTextEditor.quillEditor.enable();
             }
         },
-        // 机构协议 - 保存协议
+        // 编辑机构协议 - 保存协议
         saveOrgProtocol() {
+            if (this.orgFormData.protocalTypeCurrentUse == 1) {    // 医联体
+                this.orgFormData.protocalName = '医联体协议';
+                this.orgFormData.protocalObjType = 1;
+            } else {    // 机构
+                this.orgFormData.protocalName = '机构协议';
+                this.orgFormData.protocalObjType = 2;
+            }
             this.orgFormData.protocalObjId = this.curOrgId;
+            this.orgFormData.protocalObjName = this.curOrgName; // 机构名称
+            this.orgFormData.tenantId = this.searchContent.tenantId; // 租户ID
+
             let params = [this.orgFormData];
 
             commonAjax('cas.protocalParamService', 'updateprotocal', params).then(res => {

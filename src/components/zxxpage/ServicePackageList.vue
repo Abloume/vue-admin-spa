@@ -67,38 +67,6 @@
             <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="total" :page-sizes="[10, 20, 50]" @size-change="handleSizeChange" @current-change="handleCurrentChange" :page-size="page.pageSize">
             </el-pagination>
         </div>
-
-        <!-- 查看服务包对话框 -->
-        <el-dialog :title="dialogPackTitle" v-model="checkPackFormVisible" @close="closeDialog('checkPack')">
-            <el-form :model="checkPackFormData" :rules="formrules" ref="adinfoForm" auto-complete="off" id="adinfoForm">
-                <i class="mark_input">*</i>
-                <el-form-item label="服务包名称" class="as_inline" :label-width="formLabelWidth" prop="name">
-                    <el-input class="serv_no" v-model="checkPackFormData.packName" :disabled="true"></el-input>
-                </el-form-item>
-                <el-form-item label="编号" class="as_inline" :label-width="formLabelWidth" prop="packName">
-                    <el-input class="serv_no" v-model="checkPackFormData.packName" disabled="true"></el-input>
-                </el-form-item>
-                <el-form-item label="实际价格(元)" class="as_inline min_width" :label-width="formLabelWidth" prop="price">
-                    <el-input placeholder="0" class="serv_no" v-model="checkPackFormData.price" :disabled="true"></el-input>
-                </el-form-item>
-                <el-form-item label="有效期(天)" class="as_inline min_width" :label-width="formLabelWidth" prop="validPeriod">
-                    <el-input placeholder="365" class="serv_no" v-model="checkPackFormData.validPeriod" :disabled="true"></el-input>
-                </el-form-item>
-                <el-form-item label="适合人群" class="as_inline" :label-width="formLabelWidth" prop="name">
-                    <el-select placeholder="无" class="serv_no" v-model="checkPackFormData.suitableObject" :disabled="true">
-                        <el-option v-for="item in dictionary.base_suitableObject" :key="item.key" :label="item.text" :value="item.key">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="启用时间" class="as_inline" :label-width="formLabelWidth" prop="startDt">
-                    <el-date-picker placeholder="选择日期" class="serv_no" type="date" v-model="checkPackFormData.startDt" :picker-options="pickerOptions0" :disabled="true">
-                    </el-date-picker>
-                </el-form-item>
-                <el-form-item label="简介" :label-width="formLabelWidth" prop="packDesc">
-                    <el-input v-model="checkPackFormData.packDesc" type="textarea" :autosize="{ minRows: 4, maxRows: 8}" :disabled="true"></el-input>
-                </el-form-item>
-            </el-form>
-        </el-dialog>
     
         <!-- 添加服务包对话框 -->
         <el-dialog :title="dialogPackTitle" v-model="dialogFormVisible" @close="closeDialog('addPack')">
@@ -149,7 +117,8 @@
                         <div class="dialog_title">服务项(必填)</div>
                     </el-col>
                     <el-col :span="4">
-                        <div v-show="!isReadOnly" class="dialog_title_mini" @click='addServItem'>+新增服务项</div>
+                        <!-- <div v-show="!isReadOnly" class="dialog_title_mini" @click='addServItem'>+新增服务项</div> -->
+                        <el-button v-show="!isReadOnly" type="primary" class="dialog_title_mini" @click="addServItem">+新增服务项</el-button>
                     </el-col>
                 </el-row>
                 <el-table :data="addPackFormData.association" border style="width: 100%" class="serv_item_table">
@@ -175,9 +144,41 @@
                 <el-button type="primary" @click="savePackFormData('addPackInfoForm')">保 存</el-button>
             </div>
         </el-dialog>
+
+        <!-- 查看服务包对话框 -->
+        <el-dialog :title="dialogPackTitle" v-model="checkPackFormVisible" @close="closeDialog('checkPack')">
+            <el-form :model="checkPackFormData" :rules="formrules" ref="adinfoForm" auto-complete="off" id="adinfoForm">
+                <i class="mark_input">*</i>
+                <el-form-item label="服务包名称" class="as_inline" :label-width="formLabelWidth" prop="name">
+                    <el-input class="serv_no" v-model="checkPackFormData.packName" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="编号" class="as_inline" :label-width="formLabelWidth" prop="packName">
+                    <el-input class="serv_no" v-model="checkPackFormData.packName" disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="实际价格(元)" class="as_inline min_width" :label-width="formLabelWidth" prop="price">
+                    <el-input placeholder="0" class="serv_no" v-model="checkPackFormData.price" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="有效期(天)" class="as_inline min_width" :label-width="formLabelWidth" prop="validPeriod">
+                    <el-input placeholder="365" class="serv_no" v-model="checkPackFormData.validPeriod" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="适合人群" class="as_inline" :label-width="formLabelWidth" prop="name">
+                    <el-select placeholder="无" class="serv_no" v-model="checkPackFormData.suitableObject" :disabled="true">
+                        <el-option v-for="item in dictionary.base_suitableObject" :key="item.key" :label="item.text" :value="item.key">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="启用时间" class="as_inline" :label-width="formLabelWidth" prop="startDt">
+                    <el-date-picker placeholder="选择日期" class="serv_no" type="date" v-model="checkPackFormData.startDt" :picker-options="pickerOptions0" :disabled="true">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="简介" :label-width="formLabelWidth" prop="packDesc">
+                    <el-input v-model="checkPackFormData.packDesc" type="textarea" :autosize="{ minRows: 4, maxRows: 8}" :disabled="true"></el-input>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
     
         <!-- 编辑服务包对话框 -->
-        <el-dialog :title="dialogTitle" v-model="editPackFormVisible" @close="closeDialog">
+        <el-dialog :title="dialogTitle" v-model="editPackFormVisible" @close="closeDialog('editPack')">
             <el-tabs type="card" :active-name="tenantOption.activeName" @tab-click="tabHandleClick">
                 <!-- 基础信息标签页 -->
                 <el-tab-pane label="基础信息" name="baseInfo" class="eltabpane">
@@ -225,9 +226,8 @@
                             <div v-show="!isReadOnly" class="dialog_title_mini" @click='addServItem'>+新增服务项</div>
                         </el-col>
                     </el-row>
-                    <el-table :data="addPackFormData.association" border style="width: 100%" class="serv_item_table">
+                    <el-table :data="editPackItemFormData" border style="width: 100%" class="serv_item_table">
                         <el-table-column label="名称" prop="serviceName" width="90"></el-table-column>
-                        <!-- <el-table-column label="编号" prop="serviceCode" width="110"></el-table-column> -->
                         <el-table-column label="上限价格(元)" prop="upperPrice" width="90"></el-table-column>
                         <el-table-column label="下限价格(元)" prop="lowerPrice" width="90"></el-table-column>
                         <el-table-column label="默认价格(元)" prop="price" width="90"></el-table-column>
@@ -245,7 +245,7 @@
     
                 <!-- 优惠信息标签页 -->
                 <el-tab-pane label="优惠信息" name="discountInfo" class="eltabpane" v-if="tenantOption.isShowTab">
-                    <el-table :data="discountInfoFormData" border style="width: 100%">
+                    <el-table :data="editPackDiscFormData" border style="width: 100%">
                         <el-table-column label="名称" prop="discountTypeText"></el-table-column>
                         <el-table-column label="优惠金额(元)" prop="discountAmount"></el-table-column>
                         <el-table-column label="操作">
@@ -294,7 +294,7 @@
                 </el-form-item>
                 <el-form-item label="服务频率" class="as_inline min_width" :label-width="formLabelWidth" prop="frequency">
                     <el-input placeholder="" class="serv_freq_input" v-model.number="addServItemForm.frequency"></el-input>
-                    <el-select placeholder="周" class="serv_freq" v-model="addServItemForm.frequencyType">
+                    <el-select placeholder="无" class="serv_freq" v-model="addServItemForm.frequencyType">
                         <el-option v-for="item in dictionary.base_frequencyType" :key="item.key" :label="item.text" :value="item.key">
                         </el-option>
                     </el-select>
@@ -329,7 +329,7 @@
                 <el-checkbox label="优惠信息" v-model="checked" @change='copyDiscountInfo'></el-checkbox>
             </el-form>
             <div class="dialog-footer center-foot bottom_btn">
-                <el-button @click="closeDialog('addItem')">取 消</el-button>
+                <el-button @click="closeDialog('copyPack')">取 消</el-button>
                 <el-button type="primary" @click="saveCopyServPack">确 认</el-button>
             </div>
         </el-dialog>
@@ -499,7 +499,9 @@ export default {
                     message: '频率为数字！'
                 }]
             },
-            addPackFormData: {   // 添加服务包表单绑定数据用
+
+            // 添加服务包表单数据
+            addPackFormData: {   
                 packDesc: "",         // 简介
                 packName: "",         // 服务包名称
                 price: "",            // 价格
@@ -517,7 +519,7 @@ export default {
                 association: [] 
             },
             
-            // 查看服务包
+            // 查看服务包数据
             checkPackFormVisible: false,   // 查看包显示
             searchContent: {
                 name: '',
@@ -550,6 +552,20 @@ export default {
                 createDt: "",
                 suitableObjectText: ""
             },
+
+            // 编辑服务包下服务项数据
+            editPackItemFormData: [{   
+                serviceName: '',    //服务名称
+                upperPrice: 0,      //上限价格
+                lowerPrice: 0,      //下限价格
+                price: 0,           //默认价格
+                validPeriod: 0,     //有效期
+                times: 0,           //服务次数
+                frequency: 0,       //服务频率
+                duration: 0         //每次服务时间
+            }],
+            // 编辑服务包下优惠信息数据
+            editPackDiscFormData: [],
             
             // 添加服务项
             servItemSelect: [],     // 服务项列表选项
@@ -569,6 +585,7 @@ export default {
             },
             
             // 优惠信息
+            curDiscId: '',          // 当前项ID
             editDiscInfoFormVisible: false,
             discountInfoFormData: [],    // 优惠信息数据源
             tmpDiscInfo: [],
@@ -591,18 +608,32 @@ export default {
             this.curPickDate = val;
         },
         // 关闭对话框
-        closeDialog(one) {
-            if (one == 'addPack') {
+        closeDialog(val) {
+            if (val == 'addPack') {
                 this.dialogFormVisible = false;
                 // this.addPackFormData = {};
-            } else if (one == 'addItem') {
+            } else if (val == 'addItem') {  // 添加服务项
                 this.addServItemFormVisible = false;
-            } else if (one == 'checkPack') {
+                this.addServItemForm = {
+                    // serviceName: '',
+                    price: '',
+                    upperPrice: '',
+                    lowerPrice: '',
+                    times: 0,
+                    frequency: 0,
+                    frequencyType: '',
+                    duration: 0,
+                    validPeriod: 0
+                };
+            } else if (val == 'checkPack') {
                 this.checkPackFormVisible = false;
-            } else if (one == 'editDiscInfo') {
+            } else if (val == 'editDiscInfo') {
                 this.editDiscInfoFormVisible = false;
-            } else if (one == 'copyPack') {
+            } else if (val == 'copyPack') {
                 this.copyPackFormVisible = false;
+            } else if (val == 'editPack') {
+                this.tenantOption.activeName = 'baseInfo';
+                this.editPackFormVisible = false;
             }
         },
         // 获取字典
@@ -718,13 +749,14 @@ export default {
         /**
          *  服务包编辑 
          */ 
-        // 删除服务包编辑的服务项
+        // 删除服务包下的服务项
         delEditedServItem(index, row) {
             let params = [row.serviceId];
 
             commonAjax('cas.baseServiceService', 'deleteServiceitemTmpl', params).then(res => {
                 if (res.code == 200) {
-                    this.addPackFormData.association.splice(index, 1);
+                    // this.addPackFormData.association.splice(index, 1);
+                    this.editPackItemFormData.splice(index, 1);
                 } else {
                     this.$message({
                         type: 'error',
@@ -739,7 +771,11 @@ export default {
         },
         // 优惠信息保存
         saveEditDiscInfoForm() {
-            let params = [this.editDiscInfoForm.discountAmount, this.editDiscInfoForm.packId];
+            let params = [
+                this.editDiscInfoForm.discountAmount,
+                this.curDiscId
+                // this.editDiscInfoForm.packId
+            ];
 
             commonAjax('cas.baseServiceService', 'updateDiscountById', params).then(res => {
                 if (res.code == 200) {
@@ -749,6 +785,7 @@ export default {
         },
         // 优惠信息编辑
         editDiscInfo(index, row) {
+            this.curDiscId = row.id;
             this.editDiscInfoForm = row;
             this.dialogTitle = '编辑优惠信息';
             this.editDiscInfoFormVisible = true;
@@ -756,21 +793,21 @@ export default {
         // 标签页切换
         tabHandleClick(tag) {
             let tagName = tag.name;
-            if (tagName == 'discountInfo') {
-                let id = this.curEditPackId;
-                let params = [id];
+            // if (tagName == 'discountInfo') {
+            //     let id = this.curEditPackId;
+            //     let params = [id];
 
-                commonAjax('cas.baseServiceService', 'getDiscountList', params).then(res => {
-                    if (res.code == 200) {
-                        this.discountInfoFormData = res.body;
-                    } else {
-                        this.$message({
-                            type: 'error',
-                            message: res.msg
-                        });
-                    }
-                });
-            }
+            //     commonAjax('cas.baseServiceService', 'getDiscountList', params).then(res => {
+            //         if (res.code == 200) {
+            //             this.discountInfoFormData = res.body;
+            //         } else {
+            //             this.$message({
+            //                 type: 'error',
+            //                 message: res.msg
+            //             });
+            //         }
+            //     });
+            // }
         },
         // 基础信息对话框，取消按钮
         cancelEdit() {
@@ -818,7 +855,7 @@ export default {
             } else if (this.addServItemForm.frequencyType == '') {
                 this.$message({
                     type: 'error',
-                    message: '请填写服务频率单位'
+                    message: '请选择服务频率单位'
                 });
                 return;
             }
@@ -891,8 +928,10 @@ export default {
         },
         // 获取服务项列表
         getServItemList() {
-            var params = [{
-                tenantId: 'hcn',
+            let curTntId = sessionStorage.getItem('tenantId');
+            let params = [{
+                tenantId: curTntId,
+                status: '1',
                 pageNo: 1,
                 pageSize: 1000
             }];
@@ -920,7 +959,7 @@ export default {
 
             commonAjax('cas.baseServiceService', 'getDiscountList', params).then(res => {
                 if (res.code == 200) {
-                    this.addPackFormData.association = res.body;
+                    this.editPackDiscFormData = res.body;
                 } else {
                     this.$message({
                         type: 'error',
@@ -936,9 +975,9 @@ export default {
             commonAjax('cas.baseServiceService', 'queryServiceItemInfo', params).then(res => {
                 if (res.code == 200) {
                     // this.srvItemArr = res.body;
-                    this.addPackFormData.association = res.body;
+                    this.editPackItemFormData = res.body;
                     // 获取优惠信息数据
-                    // this.getDiscData();
+                    this.getDiscData();
                 } else {
                     this.$message({
                         type: 'error',
@@ -947,11 +986,12 @@ export default {
                 }
             });
         },
-        // 编辑
+        // 编辑服务包
         editServPack(index, row) {
             this.basicInfoData = row;
             this.curEditPackId = row.packId;
             this.isAddedPackStatus = false; // 当前为编辑状态
+            this.tenantOption.activeName = 'baseInfo';
             this.dialogTitle = '编辑服务包';
             this.editPackFormVisible = true;
             this.getSrvItem();  // 获取包下的服务项
@@ -1275,7 +1315,7 @@ export default {
     line-height: 1;
     font-size: 12px;
     font-weight: 700;
-    color: blue;
+    /* color: blue; */
 }
 
 .serv_item_table {

@@ -207,6 +207,10 @@ export default new Router({
                     path: '/contractDoctor',
                     name: 'ContractDoctor',
                     component: resolve => require(['../components/zxxpage/ContractDoctor.vue'], resolve)
+                }, { // 交易记录
+                    path: '/traderecord',
+                    name: 'Traderecord',
+                    component: resolve => require(['../components/zxxpage/Traderecord.vue'], resolve)
                 }
 
             ]

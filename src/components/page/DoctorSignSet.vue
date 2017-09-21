@@ -527,8 +527,8 @@ export default {
                         message: '请输入提醒内容',
                         trigger: 'blur'
                     }, {
-                        max: 150,
-                        message: '长度最大150个字符',
+                        max: 2000,
+                        message: '长度最大2000个字符',
                         trigger: 'blur'
                     }],
                 },

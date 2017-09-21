@@ -34,7 +34,7 @@
                         </el-table-column>
                         <el-table-column prop="info" label="简介">
                         </el-table-column>
-                        <el-table-column label="操作">
+                        <el-table-column label="操作" width="130">
                             <template scope="scope">
                                 <el-button size="small" @click="addTreeNode(scope.$index, scope.row)">编辑</el-button>
                                 <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
@@ -127,17 +127,17 @@
                     <el-table :data="spPacklist" border style="width: 100%">
                         <el-table-column prop="spPackName" label="名称">
                         </el-table-column>
-                        <el-table-column prop="price" label="价格" width="200">
+                        <el-table-column prop="price" label="价格" >
                         </el-table-column>
-                        <el-table-column prop="validPeriod" label="有效期" width="200">
+                        <el-table-column prop="validPeriod" label="有效期" >
                         </el-table-column>
-                        <el-table-column prop="status" label="启用状态" width="200">
+                        <el-table-column prop="status" label="启用状态" >
                             <template scope="scope">
                                 <p v-show="scope.row.status==1">是</p>
                                 <p v-show="scope.row.status==0">否</p>
                             </template>
                         </el-table-column>
-                        <el-table-column label="操作">
+                        <el-table-column label="操作" width="130">
                             <template scope="scope">
                                 <el-button size="small" @click="spPackEdit(scope.$index, scope.row)">编辑</el-button>
                                 <el-button size="small" type="danger" @click="spPackhandleDelete(scope.$index, scope.row)" v-show="scope.row.status==1">禁用</el-button>
@@ -201,14 +201,14 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="基础服务包" :label-width="formLabelWidth" prop="spPack.packId" v-show="dialogtitle2=='编辑服务包'">
-                    <el-input v-model="editserpackformdata.spPack.packId" disabled></el-input>
+                    <el-input v-model="editserpackformdata.spPack.packName" disabled></el-input>
                 </el-form-item>
                 <el-form-item label="团队服务包" :label-width="formLabelWidth" prop="spPack.spPackName">
                     <el-input v-model="editserpackformdata.spPack.spPackName"></el-input>
                 </el-form-item>
-                <el-form-item label="编号" :label-width="formLabelWidth" prop="spPack.packCode">
+              <!--   <el-form-item label="编号" :label-width="formLabelWidth" prop="spPack.packCode">
                     <el-input v-model="editserpackformdata.spPack.packCode" disabled></el-input>
-                </el-form-item>
+                </el-form-item> -->
                 <el-form-item label="实际价格(元)" :label-width="formLabelWidth" prop="spPack.price">
                     <el-input v-model="editserpackformdata.spPack.price"></el-input>
                 </el-form-item>
@@ -230,7 +230,7 @@
                     </el-table-column>
                     <el-table-column prop="validPeriod" label="有效期(天)">
                     </el-table-column>
-                    <el-table-column prop="frequency" label="年服务次数">
+                    <el-table-column prop="times" label="年服务次数">
                     </el-table-column>
                     <el-table-column prop="appointmentFlag" label="是否可预约">
                         <template scope="scope">
@@ -399,7 +399,8 @@ export default {
                         "spPackId": "",
                         "spId": "",
                         "validPeriod": "",
-                        "packDesc": ""
+                        "packDesc": "",
+                        "packName":""
                     }
                 },
                 dialogtitle2: "",
@@ -799,6 +800,10 @@ export default {
                     this.$refs[formName].resetFields();
                     this.editserpackldialogFormVisible = false;
                 },
+                 closeeditserpack(formName) {
+                    this.$refs[formName].resetFields();
+                    this.editserpackldialogFormVisible = false;
+                },
                 // 获取基础服务包列表
                 getbaseserlist() {
                     let param = {
@@ -866,7 +871,8 @@ export default {
                                         "spPackId": res.body.spPack.spPackId,
                                         "spId": res.body.spPack.spId,
                                         "validPeriod": res.body.spPack.validPeriod,
-                                        "packDesc": res.body.spPack.packDesc
+                                        "packDesc": res.body.spPack.packDesc,
+                                        "packName":res.body.spPack.packName,
                                     }
                                 }
                                 commonAjax("cas.teamManageService", "querySpServiceBySpPackId", `[${res.body.spPack.packId},${res.body.spPack.spPackId}]`).then(res2 => {
@@ -906,7 +912,8 @@ export default {
                                 "spPackId": undefined,
                                 "spId": this.curteamId,
                                 "validPeriod": "",
-                                "packDesc": ""
+                                "packDesc": "",
+                                "packName":"",
                             }
                         }
 

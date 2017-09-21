@@ -10,7 +10,7 @@
                     </el-breadcrumb>
                 </el-col>
                 <el-col :span="12" class="range">
-                    <el-select v-model="searchContent.tenantId" placeholder="请选择" :disabled="isCheckPattern">
+                    <el-select v-model="searchContent.tenantId" :disabled="isCheckPattern">
                         <el-option v-for="item in this.tenantNameList" :key="item.tenantId" :label="item.tenantName" :value="item.tenantId"></el-option>
                     </el-select>
                 </el-col>
@@ -230,6 +230,9 @@ export default {
             commonAjax('cas.tenantManageService', 'tenantList', params).then(res => {
                 if (res.code == 200) {
                     this.tenantNameList = res.body.data;
+                    this.searchContent.tenantId = this.tenantNameList[0].tenantId;
+                    this.searchContent.tenantName = this.tenantNameList[0].tenantName;
+                    this.getFbList();
                 } else {
                     this.$message({
                         type: 'error',
@@ -245,7 +248,7 @@ export default {
         // 获取反馈列表
         getFbList() {
             let params = [this.searchContent];
-
+debugger
             commonAjax('cas.feedBackService', 'queryFeedBack', params).then(res => {
                 if (res.code == 200) {
                     this.fbTableData = res.body.items;
@@ -275,10 +278,10 @@ export default {
 
             commonAjax('cas.feedBackService', 'getFeedBackInfo', params).then(res => {
                 if (res.code == 200) {
-                    if (this.isReadOnly==false && res.body.replyContent.length!==0) {
-                        res.body.replyContent = '';
-                    }
-                    this.imgUrls = res.body.avatar.split(',');
+                    // if (this.isReadOnly==false && res.body.replyContent.length!==0) {
+                    //     res.body.replyContent = '';
+                    // }
+                    // this.imgUrls = res.body.avatar.split(',');
                     this.fbDetailTableData = res.body;
                     this.isCheckPattern = true;
                 } else {
@@ -340,9 +343,8 @@ export default {
 
         // 初始化
         init() {
-            this.getTenantName();
             this.dictionaryRequest();
-            this.getFbList();
+            this.getTenantName();
         }
     }
 }

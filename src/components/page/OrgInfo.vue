@@ -10,7 +10,8 @@
                     </el-breadcrumb>
                 </el-col>
                 <el-col :span="12" class="return_prev">
-                    <router-link to="/organizationList"> <span class="return"><img src="../../assets/img/return.png"></span>返回上一级</router-link>
+                    <!-- <router-link to="/organizationList"> <span class="return"><img src="../../assets/img/return.png"></span>返回上一级</router-link> -->
+                    <div @click="returnback" class="returnback"><span class="return"><img src="../../assets/img/return.png"></span>返回上一级</div>
                 </el-col>
             </el-row>
         </div>
@@ -71,7 +72,7 @@
                             <el-row>
                                 <el-col :span="12">
                                     <el-form-item label="省级" :label-width="formLabelWidth" prop="province">
-                                        <el-select v-model="editarea.province" placeholder="请选择省" :disabled="orgOption.isdisabled">
+                                        <el-select v-model="orgOption.province" placeholder="请选择省" :disabled="orgOption.isdisabled">
                                             <el-option v-for="item in provincelist" :label="item.text" :value="item.key" :key="item.key">
                                             </el-option>
                                         </el-select>
@@ -79,7 +80,7 @@
                                 </el-col>
                                 <el-col :span="12">
                                     <el-form-item label="市级" :label-width="formLabelWidth" prop="city">
-                                        <el-select v-model="editarea.city" placeholder="请选择市" :disabled="orgOption.isdisabled">
+                                        <el-select v-model="orgOption.city" placeholder="请选择市" :disabled="orgOption.isdisabled">
                                             <el-option v-for="item in citylist" :label="item.text" :value="item.key" :key="item.key">
                                             </el-option>
                                         </el-select>
@@ -89,7 +90,7 @@
                             <el-row>
                                 <el-col :span="12">
                                     <el-form-item label="地区" :label-width="formLabelWidth" prop="district">
-                                        <el-select v-model="editarea.district" placeholder="请选择地区" :disabled="orgOption.isdisabled">
+                                        <el-select v-model="orgOption.district" placeholder="请选择地区" :disabled="orgOption.isdisabled">
                                             <el-option v-for="item in districtlist" :label="item.text" :value="item.key" :key="item.key">
                                             </el-option>
                                         </el-select>
@@ -97,7 +98,7 @@
                                 </el-col>
                                 <el-col :span="12">
                                     <el-form-item label="街道" :label-width="formLabelWidth" prop="city">
-                                        <el-select v-model="editarea.street" placeholder="请选择街道" :disabled="orgOption.isdisabled">
+                                        <el-select v-model="orgOption.street" placeholder="请选择街道" :disabled="orgOption.isdisabled">
                                             <el-option v-for="item in streetlist" :label="item.text" :value="item.key" :key="item.key">
                                             </el-option>
                                         </el-select>
@@ -171,7 +172,7 @@
                         </el-pagination>
                     </div>
                 </el-tab-pane>
-                <el-tab-pane label="账号信息" name="countInfo" class="eltabpane" v-if="orgOption.ishowtab">
+                <!-- <el-tab-pane label="账号信息" name="countInfo" class="eltabpane" v-if="orgOption.ishowtab">
                     <h2 class="account-title">支付宝</h2>
                     <el-form :model="countformdata" :rules="conutinformrules" ref="countForm" auto-complete="off">
                         <el-form-item label="支付宝账号" :label-width="formLabelWidth" prop="AliPay.account">
@@ -241,7 +242,7 @@
                             <el-button type="primary" @click="editForm()" v-if="orgOption.isdisabled">我要编辑</el-button>
                         </div>
                     </el-form> 
-                </el-tab-pane>
+                </el-tab-pane> -->
                 <el-tab-pane label="报告说明" name="reportDes" class="eltabpane" v-if="orgOption.ishowtab">
                     <el-row class="addbtn">
                         <el-col :span="24">
@@ -753,12 +754,7 @@ export default {
                 citylist: [],
                 districtlist: [],
                 streetlist: [],
-                editarea: {
-                    province: "",
-                    city: "",
-                    district: "",
-                    street: "",
-                }
+               
             }
         },
         computed: {
@@ -850,10 +846,7 @@ export default {
                 // 通用结束-----------------------------------------------------------
                 //机构基本信息开始
                 submitForm(formName) {
-                    this.orgOption.province = this.editarea.province;
-                    this.orgOption.city = this.editarea.city;
-                    this.orgOption.district = this.editarea.district;
-                    this.orgOption.street = this.editarea.street;
+                    
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
                             var reqmtd = this.orgOption.orgId ? "updateOrgInfo" : "addOrgInfo";
@@ -962,21 +955,15 @@ export default {
                     this.$refs[formName].resetFields();
                     this.$router.push('organizationList')
                 },
-                // 获取地区信息代码
-                // getareadata(editarea) {
-                //     this.orgOption.province = editarea.province;
-                //     this.orgOption.city = editarea.city;
-                //     this.orgOption.district = editarea.district;
-                //     this.orgOption.street = editarea.street;
-                // },
+               
                 //传递数据都地区组件
                 postdefaultarea() {
-                    this.editarea = {
-                        province: this.orgOption.province,
-                        city: this.orgOption.city,
-                        district: this.orgOption.district,
-                        street: this.orgOption.street,
-                    };
+                    // this.orgOption = {
+                    //     province: this.orgOption.province,
+                    //     city: this.orgOption.city,
+                    //     district: this.orgOption.district,
+                    //     street: this.orgOption.street,
+                    // };
                     this.baiduMap(this.orgOption.longitude, this.orgOption.latitude);
                 },
                 //机构基本信息结束---------------------------------------------------------
@@ -1631,6 +1618,12 @@ export default {
                     });
 
                 },
+                //返回上一级
+                returnback(){
+                    this.$router.push('organizationList');
+                     this.$refs["orginfoForm"].resetFields();
+                    
+                }
         },
         components: {
             // AreaText
@@ -1664,40 +1657,25 @@ export default {
             })
         },
         watch: {
-            'editarea.province' (val, oldval) {
+            'orgOption.province' (val, oldval) {
                 if (val != "") {
                     this.getchilddata(val, "city");
                 }
-                //通过省获取市
-
-                // if (oldval != "") {
-                //     this.editarea.city = "";
-                //     this.editarea.district = "";
-                //     this.editarea.street = ""
-                // }
             },
-            'editarea.city' (val, oldval) {
+            'orgOption.city' (val, oldval) {
                 // //通过市区县
                 if (val != "") {
                     this.getchilddata(val, "district");
                 }
 
-                // if (oldval != "") {
-                //     this.editarea.district = "";
-                //     this.editarea.street = ""
-                // }
             },
-            'editarea.district' (val, oldval) {
+            'orgOption.district' (val, oldval) {
                 // //通过区县获取街道
-
                 if (val != "") {
                     this.getchilddata(val, "street");
                 }
-                // if (oldval != "") {
-                //     this.editarea.street = ""
-                // }
             },
-            'editarea.street' (val, oldval) {
+            'orgOption.street' (val, oldval) {
                 if (val != "") {
 
                 }
@@ -1812,7 +1790,9 @@ h2.account-title {
     width: 200px;
     height: 200px
 }
-
+.returnback{
+    cursor: pointer;
+}
 
 /*#zhuguanyis {
     position: relative;
